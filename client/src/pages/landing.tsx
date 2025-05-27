@@ -1,39 +1,127 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Shield, Server, Lock, Zap, Mail, Phone, Sparkles } from "lucide-react";
+import { Shield, Server, Lock, Zap, Mail, Phone, Sparkles, Menu, X, Users, HelpCircle, MessageCircle } from "lucide-react";
 import { useState } from "react";
-import logoImage from "@assets/image_1748358794124.png";
 
 export default function Landing() {
-  const [countryCode, setCountryCode] = useState("+1");
-  const [loginType, setLoginType] = useState("email");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700">
+      {/* Navigation Bar */}
+      <nav className="bg-slate-800/90 backdrop-blur-sm border-b border-slate-600 sticky top-0 z-50">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between h-16">
+            {/* Logo */}
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-pink-300 to-pink-400 rounded-lg p-1.5 shadow-lg">
+                <svg width="100%" height="100%" viewBox="0 0 32 32" className="transform rotate-45">
+                  <rect x="6" y="6" width="20" height="20" fill="none" stroke="#5B21B6" strokeWidth="1.5" rx="1"/>
+                  <rect x="9" y="9" width="14" height="14" fill="none" stroke="#5B21B6" strokeWidth="1.5" rx="1"/>
+                  <rect x="12" y="12" width="8" height="8" fill="#5B21B6" rx="1"/>
+                  <rect x="14" y="14" width="4" height="4" fill="#F8BBD9" rx="0.5"/>
+                </svg>
+              </div>
+              <span className="text-xl font-bold text-white">FileSanctum</span>
+            </div>
+
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center space-x-8">
+              <a href="#help" className="text-slate-300 hover:text-white transition-colors flex items-center gap-2">
+                <HelpCircle className="w-4 h-4" />
+                Help
+              </a>
+              <a href="#about" className="text-slate-300 hover:text-white transition-colors flex items-center gap-2">
+                <Users className="w-4 h-4" />
+                About Us
+              </a>
+              <a href="#contact" className="text-slate-300 hover:text-white transition-colors flex items-center gap-2">
+                <MessageCircle className="w-4 h-4" />
+                Contact Us
+              </a>
+              <div className="flex items-center space-x-4">
+                <Button 
+                  variant="ghost" 
+                  className="text-slate-300 hover:text-white hover:bg-slate-700"
+                  onClick={() => window.location.href = '/api/login'}
+                >
+                  Log In
+                </Button>
+                <Button 
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                  onClick={() => window.location.href = '/api/login'}
+                >
+                  Sign Up
+                </Button>
+              </div>
+            </div>
+
+            {/* Mobile menu button */}
+            <div className="md:hidden">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="text-slate-300 hover:text-white"
+              >
+                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </Button>
+            </div>
+          </div>
+
+          {/* Mobile Navigation */}
+          {mobileMenuOpen && (
+            <div className="md:hidden py-4 border-t border-slate-600">
+              <div className="flex flex-col space-y-4">
+                <a href="#help" className="text-slate-300 hover:text-white transition-colors flex items-center gap-2">
+                  <HelpCircle className="w-4 h-4" />
+                  Help
+                </a>
+                <a href="#about" className="text-slate-300 hover:text-white transition-colors flex items-center gap-2">
+                  <Users className="w-4 h-4" />
+                  About Us
+                </a>
+                <a href="#contact" className="text-slate-300 hover:text-white transition-colors flex items-center gap-2">
+                  <MessageCircle className="w-4 h-4" />
+                  Contact Us
+                </a>
+                <div className="flex flex-col space-y-2 pt-2">
+                  <Button 
+                    variant="ghost" 
+                    className="text-slate-300 hover:text-white hover:bg-slate-700 justify-start"
+                    onClick={() => window.location.href = '/api/login'}
+                  >
+                    Log In
+                  </Button>
+                  <Button 
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 justify-start"
+                    onClick={() => window.location.href = '/api/login'}
+                  >
+                    Sign Up
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </nav>
+
       <div className="container mx-auto px-4 py-16">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <div className="flex items-center justify-center mb-6">
+        {/* Hero Section */}
+        <div className="text-center mb-20">
+          <div className="flex items-center justify-center mb-8">
             <div className="w-80 h-auto bg-gradient-to-br from-pink-300 to-pink-400 rounded-lg p-8 shadow-2xl">
               <div className="flex flex-col items-center">
                 {/* Diamond Logo */}
                 <div className="relative mb-6">
                   <svg width="120" height="120" viewBox="0 0 120 120" className="transform rotate-45">
-                    {/* Outer diamond */}
                     <rect x="20" y="20" width="80" height="80" fill="none" stroke="#5B21B6" strokeWidth="3" rx="2"/>
-                    {/* Middle diamond */}
                     <rect x="30" y="30" width="60" height="60" fill="none" stroke="#5B21B6" strokeWidth="3" rx="2"/>
-                    {/* Inner diamonds */}
                     <rect x="40" y="40" width="40" height="40" fill="#5B21B6" rx="2"/>
                     <rect x="52" y="52" width="16" height="16" fill="#F8BBD9" rx="1"/>
                   </svg>
                 </div>
                 
-                {/* Text */}
                 <div className="text-center">
                   <h1 className="text-4xl font-bold text-purple-800 mb-2 tracking-wider">FILE SANCTUM</h1>
                   <p className="text-sm font-medium text-purple-700 tracking-widest">ACCESS EVERYWHERE. COMPROMISE NOWHERE</p>
@@ -41,169 +129,30 @@ export default function Landing() {
               </div>
             </div>
           </div>
-          <p className="text-xl text-slate-300 max-w-2xl mx-auto mb-8">
-            Distributed File Storage System with advanced erasure coding, end-to-end encryption, and real-time monitoring
+          
+          <h2 className="text-5xl font-bold text-white mb-6">
+            Secure Distributed File Storage
+          </h2>
+          <p className="text-xl text-slate-300 max-w-3xl mx-auto mb-10">
+            Enterprise-grade distributed file storage system with advanced erasure coding, end-to-end encryption, and real-time monitoring. Store your files with confidence across our global network.
           </p>
-        </div>
-
-        {/* Authentication Section - Moved here */}
-        <div className="max-w-2xl mx-auto mb-16">
-          <Card className="bg-slate-800/90 border-2 border-slate-600 backdrop-blur-sm shadow-2xl">
-            <CardContent className="p-8">
-              <Tabs defaultValue="login" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 mb-8 bg-slate-700 border-slate-600">
-                  <TabsTrigger value="login" className="text-slate-200 data-[state=active]:bg-blue-600 data-[state=active]:text-white font-medium">Sign In</TabsTrigger>
-                  <TabsTrigger value="register" className="text-slate-200 data-[state=active]:bg-purple-600 data-[state=active]:text-white font-medium">Register</TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="login" className="mt-0">
-                  <div className="space-y-6">
-                    <div className="text-center">
-                      <h3 className="text-2xl font-bold text-white mb-2">Sign In to FileSanctum</h3>
-                      <p className="text-slate-300">Access your distributed file storage system</p>
-                    </div>
-                    
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <Label className="text-slate-200">Login Method</Label>
-                        <Tabs value={loginType} onValueChange={setLoginType}>
-                          <TabsList className="grid w-full grid-cols-2 bg-slate-700">
-                            <TabsTrigger value="email" className="flex items-center gap-2 text-slate-200 data-[state=active]:bg-blue-600 data-[state=active]:text-white">
-                              <Mail className="w-4 h-4" />
-                              Email
-                            </TabsTrigger>
-                            <TabsTrigger value="phone" className="flex items-center gap-2 text-slate-200 data-[state=active]:bg-blue-600 data-[state=active]:text-white">
-                              <Phone className="w-4 h-4" />
-                              Phone
-                            </TabsTrigger>
-                          </TabsList>
-                        </Tabs>
-                      </div>
-                      
-                      {loginType === "email" ? (
-                        <div className="space-y-2">
-                          <Label htmlFor="login-email" className="text-slate-200">Email</Label>
-                          <Input id="login-email" type="email" placeholder="Enter your email" className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400" />
-                        </div>
-                      ) : (
-                        <div className="space-y-2">
-                          <Label htmlFor="login-phone" className="text-slate-200">Phone Number</Label>
-                          <div className="flex gap-2">
-                            <Select value={countryCode} onValueChange={setCountryCode}>
-                              <SelectTrigger className="w-24 bg-slate-700 border-slate-600 text-white">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent className="bg-slate-700 border-slate-600">
-                                <SelectItem value="+1">🇺🇸 United States (+1)</SelectItem>
-                                <SelectItem value="+44">🇬🇧 United Kingdom (+44)</SelectItem>
-                                <SelectItem value="+91">🇮🇳 India (+91)</SelectItem>
-                                <SelectItem value="+86">🇨🇳 China (+86)</SelectItem>
-                                <SelectItem value="+49">🇩🇪 Germany (+49)</SelectItem>
-                                <SelectItem value="+33">🇫🇷 France (+33)</SelectItem>
-                                <SelectItem value="+81">🇯🇵 Japan (+81)</SelectItem>
-                                <SelectItem value="+82">🇰🇷 South Korea (+82)</SelectItem>
-                                <SelectItem value="+61">🇦🇺 Australia (+61)</SelectItem>
-                                <SelectItem value="+55">🇧🇷 Brazil (+55)</SelectItem>
-                                <SelectItem value="+7">🇷🇺 Russia (+7)</SelectItem>
-                                <SelectItem value="+39">🇮🇹 Italy (+39)</SelectItem>
-                                <SelectItem value="+34">🇪🇸 Spain (+34)</SelectItem>
-                                <SelectItem value="+31">🇳🇱 Netherlands (+31)</SelectItem>
-                                <SelectItem value="+46">🇸🇪 Sweden (+46)</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <Input id="login-phone" type="tel" placeholder="Enter phone number" className="flex-1 bg-slate-700 border-slate-600 text-white placeholder:text-slate-400" />
-                          </div>
-                        </div>
-                      )}
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="login-password" className="text-slate-200">Password</Label>
-                        <Input id="login-password" type="password" placeholder="Enter your password" className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400" />
-                      </div>
-                      
-                      <Button 
-                        onClick={() => window.location.href = '/api/login'}
-                        className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
-                        size="lg"
-                      >
-                        Sign In to Dashboard
-                      </Button>
-                    </div>
-                  </div>
-                </TabsContent>
-                
-                <TabsContent value="register" className="mt-0">
-                  <div className="space-y-6">
-                    <div className="text-center">
-                      <h3 className="text-2xl font-bold text-white mb-2">Create Account</h3>
-                      <p className="text-slate-300">Join FileSanctum distributed storage network</p>
-                    </div>
-                    
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="first-name" className="text-slate-200">First Name</Label>
-                          <Input id="first-name" placeholder="John" className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400" />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="last-name" className="text-slate-200">Last Name</Label>
-                          <Input id="last-name" placeholder="Doe" className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400" />
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="reg-email" className="text-slate-200">Email</Label>
-                        <Input id="reg-email" type="email" placeholder="john@example.com" className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400" />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="reg-phone" className="text-slate-200">Phone Number</Label>
-                        <div className="flex gap-2">
-                          <Select value={countryCode} onValueChange={setCountryCode}>
-                            <SelectTrigger className="w-24 bg-slate-700 border-slate-600 text-white">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent className="bg-slate-700 border-slate-600">
-                              <SelectItem value="+1">🇺🇸 United States (+1)</SelectItem>
-                              <SelectItem value="+44">🇬🇧 United Kingdom (+44)</SelectItem>
-                              <SelectItem value="+91">🇮🇳 India (+91)</SelectItem>
-                              <SelectItem value="+86">🇨🇳 China (+86)</SelectItem>
-                              <SelectItem value="+49">🇩🇪 Germany (+49)</SelectItem>
-                              <SelectItem value="+33">🇫🇷 France (+33)</SelectItem>
-                              <SelectItem value="+81">🇯🇵 Japan (+81)</SelectItem>
-                              <SelectItem value="+82">🇰🇷 South Korea (+82)</SelectItem>
-                              <SelectItem value="+61">🇦🇺 Australia (+61)</SelectItem>
-                              <SelectItem value="+55">🇧🇷 Brazil (+55)</SelectItem>
-                              <SelectItem value="+7">🇷🇺 Russia (+7)</SelectItem>
-                              <SelectItem value="+39">🇮🇹 Italy (+39)</SelectItem>
-                              <SelectItem value="+34">🇪🇸 Spain (+34)</SelectItem>
-                              <SelectItem value="+31">🇳🇱 Netherlands (+31)</SelectItem>
-                              <SelectItem value="+46">🇸🇪 Sweden (+46)</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <Input id="reg-phone" type="tel" placeholder="1234567890" className="flex-1 bg-slate-700 border-slate-600 text-white placeholder:text-slate-400" />
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="reg-password" className="text-slate-200">Password</Label>
-                        <Input id="reg-password" type="password" placeholder="Create a strong password" className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400" />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="confirm-password" className="text-slate-200">Confirm Password</Label>
-                        <Input id="confirm-password" type="password" placeholder="Confirm your password" className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400" />
-                      </div>
-                      
-                      <Button className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800" size="lg">
-                        Create Account
-                      </Button>
-                    </div>
-                  </div>
-                </TabsContent>
-              </Tabs>
-            </CardContent>
-          </Card>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button 
+              size="lg" 
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-lg px-8 py-6"
+              onClick={() => window.location.href = '/api/login'}
+            >
+              Get Started Free
+            </Button>
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="border-slate-500 text-slate-300 hover:bg-slate-700 hover:text-white text-lg px-8 py-6"
+            >
+              Watch Demo
+            </Button>
+          </div>
         </div>
 
         {/* Features */}
@@ -242,7 +191,7 @@ export default function Landing() {
 
 
         {/* Technical Details */}
-        <div className="mt-16 text-center">
+        <div className="mt-20 text-center" id="help">
           <div className="flex items-center justify-center mb-6">
             <Sparkles className="w-6 h-6 text-blue-400 mr-2" />
             <h3 className="text-2xl font-bold text-white">Technical Specifications</h3>
@@ -316,6 +265,149 @@ export default function Landing() {
             </div>
           </div>
         </div>
+
+        {/* About Us Section */}
+        <div className="mt-32" id="about">
+          <div className="text-center mb-16">
+            <h3 className="text-4xl font-bold text-white mb-6">About FileSanctum</h3>
+            <p className="text-xl text-slate-300 max-w-4xl mx-auto">
+              FileSanctum revolutionizes data storage with cutting-edge distributed file system technology. 
+              Our platform ensures your files are secure, accessible, and protected across a global network 
+              of nodes, providing enterprise-grade reliability for businesses and individuals alike.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <Card className="bg-slate-800/80 border-slate-600 backdrop-blur-sm">
+              <CardContent className="p-8 text-center">
+                <Shield className="w-16 h-16 text-blue-400 mx-auto mb-6" />
+                <h4 className="text-xl font-semibold text-white mb-4">Enterprise Security</h4>
+                <p className="text-slate-300">
+                  Military-grade encryption and zero-knowledge architecture ensure your data remains private and secure.
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-slate-800/80 border-slate-600 backdrop-blur-sm">
+              <CardContent className="p-8 text-center">
+                <Server className="w-16 h-16 text-purple-400 mx-auto mb-6" />
+                <h4 className="text-xl font-semibold text-white mb-4">Global Distribution</h4>
+                <p className="text-slate-300">
+                  Files are distributed across multiple geographic locations for maximum redundancy and performance.
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-slate-800/80 border-slate-600 backdrop-blur-sm">
+              <CardContent className="p-8 text-center">
+                <Zap className="w-16 h-16 text-green-400 mx-auto mb-6" />
+                <h4 className="text-xl font-semibold text-white mb-4">Real-time Monitoring</h4>
+                <p className="text-slate-300">
+                  Live monitoring and analytics provide insights into system performance and file access patterns.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Contact Section */}
+        <div className="mt-32 mb-16" id="contact">
+          <div className="text-center mb-16">
+            <h3 className="text-4xl font-bold text-white mb-6">Get in Touch</h3>
+            <p className="text-xl text-slate-300 max-w-2xl mx-auto">
+              Have questions about FileSanctum? We're here to help you secure your data and optimize your storage strategy.
+            </p>
+          </div>
+          
+          <div className="max-w-4xl mx-auto">
+            <Card className="bg-slate-800/80 border-slate-600 backdrop-blur-sm">
+              <CardContent className="p-12">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                  <div>
+                    <h4 className="text-2xl font-semibold text-white mb-6">Contact Information</h4>
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-4">
+                        <Mail className="w-6 h-6 text-blue-400" />
+                        <div>
+                          <p className="text-slate-300 font-medium">Support & Inquiries</p>
+                          <a 
+                            href="mailto:ankitsinghrawat001@gmail.com" 
+                            className="text-blue-400 hover:text-blue-300 transition-colors"
+                          >
+                            ankitsinghrawat001@gmail.com
+                          </a>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-4">
+                        <MessageCircle className="w-6 h-6 text-purple-400" />
+                        <div>
+                          <p className="text-slate-300 font-medium">Live Support</p>
+                          <p className="text-slate-400">Available 24/7 for enterprise customers</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-4">
+                        <HelpCircle className="w-6 h-6 text-green-400" />
+                        <div>
+                          <p className="text-slate-300 font-medium">Documentation</p>
+                          <p className="text-slate-400">Comprehensive guides and API documentation</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-2xl font-semibold text-white mb-6">Quick Contact</h4>
+                    <div className="space-y-4">
+                      <input 
+                        type="text" 
+                        placeholder="Your Name" 
+                        className="w-full p-4 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder:text-slate-400 focus:border-blue-400 focus:outline-none transition-colors"
+                      />
+                      <input 
+                        type="email" 
+                        placeholder="Your Email" 
+                        className="w-full p-4 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder:text-slate-400 focus:border-blue-400 focus:outline-none transition-colors"
+                      />
+                      <textarea 
+                        placeholder="Your Message" 
+                        rows={4}
+                        className="w-full p-4 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder:text-slate-400 focus:border-blue-400 focus:outline-none transition-colors resize-none"
+                      ></textarea>
+                      <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                        Send Message
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <footer className="border-t border-slate-600 pt-12 pb-8">
+          <div className="text-center">
+            <div className="flex items-center justify-center mb-6">
+              <div className="w-8 h-8 bg-gradient-to-br from-pink-300 to-pink-400 rounded-lg p-1 shadow-lg mr-3">
+                <svg width="100%" height="100%" viewBox="0 0 32 32" className="transform rotate-45">
+                  <rect x="6" y="6" width="20" height="20" fill="none" stroke="#5B21B6" strokeWidth="1.5" rx="1"/>
+                  <rect x="9" y="9" width="14" height="14" fill="none" stroke="#5B21B6" strokeWidth="1.5" rx="1"/>
+                  <rect x="12" y="12" width="8" height="8" fill="#5B21B6" rx="1"/>
+                  <rect x="14" y="14" width="4" height="4" fill="#F8BBD9" rx="0.5"/>
+                </svg>
+              </div>
+              <span className="text-lg font-bold text-white">FileSanctum</span>
+            </div>
+            <p className="text-slate-400 mb-4">
+              Access Everywhere. Compromise Nowhere.
+            </p>
+            <p className="text-slate-500 text-sm">
+              © 2024 FileSanctum. All rights reserved. | Distributed File Storage Technology
+            </p>
+          </div>
+        </footer>
       </div>
     </div>
   );

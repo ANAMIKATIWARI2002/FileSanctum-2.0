@@ -17,10 +17,11 @@ export default function Landing() {
         {/* Header */}
         <div className="text-center mb-12">
           <div className="flex items-center justify-center mb-6">
-            <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mr-4 shadow-lg">
-              <Shield className="w-8 h-8 text-white" />
-            </div>
-            <h1 className="text-4xl font-bold text-white">FileSanctum</h1>
+            <img 
+              src="/attached_assets/image_1748358794124.png" 
+              alt="FileSanctum Logo" 
+              className="w-64 h-auto shadow-2xl rounded-lg"
+            />
           </div>
           <p className="text-xl text-slate-300 max-w-2xl mx-auto mb-8">
             Distributed File Storage System with advanced erasure coding, end-to-end encryption, and real-time monitoring

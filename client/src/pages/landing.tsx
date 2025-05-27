@@ -51,9 +51,9 @@ export default function Landing() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700">
+    <div className="min-h-screen bg-white dark:bg-gradient-to-br dark:from-slate-900 dark:via-slate-800 dark:to-slate-700">
       {/* Navigation Bar */}
-      <nav className="bg-slate-800/90 backdrop-blur-sm border-b border-slate-600 sticky top-0 z-50">
+      <nav className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-b border-gray-200 dark:border-slate-600 sticky top-0 z-50">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
@@ -61,20 +61,20 @@ export default function Landing() {
               <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg">
                 <Shield className="w-6 h-6 text-white" />
               </div>
-              <span className="text-xl font-bold text-white">FileSanctum</span>
+              <span className="text-xl font-bold text-black dark:text-white">FileSanctum</span>
             </div>
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
-              <a href="#help" className="text-slate-300 hover:text-white transition-colors flex items-center gap-2">
+              <a href="#help" className="text-gray-600 dark:text-slate-300 hover:text-black dark:hover:text-white transition-colors flex items-center gap-2">
                 <HelpCircle className="w-4 h-4" />
                 Help
               </a>
-              <a href="#about" className="text-slate-300 hover:text-white transition-colors flex items-center gap-2">
+              <a href="#about" className="text-gray-600 dark:text-slate-300 hover:text-black dark:hover:text-white transition-colors flex items-center gap-2">
                 <Users className="w-4 h-4" />
                 About Us
               </a>
-              <a href="#contact" className="text-slate-300 hover:text-white transition-colors flex items-center gap-2">
+              <a href="#contact" className="text-gray-600 dark:text-slate-300 hover:text-black dark:hover:text-white transition-colors flex items-center gap-2">
                 <MessageCircle className="w-4 h-4" />
                 Contact Us
               </a>
@@ -83,13 +83,13 @@ export default function Landing() {
                   variant="ghost"
                   size="sm"
                   onClick={() => setIsDarkMode(!isDarkMode)}
-                  className="text-slate-300 hover:text-white hover:bg-slate-700"
+                  className="text-gray-600 dark:text-slate-300 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-700"
                 >
                   {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
                 </Button>
                 <Button 
                   variant="ghost" 
-                  className="text-slate-300 hover:text-white hover:bg-slate-700"
+                  className="text-gray-600 dark:text-slate-300 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-700"
                   onClick={() => window.location.href = '/api/login'}
                 >
                   Log In
@@ -160,13 +160,13 @@ export default function Landing() {
             <div className="w-16 h-16 bg-primary rounded-xl flex items-center justify-center mr-4 shadow-lg">
               <Shield className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-5xl font-bold text-white">FileSanctum</h1>
+            <h1 className="text-5xl font-bold text-black dark:text-white">FileSanctum</h1>
           </div>
           
-          <h2 className="text-4xl font-bold text-white mb-6">
+          <h2 className="text-4xl font-bold text-black dark:text-white mb-6">
             Secure Distributed File Storage
           </h2>
-          <p className="text-xl text-slate-300 max-w-3xl mx-auto mb-10">
+          <p className="text-xl text-gray-700 dark:text-slate-300 max-w-3xl mx-auto mb-10">
             Enterprise-grade distributed file storage system with advanced erasure coding, end-to-end encryption, and real-time monitoring. Store your files with confidence across our global network.
           </p>
           
@@ -183,31 +183,31 @@ export default function Landing() {
 
         {/* Features */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-          <Card className="bg-slate-800/80 border-slate-600 transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/25 hover:scale-105 hover:bg-gradient-to-br hover:from-blue-900/50 hover:to-blue-800/50 cursor-pointer backdrop-blur-sm">
+          <Card className="bg-white/80 dark:bg-slate-800/80 border-gray-200 dark:border-slate-600 transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/25 hover:scale-105 hover:bg-gradient-to-br hover:from-blue-50/50 hover:to-blue-100/50 dark:hover:from-blue-900/50 dark:hover:to-blue-800/50 cursor-pointer backdrop-blur-sm">
             <CardContent className="p-6 text-center">
               <Server className="w-12 h-12 text-blue-400 mx-auto mb-4 transition-all duration-300 hover:text-blue-300" />
-              <h3 className="text-lg font-semibold mb-2 text-white">Distributed Architecture</h3>
-              <p className="text-slate-300">
+              <h3 className="text-lg font-semibold mb-2 text-black dark:text-white">Distributed Architecture</h3>
+              <p className="text-gray-700 dark:text-slate-300">
                 Fault-tolerant distributed storage with automatic node recovery and load balancing
               </p>
             </CardContent>
           </Card>
 
-          <Card className="bg-slate-800/80 border-slate-600 transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/25 hover:scale-105 hover:bg-gradient-to-br hover:from-purple-900/50 hover:to-purple-800/50 cursor-pointer backdrop-blur-sm">
+          <Card className="bg-white/80 dark:bg-slate-800/80 border-gray-200 dark:border-slate-600 transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/25 hover:scale-105 hover:bg-gradient-to-br hover:from-purple-50/50 hover:to-purple-100/50 dark:hover:from-purple-900/50 dark:hover:to-purple-800/50 cursor-pointer backdrop-blur-sm">
             <CardContent className="p-6 text-center">
               <Lock className="w-12 h-12 text-purple-400 mx-auto mb-4 transition-all duration-300 hover:text-purple-300" />
-              <h3 className="text-lg font-semibold mb-2 text-white">End-to-End Encryption</h3>
-              <p className="text-slate-300">
+              <h3 className="text-lg font-semibold mb-2 text-black dark:text-white">End-to-End Encryption</h3>
+              <p className="text-gray-700 dark:text-slate-300">
                 AES-256 encryption with client-side key management for maximum security
               </p>
             </CardContent>
           </Card>
 
-          <Card className="bg-slate-800/80 border-slate-600 transition-all duration-300 hover:shadow-2xl hover:shadow-green-500/25 hover:scale-105 hover:bg-gradient-to-br hover:from-green-900/50 hover:to-green-800/50 cursor-pointer backdrop-blur-sm">
+          <Card className="bg-white/80 dark:bg-slate-800/80 border-gray-200 dark:border-slate-600 transition-all duration-300 hover:shadow-2xl hover:shadow-green-500/25 hover:scale-105 hover:bg-gradient-to-br hover:from-green-50/50 hover:to-green-100/50 dark:hover:from-green-900/50 dark:hover:to-green-800/50 cursor-pointer backdrop-blur-sm">
             <CardContent className="p-6 text-center">
               <Zap className="w-12 h-12 text-green-400 mx-auto mb-4 transition-all duration-300 hover:text-green-300" />
-              <h3 className="text-lg font-semibold mb-2 text-white">Real-time Monitoring</h3>
-              <p className="text-slate-300">
+              <h3 className="text-lg font-semibold mb-2 text-black dark:text-white">Real-time Monitoring</h3>
+              <p className="text-gray-700 dark:text-slate-300">
                 Live system analytics, node health monitoring, and performance metrics
               </p>
             </CardContent>

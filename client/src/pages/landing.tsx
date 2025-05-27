@@ -51,7 +51,7 @@ export default function Landing() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gradient-to-br dark:from-slate-900 dark:via-slate-800 dark:to-slate-700">
+    <div className="min-h-screen bg-gray-50 dark:bg-gradient-to-br dark:from-slate-900 dark:via-slate-800 dark:to-slate-700">
       {/* Navigation Bar */}
       <nav className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-b border-gray-200 dark:border-slate-600 sticky top-0 z-50">
         <div className="container mx-auto px-4">
@@ -183,7 +183,7 @@ export default function Landing() {
 
         {/* Features */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-          <Card className="bg-white/80 dark:bg-slate-800/80 border-gray-200 dark:border-slate-600 transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/25 hover:scale-105 hover:bg-gradient-to-br hover:from-blue-50/50 hover:to-blue-100/50 dark:hover:from-blue-900/50 dark:hover:to-blue-800/50 cursor-pointer backdrop-blur-sm">
+          <Card className="bg-white/80 dark:bg-slate-800/80 border-gray-200 dark:border-slate-600 transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/40 hover:scale-105 hover:bg-gradient-to-br hover:from-blue-100/80 hover:to-blue-200/80 dark:hover:from-blue-900/50 dark:hover:to-blue-800/50 cursor-pointer backdrop-blur-sm">
             <CardContent className="p-6 text-center">
               <Server className="w-12 h-12 text-blue-400 mx-auto mb-4 transition-all duration-300 hover:text-blue-300" />
               <h3 className="text-lg font-semibold mb-2 text-black dark:text-white">Distributed Architecture</h3>
@@ -193,7 +193,7 @@ export default function Landing() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white/80 dark:bg-slate-800/80 border-gray-200 dark:border-slate-600 transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/25 hover:scale-105 hover:bg-gradient-to-br hover:from-purple-50/50 hover:to-purple-100/50 dark:hover:from-purple-900/50 dark:hover:to-purple-800/50 cursor-pointer backdrop-blur-sm">
+          <Card className="bg-white/80 dark:bg-slate-800/80 border-gray-200 dark:border-slate-600 transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/40 hover:scale-105 hover:bg-gradient-to-br hover:from-purple-100/80 hover:to-purple-200/80 dark:hover:from-purple-900/50 dark:hover:to-purple-800/50 cursor-pointer backdrop-blur-sm">
             <CardContent className="p-6 text-center">
               <Lock className="w-12 h-12 text-purple-400 mx-auto mb-4 transition-all duration-300 hover:text-purple-300" />
               <h3 className="text-lg font-semibold mb-2 text-black dark:text-white">End-to-End Encryption</h3>
@@ -203,7 +203,7 @@ export default function Landing() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white/80 dark:bg-slate-800/80 border-gray-200 dark:border-slate-600 transition-all duration-300 hover:shadow-2xl hover:shadow-green-500/25 hover:scale-105 hover:bg-gradient-to-br hover:from-green-50/50 hover:to-green-100/50 dark:hover:from-green-900/50 dark:hover:to-green-800/50 cursor-pointer backdrop-blur-sm">
+          <Card className="bg-white/80 dark:bg-slate-800/80 border-gray-200 dark:border-slate-600 transition-all duration-300 hover:shadow-2xl hover:shadow-green-500/40 hover:scale-105 hover:bg-gradient-to-br hover:from-green-100/80 hover:to-green-200/80 dark:hover:from-green-900/50 dark:hover:to-green-800/50 cursor-pointer backdrop-blur-sm">
             <CardContent className="p-6 text-center">
               <Zap className="w-12 h-12 text-green-400 mx-auto mb-4 transition-all duration-300 hover:text-green-300" />
               <h3 className="text-lg font-semibold mb-2 text-black dark:text-white">Real-time Monitoring</h3>
@@ -224,39 +224,39 @@ export default function Landing() {
             <Sparkles className="w-6 h-6 text-purple-400 ml-2" />
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
-            <div className="group relative overflow-hidden bg-gradient-to-br from-slate-800/90 via-blue-900/30 to-blue-800/30 border border-slate-600 rounded-xl p-6 shadow-lg hover:shadow-2xl hover:shadow-blue-500/25 transition-all duration-500 hover:scale-105 cursor-pointer backdrop-blur-sm">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-400/10 to-purple-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="group relative overflow-hidden bg-gradient-to-br from-slate-700/90 via-blue-900/60 to-blue-800/60 dark:from-slate-800/90 dark:via-blue-900/30 dark:to-blue-800/30 border border-slate-400 dark:border-slate-600 rounded-xl p-6 shadow-lg hover:shadow-2xl hover:shadow-blue-500/40 transition-all duration-500 hover:scale-105 cursor-pointer backdrop-blur-sm">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-purple-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               <div className="relative z-10">
-                <div className="text-3xl font-bold text-blue-400 mb-2 group-hover:text-blue-300 transition-colors">6+3</div>
-                <div className="text-sm font-medium text-slate-200">Erasure Coding</div>
-                <div className="text-xs text-slate-400 mt-1">Reed-Solomon</div>
+                <div className="text-3xl font-bold text-blue-300 mb-2 group-hover:text-blue-200 transition-colors">6+3</div>
+                <div className="text-sm font-medium text-white">Erasure Coding</div>
+                <div className="text-xs text-slate-200 mt-1">Reed-Solomon</div>
               </div>
             </div>
             
-            <div className="group relative overflow-hidden bg-gradient-to-br from-slate-800/90 via-purple-900/30 to-purple-800/30 border border-slate-600 rounded-xl p-6 shadow-lg hover:shadow-2xl hover:shadow-purple-500/25 transition-all duration-500 hover:scale-105 cursor-pointer backdrop-blur-sm">
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-400/10 to-pink-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="group relative overflow-hidden bg-gradient-to-br from-slate-700/90 via-purple-900/60 to-purple-800/60 dark:from-slate-800/90 dark:via-purple-900/30 dark:to-purple-800/30 border border-slate-400 dark:border-slate-600 rounded-xl p-6 shadow-lg hover:shadow-2xl hover:shadow-purple-500/40 transition-all duration-500 hover:scale-105 cursor-pointer backdrop-blur-sm">
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-400/20 to-pink-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               <div className="relative z-10">
-                <div className="text-3xl font-bold text-purple-400 mb-2 group-hover:text-purple-300 transition-colors">AES-256</div>
-                <div className="text-sm font-medium text-slate-200">Encryption</div>
-                <div className="text-xs text-slate-400 mt-1">Client-Side Keys</div>
+                <div className="text-3xl font-bold text-purple-300 mb-2 group-hover:text-purple-200 transition-colors">AES-256</div>
+                <div className="text-sm font-medium text-white">Encryption</div>
+                <div className="text-xs text-slate-200 mt-1">Client-Side Keys</div>
               </div>
             </div>
             
-            <div className="group relative overflow-hidden bg-gradient-to-br from-slate-800/90 via-green-900/30 to-green-800/30 border border-slate-600 rounded-xl p-6 shadow-lg hover:shadow-2xl hover:shadow-green-500/25 transition-all duration-500 hover:scale-105 cursor-pointer backdrop-blur-sm">
-              <div className="absolute inset-0 bg-gradient-to-r from-green-400/10 to-emerald-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="group relative overflow-hidden bg-gradient-to-br from-slate-700/90 via-green-900/60 to-green-800/60 dark:from-slate-800/90 dark:via-green-900/30 dark:to-green-800/30 border border-slate-400 dark:border-slate-600 rounded-xl p-6 shadow-lg hover:shadow-2xl hover:shadow-green-500/40 transition-all duration-500 hover:scale-105 cursor-pointer backdrop-blur-sm">
+              <div className="absolute inset-0 bg-gradient-to-r from-green-400/20 to-emerald-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               <div className="relative z-10">
-                <div className="text-3xl font-bold text-green-400 mb-2 group-hover:text-green-300 transition-colors">99.9%</div>
-                <div className="text-sm font-medium text-slate-200">Uptime</div>
-                <div className="text-xs text-slate-400 mt-1">SLA Guaranteed</div>
+                <div className="text-3xl font-bold text-green-300 mb-2 group-hover:text-green-200 transition-colors">99.9%</div>
+                <div className="text-sm font-medium text-white">Uptime</div>
+                <div className="text-xs text-slate-200 mt-1">SLA Guaranteed</div>
               </div>
             </div>
             
-            <div className="group relative overflow-hidden bg-gradient-to-br from-slate-800/90 via-orange-900/30 to-orange-800/30 border border-slate-600 rounded-xl p-6 shadow-lg hover:shadow-2xl hover:shadow-orange-500/25 transition-all duration-500 hover:scale-105 cursor-pointer backdrop-blur-sm">
-              <div className="absolute inset-0 bg-gradient-to-r from-orange-400/10 to-red-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="group relative overflow-hidden bg-gradient-to-br from-slate-700/90 via-orange-900/60 to-orange-800/60 dark:from-slate-800/90 dark:via-orange-900/30 dark:to-orange-800/30 border border-slate-400 dark:border-slate-600 rounded-xl p-6 shadow-lg hover:shadow-2xl hover:shadow-orange-500/40 transition-all duration-500 hover:scale-105 cursor-pointer backdrop-blur-sm">
+              <div className="absolute inset-0 bg-gradient-to-r from-orange-400/20 to-red-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               <div className="relative z-10">
-                <div className="text-3xl font-bold text-orange-400 mb-2 group-hover:text-orange-300 transition-colors">10GB</div>
-                <div className="text-sm font-medium text-slate-200">Max File Size</div>
-                <div className="text-xs text-slate-400 mt-1">Per Upload</div>
+                <div className="text-3xl font-bold text-orange-300 mb-2 group-hover:text-orange-200 transition-colors">10GB</div>
+                <div className="text-sm font-medium text-white">Max File Size</div>
+                <div className="text-xs text-slate-200 mt-1">Per Upload</div>
               </div>
             </div>
           </div>

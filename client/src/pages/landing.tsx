@@ -95,7 +95,7 @@ export default function Landing() {
                   Log In
                 </Button>
                 <Button 
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
                   onClick={() => window.location.href = '/api/login'}
                 >
                   Sign Up
@@ -173,7 +173,7 @@ export default function Landing() {
           <div className="flex justify-center">
             <Button 
               size="lg" 
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-lg px-8 py-6"
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-lg px-8 py-6"
               onClick={() => window.location.href = '/api/login'}
             >
               Get Started Free
@@ -410,7 +410,7 @@ export default function Landing() {
                         required
                         className="w-full p-4 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder:text-slate-400 focus:border-blue-400 focus:outline-none transition-colors resize-none"
                       ></textarea>
-                      <Button type="submit" className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                      <Button type="submit" className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
                         Send Message
                       </Button>
                     </form>

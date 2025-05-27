@@ -304,31 +304,31 @@ export default function Landing() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <Card className="bg-slate-800/80 border-slate-600 backdrop-blur-sm">
+            <Card className="bg-white/80 dark:bg-slate-800/80 border-gray-200 dark:border-slate-600 transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/40 hover:scale-105 hover:bg-gradient-to-br hover:from-blue-100/80 hover:to-blue-200/80 dark:hover:from-blue-900/50 dark:hover:to-blue-800/50 cursor-pointer backdrop-blur-sm">
               <CardContent className="p-8 text-center">
                 <Shield className="w-16 h-16 text-blue-400 mx-auto mb-6" />
-                <h4 className="text-xl font-semibold text-white mb-4">Enterprise Security</h4>
-                <p className="text-slate-300">
+                <h4 className="text-xl font-semibold text-black dark:text-white mb-4">Enterprise Security</h4>
+                <p className="text-gray-700 dark:text-slate-300">
                   Military-grade encryption and zero-knowledge architecture ensure your data remains private and secure.
                 </p>
               </CardContent>
             </Card>
             
-            <Card className="bg-slate-800/80 border-slate-600 backdrop-blur-sm">
+            <Card className="bg-white/80 dark:bg-slate-800/80 border-gray-200 dark:border-slate-600 transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/40 hover:scale-105 hover:bg-gradient-to-br hover:from-purple-100/80 hover:to-purple-200/80 dark:hover:from-purple-900/50 dark:hover:to-purple-800/50 cursor-pointer backdrop-blur-sm">
               <CardContent className="p-8 text-center">
                 <Server className="w-16 h-16 text-purple-400 mx-auto mb-6" />
-                <h4 className="text-xl font-semibold text-white mb-4">Global Distribution</h4>
-                <p className="text-slate-300">
+                <h4 className="text-xl font-semibold text-black dark:text-white mb-4">Global Distribution</h4>
+                <p className="text-gray-700 dark:text-slate-300">
                   Files are distributed across multiple geographic locations for maximum redundancy and performance.
                 </p>
               </CardContent>
             </Card>
             
-            <Card className="bg-slate-800/80 border-slate-600 backdrop-blur-sm">
+            <Card className="bg-white/80 dark:bg-slate-800/80 border-gray-200 dark:border-slate-600 transition-all duration-300 hover:shadow-2xl hover:shadow-green-500/40 hover:scale-105 hover:bg-gradient-to-br hover:from-green-100/80 hover:to-green-200/80 dark:hover:from-green-900/50 dark:hover:to-green-800/50 cursor-pointer backdrop-blur-sm">
               <CardContent className="p-8 text-center">
                 <Zap className="w-16 h-16 text-green-400 mx-auto mb-6" />
-                <h4 className="text-xl font-semibold text-white mb-4">Real-time Monitoring</h4>
-                <p className="text-slate-300">
+                <h4 className="text-xl font-semibold text-black dark:text-white mb-4">Real-time Monitoring</h4>
+                <p className="text-gray-700 dark:text-slate-300">
                   Live monitoring and analytics provide insights into system performance and file access patterns.
                 </p>
               </CardContent>
@@ -422,23 +422,18 @@ export default function Landing() {
         </div>
 
         {/* Footer */}
-        <footer className="border-t border-slate-600 pt-12 pb-8">
+        <footer className="border-t border-gray-200 dark:border-slate-600 pt-12 pb-8">
           <div className="text-center">
             <div className="flex items-center justify-center mb-6">
-              <div className="w-8 h-8 bg-gradient-to-br from-pink-300 to-pink-400 rounded-lg p-1 shadow-lg mr-3">
-                <svg width="100%" height="100%" viewBox="0 0 32 32" className="transform rotate-45">
-                  <rect x="6" y="6" width="20" height="20" fill="none" stroke="#5B21B6" strokeWidth="1.5" rx="1"/>
-                  <rect x="9" y="9" width="14" height="14" fill="none" stroke="#5B21B6" strokeWidth="1.5" rx="1"/>
-                  <rect x="12" y="12" width="8" height="8" fill="#5B21B6" rx="1"/>
-                  <rect x="14" y="14" width="4" height="4" fill="#F8BBD9" rx="0.5"/>
-                </svg>
+              <div className="w-8 h-8 bg-primary rounded-xl flex items-center justify-center mr-3 shadow-lg">
+                <Shield className="w-5 h-5 text-white" />
               </div>
-              <span className="text-lg font-bold text-white">FileSanctum</span>
+              <span className="text-lg font-bold text-black dark:text-white">FileSanctum</span>
             </div>
-            <p className="text-slate-400 mb-4">
+            <p className="text-gray-600 dark:text-slate-400 mb-4">
               Access Everywhere. Compromise Nowhere.
             </p>
-            <p className="text-slate-500 text-sm">
+            <p className="text-gray-500 dark:text-slate-500 text-sm">
               © 2024 FileSanctum. All rights reserved. | Distributed File Storage Technology
             </p>
           </div>

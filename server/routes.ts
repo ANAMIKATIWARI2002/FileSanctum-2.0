@@ -38,11 +38,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     secret: process.env.SESSION_SECRET || 'filesanctum-demo-secret',
     store: sessionStore,
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true,
     cookie: {
       httpOnly: true,
-      secure: false, // Set to true in production with HTTPS
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
+      secure: false,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      sameSite: 'lax'
     },
   }));
 
@@ -62,7 +63,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           profileImageUrl: null
         });
         
-        req.session.user = demoUser;
+        (req.session as any).user = demoUser;
         
         await storage.createActivityLog({
           userId: demoUser.id,
@@ -74,7 +75,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
           userAgent: req.get('User-Agent') || 'unknown'
         });
         
-        res.json({ message: 'Login successful', user: demoUser });
+        // Save session explicitly
+        req.session.save((err: any) => {
+          if (err) {
+            console.error('Session save error:', err);
+            return res.status(500).json({ message: 'Session error' });
+          }
+          res.json({ message: 'Login successful', user: demoUser });
+        });
       } else {
         res.status(401).json({ message: 'Invalid credentials' });
       }

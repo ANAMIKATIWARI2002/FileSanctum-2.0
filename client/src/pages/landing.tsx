@@ -28,44 +28,108 @@ export default function Landing() {
         </div>
 
         {/* Authentication Section - Moved here */}
-        <div className="max-w-4xl mx-auto mb-16">
-          <Tabs defaultValue="login" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-8 bg-slate-800 border-slate-600">
-              <TabsTrigger value="login" className="text-slate-200 data-[state=active]:bg-blue-600 data-[state=active]:text-white">Sign In</TabsTrigger>
-              <TabsTrigger value="register" className="text-slate-200 data-[state=active]:bg-purple-600 data-[state=active]:text-white">Register</TabsTrigger>
-            </TabsList>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <TabsContent value="login" className="mt-0">
-                <Card className="bg-slate-800/90 border-slate-600 backdrop-blur-sm">
-                  <CardHeader>
-                    <CardTitle className="text-center text-white">Sign In to FileSanctum</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                      <Label className="text-slate-200">Login Method</Label>
-                      <Tabs value={loginType} onValueChange={setLoginType}>
-                        <TabsList className="grid w-full grid-cols-2 bg-slate-700">
-                          <TabsTrigger value="email" className="flex items-center gap-2 text-slate-200 data-[state=active]:bg-blue-600 data-[state=active]:text-white">
-                            <Mail className="w-4 h-4" />
-                            Email
-                          </TabsTrigger>
-                          <TabsTrigger value="phone" className="flex items-center gap-2 text-slate-200 data-[state=active]:bg-blue-600 data-[state=active]:text-white">
-                            <Phone className="w-4 h-4" />
-                            Phone
-                          </TabsTrigger>
-                        </TabsList>
-                      </Tabs>
+        <div className="max-w-2xl mx-auto mb-16">
+          <Card className="bg-slate-800/90 border-2 border-slate-600 backdrop-blur-sm shadow-2xl">
+            <CardContent className="p-8">
+              <Tabs defaultValue="login" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 mb-8 bg-slate-700 border-slate-600">
+                  <TabsTrigger value="login" className="text-slate-200 data-[state=active]:bg-blue-600 data-[state=active]:text-white font-medium">Sign In</TabsTrigger>
+                  <TabsTrigger value="register" className="text-slate-200 data-[state=active]:bg-purple-600 data-[state=active]:text-white font-medium">Register</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="login" className="mt-0">
+                  <div className="space-y-6">
+                    <div className="text-center">
+                      <h3 className="text-2xl font-bold text-white mb-2">Sign In to FileSanctum</h3>
+                      <p className="text-slate-300">Access your distributed file storage system</p>
                     </div>
                     
-                    {loginType === "email" ? (
+                    <div className="space-y-4">
                       <div className="space-y-2">
-                        <Label htmlFor="login-email" className="text-slate-200">Email</Label>
-                        <Input id="login-email" type="email" placeholder="Enter your email" className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400" />
+                        <Label className="text-slate-200">Login Method</Label>
+                        <Tabs value={loginType} onValueChange={setLoginType}>
+                          <TabsList className="grid w-full grid-cols-2 bg-slate-700">
+                            <TabsTrigger value="email" className="flex items-center gap-2 text-slate-200 data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+                              <Mail className="w-4 h-4" />
+                              Email
+                            </TabsTrigger>
+                            <TabsTrigger value="phone" className="flex items-center gap-2 text-slate-200 data-[state=active]:bg-blue-600 data-[state=active]:text-white">
+                              <Phone className="w-4 h-4" />
+                              Phone
+                            </TabsTrigger>
+                          </TabsList>
+                        </Tabs>
                       </div>
-                    ) : (
+                      
+                      {loginType === "email" ? (
+                        <div className="space-y-2">
+                          <Label htmlFor="login-email" className="text-slate-200">Email</Label>
+                          <Input id="login-email" type="email" placeholder="Enter your email" className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400" />
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          <Label htmlFor="login-phone" className="text-slate-200">Phone Number</Label>
+                          <div className="flex gap-2">
+                            <Select value={countryCode} onValueChange={setCountryCode}>
+                              <SelectTrigger className="w-24 bg-slate-700 border-slate-600 text-white">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent className="bg-slate-700 border-slate-600">
+                                <SelectItem value="+1">🇺🇸 +1</SelectItem>
+                                <SelectItem value="+44">🇬🇧 +44</SelectItem>
+                                <SelectItem value="+91">🇮🇳 +91</SelectItem>
+                                <SelectItem value="+86">🇨🇳 +86</SelectItem>
+                                <SelectItem value="+49">🇩🇪 +49</SelectItem>
+                                <SelectItem value="+33">🇫🇷 +33</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <Input id="login-phone" type="tel" placeholder="Enter phone number" className="flex-1 bg-slate-700 border-slate-600 text-white placeholder:text-slate-400" />
+                          </div>
+                        </div>
+                      )}
+                      
                       <div className="space-y-2">
-                        <Label htmlFor="login-phone" className="text-slate-200">Phone Number</Label>
+                        <Label htmlFor="login-password" className="text-slate-200">Password</Label>
+                        <Input id="login-password" type="password" placeholder="Enter your password" className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400" />
+                      </div>
+                      
+                      <Button 
+                        onClick={() => window.location.href = '/api/login'}
+                        className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
+                        size="lg"
+                      >
+                        Sign In to Dashboard
+                      </Button>
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="register" className="mt-0">
+                  <div className="space-y-6">
+                    <div className="text-center">
+                      <h3 className="text-2xl font-bold text-white mb-2">Create Account</h3>
+                      <p className="text-slate-300">Join FileSanctum distributed storage network</p>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="first-name" className="text-slate-200">First Name</Label>
+                          <Input id="first-name" placeholder="John" className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400" />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="last-name" className="text-slate-200">Last Name</Label>
+                          <Input id="last-name" placeholder="Doe" className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400" />
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="reg-email" className="text-slate-200">Email</Label>
+                        <Input id="reg-email" type="email" placeholder="john@example.com" className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400" />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="reg-phone" className="text-slate-200">Phone Number</Label>
                         <div className="flex gap-2">
                           <Select value={countryCode} onValueChange={setCountryCode}>
                             <SelectTrigger className="w-24 bg-slate-700 border-slate-600 text-white">
@@ -80,87 +144,29 @@ export default function Landing() {
                               <SelectItem value="+33">🇫🇷 +33</SelectItem>
                             </SelectContent>
                           </Select>
-                          <Input id="login-phone" type="tel" placeholder="Enter phone number" className="flex-1 bg-slate-700 border-slate-600 text-white placeholder:text-slate-400" />
+                          <Input id="reg-phone" type="tel" placeholder="1234567890" className="flex-1 bg-slate-700 border-slate-600 text-white placeholder:text-slate-400" />
                         </div>
                       </div>
-                    )}
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="login-password" className="text-slate-200">Password</Label>
-                      <Input id="login-password" type="password" placeholder="Enter your password" className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400" />
-                    </div>
-                    
-                    <Button 
-                      onClick={() => window.location.href = '/api/login'}
-                      className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
-                      size="lg"
-                    >
-                      Sign In to Dashboard
-                    </Button>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-              
-              <TabsContent value="register" className="mt-0">
-                <Card className="bg-slate-800/90 border-slate-600 backdrop-blur-sm">
-                  <CardHeader>
-                    <CardTitle className="text-center text-white">Create Account</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
+                      
                       <div className="space-y-2">
-                        <Label htmlFor="first-name" className="text-slate-200">First Name</Label>
-                        <Input id="first-name" placeholder="John" className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400" />
+                        <Label htmlFor="reg-password" className="text-slate-200">Password</Label>
+                        <Input id="reg-password" type="password" placeholder="Create a strong password" className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400" />
                       </div>
+                      
                       <div className="space-y-2">
-                        <Label htmlFor="last-name" className="text-slate-200">Last Name</Label>
-                        <Input id="last-name" placeholder="Doe" className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400" />
+                        <Label htmlFor="confirm-password" className="text-slate-200">Confirm Password</Label>
+                        <Input id="confirm-password" type="password" placeholder="Confirm your password" className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400" />
                       </div>
+                      
+                      <Button className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800" size="lg">
+                        Create Account
+                      </Button>
                     </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="reg-email" className="text-slate-200">Email</Label>
-                      <Input id="reg-email" type="email" placeholder="john@example.com" className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400" />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="reg-phone" className="text-slate-200">Phone Number</Label>
-                      <div className="flex gap-2">
-                        <Select value={countryCode} onValueChange={setCountryCode}>
-                          <SelectTrigger className="w-24 bg-slate-700 border-slate-600 text-white">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent className="bg-slate-700 border-slate-600">
-                            <SelectItem value="+1">🇺🇸 +1</SelectItem>
-                            <SelectItem value="+44">🇬🇧 +44</SelectItem>
-                            <SelectItem value="+91">🇮🇳 +91</SelectItem>
-                            <SelectItem value="+86">🇨🇳 +86</SelectItem>
-                            <SelectItem value="+49">🇩🇪 +49</SelectItem>
-                            <SelectItem value="+33">🇫🇷 +33</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <Input id="reg-phone" type="tel" placeholder="1234567890" className="flex-1 bg-slate-700 border-slate-600 text-white placeholder:text-slate-400" />
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="reg-password" className="text-slate-200">Password</Label>
-                      <Input id="reg-password" type="password" placeholder="Create a strong password" className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400" />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="confirm-password" className="text-slate-200">Confirm Password</Label>
-                      <Input id="confirm-password" type="password" placeholder="Confirm your password" className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400" />
-                    </div>
-                    
-                    <Button className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800" size="lg">
-                      Create Account
-                    </Button>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </div>
-          </Tabs>
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Features */}

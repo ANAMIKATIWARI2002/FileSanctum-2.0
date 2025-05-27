@@ -223,10 +223,10 @@ export default function SignUp() {
 
             <Button 
               variant="outline" 
-              className="w-full border-slate-600 text-slate-300 hover:bg-slate-700"
+              className="w-full border-slate-600 bg-white hover:bg-gray-50 text-gray-700 hover:text-gray-900 font-medium"
               onClick={() => window.location.href = '/api/login'}
             >
-              <Shield className="mr-2 h-4 w-4" />
+              <span className="mr-2 text-lg">🌐</span>
               Continue with Google
             </Button>
 

@@ -1,0 +1,17 @@
+Project is looking pretty good. but i have few issues which i want to tell you and need you to correct it.
+1. on the landing page where login and registration sections are present i want you to make some corrections.
+      . first, i want a hover effect over all the 3 cards (i.e distributed architecture card, end to end encryption card and real time monitoring card)  and all cards should change their color upon hovering. you choose the color but color should be aesthetic and it should match the theme.
+      .the login and registration page should be side by side (like imagine a box divided in two parts, 1 for login , 1 for registration) and it should be below the description of project title. 
+      . any user should able to register using his email id or phone number. phone number country code option should be present so he should select it from over there and then that data should be stored in database.
+      . technical specifications section can be beautified more with some special effects. take a look into it please.
+      
+2.     . when i fully scroll on the main page of website, bottom part isnt visible and its all white, please look into it.
+        . add some more beautiful color themes in field.
+        .there is no need of description below dashboard. kindly remove it.
+        . in the right of dashboard, last updated text should be changed to last login text and it should show the recent login time
+        . in file upload, upload section isnt properly visible as mentioned is 1st part of point number 2.
+3.  i am not able to upload and view files.
+4.  file download button should be present 
+5. there should be option of file upload and download in the main page besides the sections in sidebar for easy access.
+6. there should be a light/dark theme button which should change the time alternatively when pressed.
+7. a notification icon should be present where all the notifcations should be stored after popping up on the top right hand side (notifications should be of file upload, file download, node information etc). all the notifications notfications should be removed after logout.

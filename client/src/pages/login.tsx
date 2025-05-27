@@ -30,17 +30,20 @@ export default function Login() {
       
       if (response.ok) {
         const data = await response.json();
+        console.log('Login successful:', data);
         // Store token in localStorage for persistence
         localStorage.setItem('authToken', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
-        // Force page reload to update auth state
-        window.location.reload();
+        // Redirect to home page
+        window.location.href = '/';
       } else {
         const error = await response.json();
-        alert(error.message || 'Login failed');
+        console.error('Login error:', error);
+        alert(error.message || 'Invalid credentials');
       }
     } catch (error) {
-      alert('Login failed. Please try again.');
+      console.error('Network error:', error);
+      alert('Network error. Please check your connection.');
     }
   };
 

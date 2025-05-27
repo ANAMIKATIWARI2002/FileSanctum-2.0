@@ -1,10 +1,54 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Shield, Server, Lock, Zap, Mail, Phone, Sparkles, Menu, X, Users, HelpCircle, MessageCircle } from "lucide-react";
-import { useState } from "react";
+import { Shield, Server, Lock, Zap, Mail, Phone, Sparkles, Menu, X, Users, HelpCircle, MessageCircle, Sun, Moon } from "lucide-react";
+import { useState, useEffect } from "react";
 
 export default function Landing() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [contactForm, setContactForm] = useState({
+    name: '',
+    email: '',
+    message: ''
+  });
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      setIsDarkMode(savedTheme === 'dark');
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [isDarkMode]);
+
+  const handleContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(contactForm),
+      });
+      
+      if (response.ok) {
+        alert('Message sent successfully!');
+        setContactForm({ name: '', email: '', message: '' });
+      } else {
+        alert('Failed to send message. Please try again.');
+      }
+    } catch (error) {
+      alert('Failed to send message. Please try again.');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700">
@@ -14,13 +58,8 @@ export default function Landing() {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-pink-300 to-pink-400 rounded-lg p-1.5 shadow-lg">
-                <svg width="100%" height="100%" viewBox="0 0 32 32" className="transform rotate-45">
-                  <rect x="6" y="6" width="20" height="20" fill="none" stroke="#5B21B6" strokeWidth="1.5" rx="1"/>
-                  <rect x="9" y="9" width="14" height="14" fill="none" stroke="#5B21B6" strokeWidth="1.5" rx="1"/>
-                  <rect x="12" y="12" width="8" height="8" fill="#5B21B6" rx="1"/>
-                  <rect x="14" y="14" width="4" height="4" fill="#F8BBD9" rx="0.5"/>
-                </svg>
+              <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg">
+                <Shield className="w-6 h-6 text-white" />
               </div>
               <span className="text-xl font-bold text-white">FileSanctum</span>
             </div>
@@ -40,6 +79,14 @@ export default function Landing() {
                 Contact Us
               </a>
               <div className="flex items-center space-x-4">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsDarkMode(!isDarkMode)}
+                  className="text-slate-300 hover:text-white hover:bg-slate-700"
+                >
+                  {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                </Button>
                 <Button 
                   variant="ghost" 
                   className="text-slate-300 hover:text-white hover:bg-slate-700"
@@ -110,47 +157,26 @@ export default function Landing() {
         {/* Hero Section */}
         <div className="text-center mb-20">
           <div className="flex items-center justify-center mb-8">
-            <div className="w-80 h-auto bg-gradient-to-br from-pink-300 to-pink-400 rounded-lg p-8 shadow-2xl">
-              <div className="flex flex-col items-center">
-                {/* Diamond Logo */}
-                <div className="relative mb-6">
-                  <svg width="120" height="120" viewBox="0 0 120 120" className="transform rotate-45">
-                    <rect x="20" y="20" width="80" height="80" fill="none" stroke="#5B21B6" strokeWidth="3" rx="2"/>
-                    <rect x="30" y="30" width="60" height="60" fill="none" stroke="#5B21B6" strokeWidth="3" rx="2"/>
-                    <rect x="40" y="40" width="40" height="40" fill="#5B21B6" rx="2"/>
-                    <rect x="52" y="52" width="16" height="16" fill="#F8BBD9" rx="1"/>
-                  </svg>
-                </div>
-                
-                <div className="text-center">
-                  <h1 className="text-4xl font-bold text-purple-800 mb-2 tracking-wider">FILE SANCTUM</h1>
-                  <p className="text-sm font-medium text-purple-700 tracking-widest">ACCESS EVERYWHERE. COMPROMISE NOWHERE</p>
-                </div>
-              </div>
+            <div className="w-16 h-16 bg-primary rounded-xl flex items-center justify-center mr-4 shadow-lg">
+              <Shield className="w-8 h-8 text-white" />
             </div>
+            <h1 className="text-5xl font-bold text-white">FileSanctum</h1>
           </div>
           
-          <h2 className="text-5xl font-bold text-white mb-6">
+          <h2 className="text-4xl font-bold text-white mb-6">
             Secure Distributed File Storage
           </h2>
           <p className="text-xl text-slate-300 max-w-3xl mx-auto mb-10">
             Enterprise-grade distributed file storage system with advanced erasure coding, end-to-end encryption, and real-time monitoring. Store your files with confidence across our global network.
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex justify-center">
             <Button 
               size="lg" 
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-lg px-8 py-6"
               onClick={() => window.location.href = '/api/login'}
             >
               Get Started Free
-            </Button>
-            <Button 
-              size="lg" 
-              variant="outline" 
-              className="border-slate-500 text-slate-300 hover:bg-slate-700 hover:text-white text-lg px-8 py-6"
-            >
-              Watch Demo
             </Button>
           </div>
         </div>
@@ -359,26 +385,35 @@ export default function Landing() {
                   
                   <div>
                     <h4 className="text-2xl font-semibold text-white mb-6">Quick Contact</h4>
-                    <div className="space-y-4">
+                    <form onSubmit={handleContactSubmit} className="space-y-4">
                       <input 
                         type="text" 
                         placeholder="Your Name" 
+                        value={contactForm.name}
+                        onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
+                        required
                         className="w-full p-4 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder:text-slate-400 focus:border-blue-400 focus:outline-none transition-colors"
                       />
                       <input 
                         type="email" 
                         placeholder="Your Email" 
+                        value={contactForm.email}
+                        onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
+                        required
                         className="w-full p-4 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder:text-slate-400 focus:border-blue-400 focus:outline-none transition-colors"
                       />
                       <textarea 
                         placeholder="Your Message" 
                         rows={4}
+                        value={contactForm.message}
+                        onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
+                        required
                         className="w-full p-4 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder:text-slate-400 focus:border-blue-400 focus:outline-none transition-colors resize-none"
                       ></textarea>
-                      <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                      <Button type="submit" className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
                         Send Message
                       </Button>
-                    </div>
+                    </form>
                   </div>
                 </div>
               </CardContent>

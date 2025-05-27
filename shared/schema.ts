@@ -120,6 +120,16 @@ export const systemMetrics = pgTable("system_metrics", {
   timestamp: timestamp("timestamp").defaultNow(),
 });
 
+// Contact messages table
+export const contactMessages = pgTable("contact_messages", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  email: varchar("email", { length: 255 }).notNull(),
+  message: text("message").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  status: varchar("status", { length: 50 }).default("unread").notNull(), // unread, read, replied
+});
+
 // Schema exports
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
@@ -141,6 +151,9 @@ export type Invitation = typeof invitations.$inferSelect;
 
 export type InsertSystemMetric = typeof systemMetrics.$inferInsert;
 export type SystemMetric = typeof systemMetrics.$inferSelect;
+
+export type InsertContactMessage = typeof contactMessages.$inferInsert;
+export type ContactMessage = typeof contactMessages.$inferSelect;
 
 // Insert schemas
 export const insertNodeSchema = createInsertSchema(nodes).omit({

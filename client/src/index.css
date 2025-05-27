@@ -1,0 +1,418 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 210 11% 98%; /* #F5F7FA */
+  --foreground: 222 84% 5%; /* #0F172A */
+  --muted: 210 40% 96%; /* #F1F5F9 */
+  --muted-foreground: 215 16% 47%; /* #64748B */
+  --popover: 0 0% 100%; /* #FFFFFF */
+  --popover-foreground: 222 84% 5%; /* #0F172A */
+  --card: 0 0% 100%; /* #FFFFFF */
+  --card-foreground: 222 84% 5%; /* #0F172A */
+  --border: 214 32% 91%; /* #E2E8F0 */
+  --input: 214 32% 91%; /* #E2E8F0 */
+  --primary: 221 83% 53%; /* #2563EB */
+  --primary-foreground: 210 40% 98%; /* #F8FAFC */
+  --secondary: 210 40% 96%; /* #F1F5F9 */
+  --secondary-foreground: 222 84% 5%; /* #0F172A */
+  --accent: 210 40% 96%; /* #F1F5F9 */
+  --accent-foreground: 222 84% 5%; /* #0F172A */
+  --destructive: 0 84% 60%; /* #EF4444 */
+  --destructive-foreground: 210 40% 98%; /* #F8FAFC */
+  --ring: 221 83% 53%; /* #2563EB */
+  --radius: 0.5rem;
+  --chart-1: 221 83% 53%; /* #2563EB */
+  --chart-2: 142 76% 36%; /* #10B981 */
+  --chart-3: 45 93% 47%; /* #F59E0B */
+  --chart-4: 0 84% 60%; /* #EF4444 */
+  --chart-5: 262 83% 58%; /* #8B5CF6 */
+  --sidebar-background: 222 84% 5%; /* #0F172A */
+  --sidebar-foreground: 210 40% 98%; /* #F8FAFC */
+  --sidebar-primary: 221 83% 53%; /* #2563EB */
+  --sidebar-primary-foreground: 210 40% 98%; /* #F8FAFC */
+  --sidebar-accent: 215 28% 17%; /* #334155 */
+  --sidebar-accent-foreground: 210 40% 98%; /* #F8FAFC */
+  --sidebar-border: 215 28% 17%; /* #334155 */
+  --sidebar-ring: 221 83% 53%; /* #2563EB */
+}
+
+.dark {
+  --background: 222 84% 5%; /* #0F172A */
+  --foreground: 210 40% 98%; /* #F8FAFC */
+  --muted: 217 33% 17%; /* #1E293B */
+  --muted-foreground: 215 20% 65%; /* #94A3B8 */
+  --popover: 222 84% 5%; /* #0F172A */
+  --popover-foreground: 210 40% 98%; /* #F8FAFC */
+  --card: 222 84% 5%; /* #0F172A */
+  --card-foreground: 210 40% 98%; /* #F8FAFC */
+  --border: 217 33% 17%; /* #1E293B */
+  --input: 217 33% 17%; /* #1E293B */
+  --primary: 217 91% 60%; /* #3B82F6 */
+  --primary-foreground: 222 84% 5%; /* #0F172A */
+  --secondary: 217 33% 17%; /* #1E293B */
+  --secondary-foreground: 210 40% 98%; /* #F8FAFC */
+  --accent: 217 33% 17%; /* #1E293B */
+  --accent-foreground: 210 40% 98%; /* #F8FAFC */
+  --destructive: 0 63% 31%; /* #991B1B */
+  --destructive-foreground: 210 40% 98%; /* #F8FAFC */
+  --ring: 217 91% 60%; /* #3B82F6 */
+  --chart-1: 217 91% 60%; /* #3B82F6 */
+  --chart-2: 142 76% 36%; /* #10B981 */
+  --chart-3: 45 93% 47%; /* #F59E0B */
+  --chart-4: 0 84% 60%; /* #EF4444 */
+  --chart-5: 262 83% 58%; /* #8B5CF6 */
+  --sidebar-background: 222 84% 5%; /* #0F172A */
+  --sidebar-foreground: 210 40% 98%; /* #F8FAFC */
+  --sidebar-primary: 217 91% 60%; /* #3B82F6 */
+  --sidebar-primary-foreground: 222 84% 5%; /* #0F172A */
+  --sidebar-accent: 217 33% 17%; /* #1E293B */
+  --sidebar-accent-foreground: 210 40% 98%; /* #F8FAFC */
+  --sidebar-border: 217 33% 17%; /* #1E293B */
+  --sidebar-ring: 217 91% 60%; /* #3B82F6 */
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+    font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  }
+}
+
+@layer components {
+  .node-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+  }
+
+  .fade-in {
+    animation: fadeIn 0.3s ease-in;
+  }
+
+  .pulse-dot {
+    animation: pulse 2s infinite;
+  }
+
+  .status-healthy {
+    @apply bg-green-100 text-green-800 border-green-200;
+  }
+
+  .status-degraded {
+    @apply bg-yellow-100 text-yellow-800 border-yellow-200;
+  }
+
+  .status-failed {
+    @apply bg-red-100 text-red-800 border-red-200;
+  }
+
+  .metric-card {
+    @apply bg-white rounded-lg shadow-sm border border-slate-200 p-6 transition-shadow hover:shadow-md;
+  }
+
+  .sidebar-item {
+    @apply w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors duration-200;
+  }
+
+  .sidebar-item-active {
+    @apply bg-primary text-white;
+  }
+
+  .sidebar-item-inactive {
+    @apply text-slate-300 hover:bg-slate-700 hover:text-white;
+  }
+
+  .file-upload-area {
+    @apply border-2 border-dashed border-slate-300 rounded-lg p-8 text-center hover:border-primary transition-colors cursor-pointer;
+  }
+
+  .progress-bar {
+    @apply w-full bg-slate-200 rounded-full h-2;
+  }
+
+  .progress-fill {
+    @apply h-2 rounded-full transition-all duration-300;
+  }
+
+  .storage-bar-low {
+    @apply bg-green-500;
+  }
+
+  .storage-bar-medium {
+    @apply bg-yellow-500;
+  }
+
+  .storage-bar-high {
+    @apply bg-red-500;
+  }
+}
+
+@layer utilities {
+  .text-success {
+    @apply text-green-600;
+  }
+
+  .text-warning {
+    @apply text-yellow-600;
+  }
+
+  .text-danger {
+    @apply text-red-600;
+  }
+
+  .bg-success {
+    @apply bg-green-500;
+  }
+
+  .bg-warning {
+    @apply bg-yellow-500;
+  }
+
+  .bg-danger {
+    @apply bg-red-500;
+  }
+
+  .border-success {
+    @apply border-green-500;
+  }
+
+  .border-warning {
+    @apply border-yellow-500;
+  }
+
+  .border-danger {
+    @apply border-red-500;
+  }
+}
+
+@keyframes fadeIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(10px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { 
+    opacity: 1; 
+  }
+  50% { 
+    opacity: 0.5; 
+  }
+}
+
+/* Custom scrollbar for webkit browsers */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground));
+}
+
+/* Loading spinner animation */
+.loading-spinner {
+  @apply animate-spin rounded-full border-b-2 border-primary;
+}
+
+/* Status indicator animations */
+.status-indicator {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+}
+
+.status-indicator.healthy {
+  @apply bg-green-100 text-green-800;
+}
+
+.status-indicator.degraded {
+  @apply bg-yellow-100 text-yellow-800;
+}
+
+.status-indicator.failed {
+  @apply bg-red-100 text-red-800;
+}
+
+.status-indicator.offline {
+  @apply bg-slate-100 text-slate-800;
+}
+
+/* Chart container styling */
+.chart-container {
+  position: relative;
+  height: 250px;
+  width: 100%;
+}
+
+/* Node card hover effects */
+.node-card {
+  @apply border border-slate-200 rounded-lg p-4 transition-all duration-200 hover:shadow-md hover:border-slate-300;
+}
+
+.node-card:hover {
+  transform: translateY(-1px);
+}
+
+/* File type icons */
+.file-icon {
+  @apply w-5 h-5 mr-3;
+}
+
+.file-icon.pdf {
+  @apply text-red-600;
+}
+
+.file-icon.image {
+  @apply text-blue-600;
+}
+
+.file-icon.video {
+  @apply text-purple-600;
+}
+
+.file-icon.audio {
+  @apply text-green-600;
+}
+
+.file-icon.document {
+  @apply text-orange-600;
+}
+
+.file-icon.default {
+  @apply text-slate-600;
+}
+
+/* Activity log styling */
+.activity-log-item {
+  @apply flex items-start space-x-4 pb-4 border-b border-slate-100 last:border-b-0;
+}
+
+.activity-icon {
+  @apply w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0;
+}
+
+.activity-icon.success {
+  @apply bg-green-100 text-green-600;
+}
+
+.activity-icon.warning {
+  @apply bg-yellow-100 text-yellow-600;
+}
+
+.activity-icon.error {
+  @apply bg-red-100 text-red-600;
+}
+
+.activity-icon.info {
+  @apply bg-blue-100 text-blue-600;
+}
+
+/* Responsive table wrapper */
+.table-wrapper {
+  @apply overflow-x-auto;
+}
+
+.table-wrapper table {
+  @apply w-full min-w-full;
+}
+
+/* Button variants for FileSanctum theme */
+.btn-recovery {
+  @apply bg-yellow-600 hover:bg-yellow-700 text-white;
+}
+
+.btn-add-node {
+  @apply bg-green-600 hover:bg-green-700 text-white;
+}
+
+.btn-danger {
+  @apply bg-red-600 hover:bg-red-700 text-white;
+}
+
+/* Modal and dialog animations */
+.dialog-overlay {
+  @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50;
+}
+
+.dialog-content {
+  @apply bg-white rounded-lg shadow-xl max-w-md w-full mx-4;
+  animation: slideIn 0.2s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Metric display styling */
+.metric-display {
+  @apply text-2xl font-bold mb-2;
+}
+
+.metric-display.primary {
+  @apply text-primary;
+}
+
+.metric-display.success {
+  @apply text-green-600;
+}
+
+.metric-display.warning {
+  @apply text-yellow-600;
+}
+
+.metric-display.danger {
+  @apply text-red-600;
+}
+
+/* Real-time indicator */
+.realtime-indicator {
+  @apply flex items-center space-x-2 text-sm;
+}
+
+.realtime-dot {
+  @apply w-3 h-3 bg-green-500 rounded-full;
+  animation: pulse 2s infinite;
+}
+
+/* Encryption and security indicators */
+.security-badge {
+  @apply inline-flex items-center px-2 py-1 rounded-full text-xs font-medium;
+}
+
+.security-badge.encrypted {
+  @apply bg-green-100 text-green-800;
+}
+
+.security-badge.secure {
+  @apply bg-blue-100 text-blue-800;
+}
+
+.security-badge.warning {
+  @apply bg-yellow-100 text-yellow-800;
+}

@@ -6,6 +6,7 @@ import {
   activityLogs,
   invitations,
   systemMetrics,
+  contactMessages,
   type User,
   type UpsertUser,
   type Node,
@@ -20,6 +21,8 @@ import {
   type InsertInvitation,
   type SystemMetric,
   type InsertSystemMetric,
+  type ContactMessage,
+  type InsertContactMessage,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, sql, gte, lte } from "drizzle-orm";
@@ -68,6 +71,10 @@ export interface IStorage {
   // System metrics operations
   createSystemMetric(metric: InsertSystemMetric): Promise<SystemMetric>;
   getSystemMetrics(metricType?: string, hours?: number): Promise<SystemMetric[]>;
+
+  // Contact message operations
+  createContactMessage(message: InsertContactMessage): Promise<ContactMessage>;
+  getContactMessages(): Promise<ContactMessage[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -259,6 +266,19 @@ export class DatabaseStorage implements IStorage {
       .from(systemMetrics)
       .where(gte(systemMetrics.timestamp, since))
       .orderBy(desc(systemMetrics.timestamp));
+  }
+
+  // Contact message operations
+  async createContactMessage(message: InsertContactMessage): Promise<ContactMessage> {
+    const [contactMessage] = await db
+      .insert(contactMessages)
+      .values(message)
+      .returning();
+    return contactMessage;
+  }
+
+  async getContactMessages(): Promise<ContactMessage[]> {
+    return await db.select().from(contactMessages).orderBy(desc(contactMessages.createdAt));
   }
 }
 

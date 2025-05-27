@@ -75,12 +75,21 @@ export default function Landing() {
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent className="bg-slate-700 border-slate-600">
-                                <SelectItem value="+1">🇺🇸 +1</SelectItem>
-                                <SelectItem value="+44">🇬🇧 +44</SelectItem>
-                                <SelectItem value="+91">🇮🇳 +91</SelectItem>
-                                <SelectItem value="+86">🇨🇳 +86</SelectItem>
-                                <SelectItem value="+49">🇩🇪 +49</SelectItem>
-                                <SelectItem value="+33">🇫🇷 +33</SelectItem>
+                                <SelectItem value="+1">🇺🇸 United States (+1)</SelectItem>
+                                <SelectItem value="+44">🇬🇧 United Kingdom (+44)</SelectItem>
+                                <SelectItem value="+91">🇮🇳 India (+91)</SelectItem>
+                                <SelectItem value="+86">🇨🇳 China (+86)</SelectItem>
+                                <SelectItem value="+49">🇩🇪 Germany (+49)</SelectItem>
+                                <SelectItem value="+33">🇫🇷 France (+33)</SelectItem>
+                                <SelectItem value="+81">🇯🇵 Japan (+81)</SelectItem>
+                                <SelectItem value="+82">🇰🇷 South Korea (+82)</SelectItem>
+                                <SelectItem value="+61">🇦🇺 Australia (+61)</SelectItem>
+                                <SelectItem value="+55">🇧🇷 Brazil (+55)</SelectItem>
+                                <SelectItem value="+7">🇷🇺 Russia (+7)</SelectItem>
+                                <SelectItem value="+39">🇮🇹 Italy (+39)</SelectItem>
+                                <SelectItem value="+34">🇪🇸 Spain (+34)</SelectItem>
+                                <SelectItem value="+31">🇳🇱 Netherlands (+31)</SelectItem>
+                                <SelectItem value="+46">🇸🇪 Sweden (+46)</SelectItem>
                               </SelectContent>
                             </Select>
                             <Input id="login-phone" type="tel" placeholder="Enter phone number" className="flex-1 bg-slate-700 border-slate-600 text-white placeholder:text-slate-400" />
@@ -136,12 +145,21 @@ export default function Landing() {
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent className="bg-slate-700 border-slate-600">
-                              <SelectItem value="+1">🇺🇸 +1</SelectItem>
-                              <SelectItem value="+44">🇬🇧 +44</SelectItem>
-                              <SelectItem value="+91">🇮🇳 +91</SelectItem>
-                              <SelectItem value="+86">🇨🇳 +86</SelectItem>
-                              <SelectItem value="+49">🇩🇪 +49</SelectItem>
-                              <SelectItem value="+33">🇫🇷 +33</SelectItem>
+                              <SelectItem value="+1">🇺🇸 United States (+1)</SelectItem>
+                              <SelectItem value="+44">🇬🇧 United Kingdom (+44)</SelectItem>
+                              <SelectItem value="+91">🇮🇳 India (+91)</SelectItem>
+                              <SelectItem value="+86">🇨🇳 China (+86)</SelectItem>
+                              <SelectItem value="+49">🇩🇪 Germany (+49)</SelectItem>
+                              <SelectItem value="+33">🇫🇷 France (+33)</SelectItem>
+                              <SelectItem value="+81">🇯🇵 Japan (+81)</SelectItem>
+                              <SelectItem value="+82">🇰🇷 South Korea (+82)</SelectItem>
+                              <SelectItem value="+61">🇦🇺 Australia (+61)</SelectItem>
+                              <SelectItem value="+55">🇧🇷 Brazil (+55)</SelectItem>
+                              <SelectItem value="+7">🇷🇺 Russia (+7)</SelectItem>
+                              <SelectItem value="+39">🇮🇹 Italy (+39)</SelectItem>
+                              <SelectItem value="+34">🇪🇸 Spain (+34)</SelectItem>
+                              <SelectItem value="+31">🇳🇱 Netherlands (+31)</SelectItem>
+                              <SelectItem value="+46">🇸🇪 Sweden (+46)</SelectItem>
                             </SelectContent>
                           </Select>
                           <Input id="reg-phone" type="tel" placeholder="1234567890" className="flex-1 bg-slate-700 border-slate-600 text-white placeholder:text-slate-400" />

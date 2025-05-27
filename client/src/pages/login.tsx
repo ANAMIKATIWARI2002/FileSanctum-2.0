@@ -12,47 +12,28 @@ export default function Login() {
     password: ""
   });
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     
-    try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          email: loginForm.email,
-          password: loginForm.password
-        })
-      });
+    // Direct credential check
+    if ((loginForm.email === 'admin@example.com' && loginForm.password === 'admin123') || 
+        (loginForm.email === 'user@example.com' && loginForm.password === 'user123')) {
       
-      console.log('Response status:', response.status);
+      const user = {
+        id: loginForm.email === 'admin@example.com' ? 'admin-demo' : 'user-demo',
+        email: loginForm.email,
+        firstName: loginForm.email === 'admin@example.com' ? 'Admin' : 'Demo',
+        lastName: 'User'
+      };
       
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Login response data:', data);
-        
-        if (data.token && data.user) {
-          // Store token in localStorage for persistence
-          localStorage.setItem('authToken', data.token);
-          localStorage.setItem('user', JSON.stringify(data.user));
-          console.log('Stored auth data, redirecting...');
-          // Redirect to home page
-          window.location.href = '/';
-        } else {
-          console.error('Missing token or user in response');
-          alert('Login response missing required data');
-        }
-      } else {
-        const errorText = await response.text();
-        console.error('Login failed:', response.status, errorText);
-        alert('Login failed: ' + errorText);
-      }
-    } catch (error) {
-      console.error('Network error:', error);
-      alert('Network error. Please check your connection.');
+      // Store user data
+      localStorage.setItem('authToken', 'demo-token-' + Date.now());
+      localStorage.setItem('user', JSON.stringify(user));
+      
+      // Redirect to dashboard
+      window.location.href = '/';
+    } else {
+      alert('Invalid credentials. Use admin@example.com/admin123 or user@example.com/user123');
     }
   };
 

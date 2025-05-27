@@ -2,30 +2,106 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { WebSocketServer, WebSocket } from "ws";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
 import { insertNodeSchema, insertInvitationSchema, insertActivityLogSchema } from "@shared/schema";
 import multer from "multer";
 import { z } from "zod";
+import session from "express-session";
+import connectPg from "connect-pg-simple";
 
 const upload = multer({ 
   storage: multer.memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024 * 1024 } // 10GB limit
 });
 
-export async function registerRoutes(app: Express): Promise<Server> {
-  // Auth middleware
-  await setupAuth(app);
+// Simple authentication middleware
+const isAuthenticated = (req: any, res: any, next: any) => {
+  const user = req.session?.user;
+  if (!user) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+  req.user = user;
+  next();
+};
 
-  // Auth routes
+export async function registerRoutes(app: Express): Promise<Server> {
+  // Setup session middleware
+  app.set("trust proxy", 1);
+  const pgStore = connectPg(session);
+  const sessionStore = new pgStore({
+    conString: process.env.DATABASE_URL,
+    createTableIfMissing: false,
+    ttl: 7 * 24 * 60 * 60 * 1000, // 1 week
+    tableName: "sessions",
+  });
+  
+  app.use(session({
+    secret: process.env.SESSION_SECRET || 'filesanctum-demo-secret',
+    store: sessionStore,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      secure: false, // Set to true in production with HTTPS
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
+    },
+  }));
+
+  // Simple login for demo credentials
+  app.post('/api/auth/login', async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      
+      if ((email === 'admin@example.com' && password === 'admin123') || 
+          (email === 'user@example.com' && password === 'user123')) {
+        
+        const demoUser = await storage.upsertUser({
+          id: email === 'admin@example.com' ? 'admin-demo' : 'user-demo',
+          email: email,
+          firstName: email === 'admin@example.com' ? 'Admin' : 'Demo',
+          lastName: 'User',
+          profileImageUrl: null
+        });
+        
+        req.session.user = demoUser;
+        
+        await storage.createActivityLog({
+          userId: demoUser.id,
+          action: 'LOGIN',
+          resource: 'user',
+          resourceId: demoUser.id,
+          details: { message: `User ${demoUser.email} logged in` },
+          ipAddress: req.ip || 'unknown',
+          userAgent: req.get('User-Agent') || 'unknown'
+        });
+        
+        res.json({ message: 'Login successful', user: demoUser });
+      } else {
+        res.status(401).json({ message: 'Invalid credentials' });
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  // Get current user
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
-      const user = await storage.getUser(userId);
-      res.json(user);
+      res.json(req.user);
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });
     }
+  });
+
+  // Logout route
+  app.post('/api/auth/logout', (req: any, res) => {
+    req.session.destroy((err: any) => {
+      if (err) {
+        return res.status(500).json({ message: 'Could not log out' });
+      }
+      res.json({ message: 'Logged out successfully' });
+    });
   });
 
   // Node management routes

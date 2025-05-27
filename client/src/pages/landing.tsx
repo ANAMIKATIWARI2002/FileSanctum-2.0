@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Shield, Server, Lock, Zap, Mail, Phone, Sparkles } from "lucide-react";
 import { useState } from "react";
+import logoImage from "@assets/image_1748358794124.png";
 
 export default function Landing() {
   const [countryCode, setCountryCode] = useState("+1");
@@ -17,11 +18,28 @@ export default function Landing() {
         {/* Header */}
         <div className="text-center mb-12">
           <div className="flex items-center justify-center mb-6">
-            <img 
-              src="/attached_assets/image_1748358794124.png" 
-              alt="FileSanctum Logo" 
-              className="w-64 h-auto shadow-2xl rounded-lg"
-            />
+            <div className="w-80 h-auto bg-gradient-to-br from-pink-300 to-pink-400 rounded-lg p-8 shadow-2xl">
+              <div className="flex flex-col items-center">
+                {/* Diamond Logo */}
+                <div className="relative mb-6">
+                  <svg width="120" height="120" viewBox="0 0 120 120" className="transform rotate-45">
+                    {/* Outer diamond */}
+                    <rect x="20" y="20" width="80" height="80" fill="none" stroke="#5B21B6" strokeWidth="3" rx="2"/>
+                    {/* Middle diamond */}
+                    <rect x="30" y="30" width="60" height="60" fill="none" stroke="#5B21B6" strokeWidth="3" rx="2"/>
+                    {/* Inner diamonds */}
+                    <rect x="40" y="40" width="40" height="40" fill="#5B21B6" rx="2"/>
+                    <rect x="52" y="52" width="16" height="16" fill="#F8BBD9" rx="1"/>
+                  </svg>
+                </div>
+                
+                {/* Text */}
+                <div className="text-center">
+                  <h1 className="text-4xl font-bold text-purple-800 mb-2 tracking-wider">FILE SANCTUM</h1>
+                  <p className="text-sm font-medium text-purple-700 tracking-widest">ACCESS EVERYWHERE. COMPROMISE NOWHERE</p>
+                </div>
+              </div>
+            </div>
           </div>
           <p className="text-xl text-slate-300 max-w-2xl mx-auto mb-8">
             Distributed File Storage System with advanced erasure coding, end-to-end encryption, and real-time monitoring

@@ -220,7 +220,7 @@ export default function Landing() {
         <div className="mt-20 text-center" id="help">
           <div className="flex items-center justify-center mb-6">
             <Sparkles className="w-6 h-6 text-blue-400 mr-2" />
-            <h3 className="text-2xl font-bold text-white">Technical Specifications</h3>
+            <h3 className="text-2xl font-bold text-black dark:text-white">Technical Specifications</h3>
             <Sparkles className="w-6 h-6 text-purple-400 ml-2" />
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
@@ -339,8 +339,8 @@ export default function Landing() {
         {/* Contact Section */}
         <div className="mt-32 mb-16" id="contact">
           <div className="text-center mb-16">
-            <h3 className="text-4xl font-bold text-white mb-6">Get in Touch</h3>
-            <p className="text-xl text-slate-300 max-w-2xl mx-auto">
+            <h3 className="text-4xl font-bold text-black dark:text-white mb-6">Get in Touch</h3>
+            <p className="text-xl text-gray-700 dark:text-slate-300 max-w-2xl mx-auto">
               Have questions about FileSanctum? We're here to help you secure your data and optimize your storage strategy.
             </p>
           </div>

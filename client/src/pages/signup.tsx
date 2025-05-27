@@ -217,7 +217,7 @@ export default function SignUp() {
                 <span className="w-full border-t border-slate-600" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-slate-800 px-2 text-slate-400">Or sign up with</span>
+                <span className="bg-slate-800 px-2 text-slate-400">Or</span>
               </div>
             </div>
 
@@ -227,7 +227,7 @@ export default function SignUp() {
               onClick={() => window.location.href = '/api/login'}
             >
               <Shield className="mr-2 h-4 w-4" />
-              Continue with Replit
+              Continue with Google
             </Button>
 
             <div className="text-center">

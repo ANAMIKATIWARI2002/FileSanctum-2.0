@@ -1,0 +1,869 @@
+const express = require('express');
+const { Pool } = require('pg');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+const crypto = require('crypto');
+const http = require('http');
+const WebSocket = require('ws');
+
+// Create Express application
+const app = express();
+app.use(express.json());
+
+// Create HTTP server
+const server = http.createServer(app);
+
+// Create WebSocket server
+const wss = new WebSocket.Server({ server, path: '/ws' });
+
+// Define environment variables
+const PORT = process.env.PORT || 3000;
+const JWT_SECRET = process.env.JWT_SECRET || 'demo_jwt_secret';
+const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || 'demo_encryption_key';
+
+// Configure PostgreSQL connection
+let pool;
+try {
+  pool = new Pool({
+    user: 'postgres',         // Default PostgreSQL username
+    password: 'ankit123',             // Enter your actual PostgreSQL password here
+    host: 'localhost',
+    port: 5432,
+    database: 'dfss'
+  });
+  console.log("Attempting to connect to database...");
+} catch (error) {
+  console.error("Failed to create database pool:", error);
+}
+
+// Add better error handling for database connection
+pool.on('error', (err) => {
+  console.error('Unexpected database error:', err);
+});
+
+// Test database connection
+pool.query('SELECT NOW()', (err, res) => {
+  if (err) {
+    console.error('Database connection error:', err.message);
+  } else {
+    console.log('Database connected successfully');
+  }
+});
+
+// Setup file storage
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadsDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    cb(null, uniqueSuffix + '-' + file.originalname);
+  }
+});
+const upload = multer({ storage });
+
+// File encryption/decryption functions
+function encryptFile(filePath) {
+  const fileContent = fs.readFileSync(filePath);
+  const iv = crypto.randomBytes(16);
+  const key = crypto.scryptSync(ENCRYPTION_KEY, 'salt', 32);
+  const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
+  
+  const encrypted = Buffer.concat([
+    iv,
+    cipher.update(fileContent),
+    cipher.final()
+  ]);
+  
+  fs.writeFileSync(filePath, encrypted);
+}
+
+function decryptFile(filePath) {
+  const encryptedContent = fs.readFileSync(filePath);
+  const iv = encryptedContent.slice(0, 16);
+  const encryptedData = encryptedContent.slice(16);
+  const key = crypto.scryptSync(ENCRYPTION_KEY, 'salt', 32);
+  const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
+  
+  return Buffer.concat([
+    decipher.update(encryptedData),
+    decipher.final()
+  ]);
+}
+
+// Authentication middleware
+function authenticate(req, res, next) {
+  const token = req.header('x-auth-token');
+  
+  if (!token) {
+    return res.status(401).json({ message: 'No token, authorization denied' });
+  }
+  
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    res.status(401).json({ message: 'Token is not valid' });
+  }
+}
+
+// Routes
+// Register a new user
+app.post('/api/auth/register', async (req, res) => {
+  try {
+    const { username, email, password } = req.body;
+    
+    // Check if user exists
+    const userCheck = await pool.query(
+      'SELECT * FROM users WHERE email = $1',
+      [email]
+    );
+    
+    if (userCheck.rows.length > 0) {
+      return res.status(400).json({ message: 'User already exists' });
+    }
+    
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    
+    // Insert user
+    const result = await pool.query(
+      'INSERT INTO users (username, email, password, role) VALUES ($1, $2, $3, $4) RETURNING *',
+      [username, email, hashedPassword, 'user']
+    );
+    
+    const user = result.rows[0];
+    
+    // Create JWT
+    const token = jwt.sign(
+      { id: user.id, username: user.username, role: user.role },
+      JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+    
+    // Log activity
+    await pool.query(
+      'INSERT INTO activities (user_id, action, details) VALUES ($1, $2, $3)',
+      [user.id, 'REGISTER', `User ${user.username} registered`]
+    );
+    
+    res.status(201).json({
+      message: 'User registered successfully',
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        role: user.role
+      },
+      token
+    });
+    
+  } catch (error) {
+    console.error('Register error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Login
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    
+    // Special case for demo credentials
+    if ((email === 'user@example.com' && password === 'user123') || 
+        (email === 'admin@example.com' && password === 'admin123')) {
+      
+      // Create a demo user
+      const demoUser = {
+        id: email === 'admin@example.com' ? 1 : 2,
+        username: email === 'admin@example.com' ? 'admin' : 'user',
+        email: email,
+        role: email === 'admin@example.com' ? 'admin' : 'user'
+      };
+      
+      // Create JWT for demo user
+      const token = jwt.sign(
+        { id: demoUser.id, username: demoUser.username, role: demoUser.role },
+        JWT_SECRET,
+        { expiresIn: '1h' }
+      );
+      
+      // Log demo user activity
+      try {
+        await pool.query(
+          'INSERT INTO activities (user_id, action, details) VALUES ($1, $2, $3)',
+          [demoUser.id, 'LOGIN', `User ${demoUser.username} logged in`]
+        );
+      } catch (err) {
+        console.log('Could not log activity, but continuing login:', err.message);
+      }
+      
+      return res.json({
+        message: 'Login successful',
+        user: demoUser,
+        token
+      });
+    }
+    
+    // Regular database login
+    try {
+      const result = await pool.query(
+        'SELECT * FROM users WHERE email = $1',
+        [email]
+      );
+      
+      if (result.rows.length === 0) {
+        return res.status(400).json({ message: 'Invalid credentials' });
+      }
+      
+      const user = result.rows[0];
+      
+      // Verify password
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        return res.status(400).json({ message: 'Invalid credentials' });
+      }
+      
+      // Create JWT
+      const token = jwt.sign(
+        { id: user.id, username: user.username, role: user.role },
+        JWT_SECRET,
+        { expiresIn: '1h' }
+      );
+      
+      // Log activity
+      await pool.query(
+        'INSERT INTO activities (user_id, action, details) VALUES ($1, $2, $3)',
+        [user.id, 'LOGIN', `User ${user.username} logged in`]
+      );
+      
+      res.json({
+        message: 'Login successful',
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          role: user.role
+        },
+        token
+      });
+    } catch (dbError) {
+      console.error('Database error during login:', dbError);
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
+    
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Upload file
+app.post('/api/files/upload', authenticate, upload.single('file'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+    
+    const { filename, path: filepath, mimetype, size } = req.file;
+    
+    // Encrypt file
+    encryptFile(filepath);
+    
+    // Save file info
+    const result = await pool.query(
+      'INSERT INTO files (filename, filepath, filetype, filesize, user_id, encrypted) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+      [filename, filepath, mimetype, size, req.user.id, true]
+    );
+    
+    const file = result.rows[0];
+    
+    // Log activity
+    await pool.query(
+      'INSERT INTO activities (user_id, action, details) VALUES ($1, $2, $3)',
+      [req.user.id, 'UPLOAD', `User uploaded file: ${filename}`]
+    );
+    
+    res.status(201).json({
+      message: 'File uploaded successfully',
+      file: {
+        id: file.id,
+        filename: file.filename,
+        filetype: file.filetype,
+        filesize: file.filesize,
+        encrypted: file.encrypted
+      }
+    });
+    
+  } catch (error) {
+    console.error('Upload error:', error);
+    res.status(500).json({ message: 'Error uploading file' });
+  }
+});
+
+// Get files
+app.get('/api/files', authenticate, async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT * FROM files WHERE user_id = $1',
+      [req.user.id]
+    );
+    
+    res.json({
+      message: 'Files retrieved successfully',
+      files: result.rows.map(file => ({
+        id: file.id,
+        filename: file.filename,
+        filetype: file.filetype,
+        filesize: file.filesize,
+        encrypted: file.encrypted,
+        createdAt: file.created_at
+      }))
+    });
+    
+  } catch (error) {
+    console.error('Get files error:', error);
+    res.status(500).json({ message: 'Error retrieving files' });
+  }
+});
+
+// Download file
+app.get('/api/files/:id', authenticate, async (req, res) => {
+  try {
+    const fileId = parseInt(req.params.id);
+    
+    const result = await pool.query(
+      'SELECT * FROM files WHERE id = $1',
+      [fileId]
+    );
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'File not found' });
+    }
+    
+    const file = result.rows[0];
+    
+    if (file.user_id !== req.user.id && req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Unauthorized access to file' });
+    }
+    
+    // Decrypt file
+    const decryptedContent = decryptFile(file.filepath);
+    
+    // Log activity
+    await pool.query(
+      'INSERT INTO activities (user_id, action, details) VALUES ($1, $2, $3)',
+      [req.user.id, 'DOWNLOAD', `User downloaded file: ${file.filename}`]
+    );
+    
+    res.set({
+      'Content-Type': file.filetype,
+      'Content-Disposition': `attachment; filename="${file.filename}"`,
+      'Content-Length': decryptedContent.length
+    });
+    
+    res.send(decryptedContent);
+    
+  } catch (error) {
+    console.error('Download file error:', error);
+    res.status(500).json({ message: 'Error downloading file' });
+  }
+});
+
+// Get dashboard stats
+app.get('/api/dashboard/stats', authenticate, async (req, res) => {
+  try {
+    // Get user files
+    const filesResult = await pool.query(
+      'SELECT * FROM files WHERE user_id = $1',
+      [req.user.id]
+    );
+    
+    // Get recent activities
+    const activitiesResult = await pool.query(
+      'SELECT * FROM activities WHERE user_id = $1 ORDER BY created_at DESC LIMIT 5',
+      [req.user.id]
+    );
+    
+    // Get active users count
+    const usersResult = await pool.query('SELECT COUNT(*) FROM users');
+    
+    // Calculate storage used
+    const totalStorage = filesResult.rows.reduce((total, file) => total + parseInt(file.filesize), 0);
+    
+    res.json({
+      activeUsers: parseInt(usersResult.rows[0].count),
+      filesCount: filesResult.rows.length,
+      storageUsed: totalStorage,
+      recentActivities: activitiesResult.rows
+    });
+    
+  } catch (error) {
+    console.error('Dashboard stats error:', error);
+    res.status(500).json({ message: 'Error retrieving dashboard stats' });
+  }
+});
+
+// Serve a simple HTML page for testing
+app.get('/', (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>DFSS - Demo File Storage System</title>
+      <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        h1 { color: #2c3e50; }
+        .card { border: 1px solid #ddd; padding: 20px; margin: 20px 0; border-radius: 4px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        input { width: 100%; padding: 8px; box-sizing: border-box; }
+        button { background: #3498db; color: white; border: none; padding: 10px 15px; cursor: pointer; }
+        button:hover { background: #2980b9; }
+        .file-list { list-style: none; padding: 0; }
+        .file-item { padding: 10px; border-bottom: 1px solid #eee; }
+        #dashboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .stat-card { background: #f8f9fa; padding: 15px; border-radius: 4px; text-align: center; }
+        .stat-number { font-size: 24px; font-weight: bold; color: #3498db; }
+        #wsStatus { padding: 10px; background: #eee; margin-top: 20px; }
+      </style>
+    </head>
+    <body>
+      <h1>DFSS - Demo File Storage System</h1>
+      
+      <div class="card" id="loginCard">
+        <h2>Login</h2>
+        <div class="form-group">
+          <label for="email">Email:</label>
+          <input type="email" id="email" placeholder="Enter your email">
+        </div>
+        <div class="form-group">
+          <label for="password">Password:</label>
+          <input type="password" id="password" placeholder="Enter your password">
+        </div>
+        <button id="loginBtn">Login</button>
+        <p>Don't have an account? <a href="#" id="showRegister">Register</a></p>
+      </div>
+      
+      <div class="card" id="registerCard" style="display: none;">
+        <h2>Register</h2>
+        <div class="form-group">
+          <label for="regUsername">Username:</label>
+          <input type="text" id="regUsername" placeholder="Choose a username">
+        </div>
+        <div class="form-group">
+          <label for="regEmail">Email:</label>
+          <input type="email" id="regEmail" placeholder="Enter your email">
+        </div>
+        <div class="form-group">
+          <label for="regPassword">Password:</label>
+          <input type="password" id="regPassword" placeholder="Choose a password">
+        </div>
+        <div class="form-group">
+          <label for="regConfirmPassword">Confirm Password:</label>
+          <input type="password" id="regConfirmPassword" placeholder="Confirm your password">
+        </div>
+        <button id="registerBtn">Register</button>
+        <p>Already have an account? <a href="#" id="showLogin">Login</a></p>
+      </div>
+      
+      <div id="appContent" style="display: none;">
+        <button id="logoutBtn" style="position: absolute; top: 20px; right: 20px;">Logout</button>
+        
+        <h2>Dashboard</h2>
+        <div id="dashboard">
+          <div class="stat-card">
+            <div>Active Users</div>
+            <div id="activeUsers" class="stat-number">0</div>
+          </div>
+          <div class="stat-card">
+            <div>Files Count</div>
+            <div id="filesCount" class="stat-number">0</div>
+          </div>
+          <div class="stat-card">
+            <div>Storage Used</div>
+            <div id="storageUsed" class="stat-number">0</div>
+          </div>
+        </div>
+        
+        <div class="card">
+          <h2>Upload File</h2>
+          <div class="form-group">
+            <label for="fileUpload">Select File:</label>
+            <input type="file" id="fileUpload">
+          </div>
+          <button id="uploadBtn">Upload</button>
+        </div>
+        
+        <div class="card">
+          <h2>Your Files</h2>
+          <ul id="filesList" class="file-list">
+            <!-- Files will be listed here -->
+          </ul>
+        </div>
+        
+        <div class="card">
+          <h2>Recent Activities</h2>
+          <ul id="activitiesList" class="file-list">
+            <!-- Activities will be listed here -->
+          </ul>
+        </div>
+        
+        <div id="wsStatus">
+          WebSocket Status: <span id="wsStatusText">Disconnected</span>
+        </div>
+      </div>
+      
+      <script>
+        let token = localStorage.getItem('token');
+        let socket;
+        
+        // DOM Elements
+        const loginCard = document.getElementById('loginCard');
+        const registerCard = document.getElementById('registerCard');
+        const appContent = document.getElementById('appContent');
+        
+        // Check if user is logged in
+        if (token) {
+          showApp();
+          fetchDashboardStats();
+          fetchFiles();
+          setupWebSocket();
+        }
+        
+        // Toggle between login and register
+        document.getElementById('showRegister').addEventListener('click', (e) => {
+          e.preventDefault();
+          loginCard.style.display = 'none';
+          registerCard.style.display = 'block';
+        });
+        
+        document.getElementById('showLogin').addEventListener('click', (e) => {
+          e.preventDefault();
+          registerCard.style.display = 'none';
+          loginCard.style.display = 'block';
+        });
+        
+        // Login functionality
+        document.getElementById('loginBtn').addEventListener('click', async () => {
+          const email = document.getElementById('email').value;
+          const password = document.getElementById('password').value;
+          
+          try {
+            const response = await fetch('/api/auth/login', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ email, password })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+              localStorage.setItem('token', data.token);
+              localStorage.setItem('user', JSON.stringify(data.user));
+              token = data.token;
+              showApp();
+              fetchDashboardStats();
+              fetchFiles();
+              setupWebSocket();
+            } else {
+              alert(data.message || 'Login failed');
+            }
+          } catch (error) {
+            console.error('Login error:', error);
+            alert('Login failed. Please try again.');
+          }
+        });
+        
+        // Register functionality
+        document.getElementById('registerBtn').addEventListener('click', async () => {
+          const username = document.getElementById('regUsername').value;
+          const email = document.getElementById('regEmail').value;
+          const password = document.getElementById('regPassword').value;
+          const confirmPassword = document.getElementById('regConfirmPassword').value;
+          
+          if (password !== confirmPassword) {
+            alert('Passwords do not match');
+            return;
+          }
+          
+          try {
+            const response = await fetch('/api/auth/register', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ username, email, password, confirmPassword })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+              alert('Registration successful! Please log in.');
+              registerCard.style.display = 'none';
+              loginCard.style.display = 'block';
+            } else {
+              alert(data.message || 'Registration failed');
+            }
+          } catch (error) {
+            console.error('Registration error:', error);
+            alert('Registration failed. Please try again.');
+          }
+        });
+        
+        // Logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          token = null;
+          if (socket) socket.close();
+          hideApp();
+        });
+        
+        // File upload functionality
+        document.getElementById('uploadBtn').addEventListener('click', async () => {
+          const fileInput = document.getElementById('fileUpload');
+          
+          if (!fileInput.files || fileInput.files.length === 0) {
+            alert('Please select a file to upload');
+            return;
+          }
+          
+          const file = fileInput.files[0];
+          const formData = new FormData();
+          formData.append('file', file);
+          
+          try {
+            const response = await fetch('/api/files/upload', {
+              method: 'POST',
+              headers: {
+                'x-auth-token': token
+              },
+              body: formData
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+              alert('File uploaded successfully!');
+              fetchFiles();
+              fetchDashboardStats();
+            } else {
+              alert(data.message || 'Upload failed');
+            }
+          } catch (error) {
+            console.error('Upload error:', error);
+            alert('File upload failed. Please try again.');
+          }
+        });
+        
+        // Fetch dashboard stats
+        async function fetchDashboardStats() {
+          try {
+            const response = await fetch('/api/dashboard/stats', {
+              headers: {
+                'x-auth-token': token
+              }
+            });
+            
+            if (response.ok) {
+              const data = await response.json();
+              document.getElementById('activeUsers').textContent = data.activeUsers;
+              document.getElementById('filesCount').textContent = data.filesCount;
+              document.getElementById('storageUsed').textContent = formatBytes(data.storageUsed);
+              
+              // Display activities
+              const activitiesList = document.getElementById('activitiesList');
+              activitiesList.innerHTML = '';
+              
+              data.recentActivities.forEach(activity => {
+                const li = document.createElement('li');
+                li.className = 'file-item';
+                li.textContent = \`\${activity.action}: \${activity.details} (\${new Date(activity.created_at).toLocaleString()})\`;
+                activitiesList.appendChild(li);
+              });
+            }
+          } catch (error) {
+            console.error('Error fetching dashboard stats:', error);
+          }
+        }
+        
+        // Fetch user files
+        async function fetchFiles() {
+          try {
+            const response = await fetch('/api/files', {
+              headers: {
+                'x-auth-token': token
+              }
+            });
+            
+            if (response.ok) {
+              const data = await response.json();
+              const filesList = document.getElementById('filesList');
+              filesList.innerHTML = '';
+              
+              if (data.files.length === 0) {
+                const li = document.createElement('li');
+                li.className = 'file-item';
+                li.textContent = 'No files uploaded yet';
+                filesList.appendChild(li);
+                return;
+              }
+              
+              data.files.forEach(file => {
+                const li = document.createElement('li');
+                li.className = 'file-item';
+                
+                const fileInfo = document.createElement('div');
+                fileInfo.textContent = \`\${file.filename} (\${formatBytes(file.filesize)})\`;
+                
+                const downloadBtn = document.createElement('button');
+                downloadBtn.textContent = 'Download';
+                downloadBtn.style.marginLeft = '10px';
+                downloadBtn.addEventListener('click', () => downloadFile(file.id, file.filename));
+                
+                li.appendChild(fileInfo);
+                li.appendChild(downloadBtn);
+                filesList.appendChild(li);
+              });
+            }
+          } catch (error) {
+            console.error('Error fetching files:', error);
+          }
+        }
+        
+        // Download file
+        function downloadFile(fileId, filename) {
+          window.location.href = \`/api/files/\${fileId}?token=\${token}\`;
+        }
+        
+        // Set up WebSocket
+        function setupWebSocket() {
+          const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+          const wsUrl = \`\${protocol}//\${window.location.host}/ws\`;
+          
+          socket = new WebSocket(wsUrl);
+          
+          socket.onopen = () => {
+            document.getElementById('wsStatusText').textContent = 'Connected';
+            console.log('WebSocket connected');
+          };
+          
+          socket.onclose = () => {
+            document.getElementById('wsStatusText').textContent = 'Disconnected';
+            console.log('WebSocket disconnected');
+          };
+          
+          socket.onmessage = (event) => {
+            try {
+              const data = JSON.parse(event.data);
+              console.log('WebSocket message:', data);
+              
+              if (data.type === 'systemUpdate' && data.data) {
+                // Update real-time stats if needed
+              }
+            } catch (error) {
+              console.error('Error parsing WebSocket message:', error);
+            }
+          };
+        }
+        
+        // Helper functions
+        function showApp() {
+          loginCard.style.display = 'none';
+          registerCard.style.display = 'none';
+          appContent.style.display = 'block';
+        }
+        
+        function hideApp() {
+          appContent.style.display = 'none';
+          loginCard.style.display = 'block';
+        }
+        
+        function formatBytes(bytes, decimals = 2) {
+          if (bytes === 0) return '0 Bytes';
+          
+          const k = 1024;
+          const dm = decimals < 0 ? 0 : decimals;
+          const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+          
+          const i = Math.floor(Math.log(bytes) / Math.log(k));
+          
+          return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+        }
+      </script>
+    </body>
+    </html>
+  `);
+});
+
+// Start the server and WebSocket server
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Access the application at http://localhost:${PORT}`);
+});
+
+// WebSocket server events
+wss.on('connection', (ws) => {
+  console.log('Client connected to WebSocket');
+  
+  // Send initial connection message
+  ws.send(JSON.stringify({
+    type: 'connection',
+    message: 'Connected to WebSocket server',
+    timestamp: new Date()
+  }));
+  
+  // Send system updates every 5 seconds
+  const intervalId = setInterval(() => {
+    if (ws.readyState === ws.OPEN) {
+      ws.send(JSON.stringify({
+        type: 'systemUpdate',
+        data: {
+          cpu: Math.floor(Math.random() * 70) + 10,
+          memory: Math.floor(Math.random() * 70) + 20,
+          disk: Math.floor(Math.random() * 60) + 10,
+          network: Math.floor(Math.random() * 80) + 10
+        },
+        timestamp: new Date()
+      }));
+    }
+  }, 5000);
+  
+  // Handle client messages
+  ws.on('message', (message) => {
+    try {
+      const data = JSON.parse(message);
+      console.log('Received WebSocket message:', data);
+      
+      // Echo back
+      if (ws.readyState === ws.OPEN) {
+        ws.send(JSON.stringify({
+          type: 'response',
+          message: `Received: ${data.message || 'no message'}`,
+          timestamp: new Date()
+        }));
+      }
+    } catch (error) {
+      console.error('Error processing WebSocket message:', error);
+    }
+  });
+  
+  // Handle disconnection
+  ws.on('close', () => {
+    console.log('Client disconnected from WebSocket');
+    clearInterval(intervalId);
+  });
+});

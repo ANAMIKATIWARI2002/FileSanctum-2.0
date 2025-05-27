@@ -5,47 +5,43 @@ import { storage } from "./storage";
 import { insertNodeSchema, insertInvitationSchema, insertActivityLogSchema } from "@shared/schema";
 import multer from "multer";
 import { z } from "zod";
-import session from "express-session";
-import connectPg from "connect-pg-simple";
+import jwt from "jsonwebtoken";
 
 const upload = multer({ 
   storage: multer.memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024 * 1024 } // 10GB limit
 });
 
-// Simple authentication middleware
+// Token-based authentication middleware
 const isAuthenticated = (req: any, res: any, next: any) => {
-  const user = req.session?.user;
-  if (!user) {
+  const token = req.headers.authorization?.replace('Bearer ', '') || req.cookies?.authToken;
+  
+  if (!token) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
-  req.user = user;
-  next();
+  
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'filesanctum-secret') as any;
+    req.user = decoded;
+    next();
+  } catch (error) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
 };
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Setup session middleware
-  app.set("trust proxy", 1);
-  const pgStore = connectPg(session);
-  const sessionStore = new pgStore({
-    conString: process.env.DATABASE_URL,
-    createTableIfMissing: false,
-    ttl: 7 * 24 * 60 * 60 * 1000, // 1 week
-    tableName: "sessions",
+  // Cookie parser for token handling
+  app.use((req: any, res: any, next: any) => {
+    const cookies = req.headers.cookie;
+    req.cookies = {};
+    if (cookies) {
+      cookies.split(';').forEach((cookie: string) => {
+        const [key, value] = cookie.trim().split('=');
+        req.cookies[key] = value;
+      });
+    }
+    next();
   });
-  
-  app.use(session({
-    secret: process.env.SESSION_SECRET || 'filesanctum-demo-secret',
-    store: sessionStore,
-    resave: false,
-    saveUninitialized: true,
-    cookie: {
-      httpOnly: true,
-      secure: false,
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      sameSite: 'lax'
-    },
-  }));
 
   // Simple login for demo credentials
   app.post('/api/auth/login', async (req, res) => {
@@ -63,7 +59,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
           profileImageUrl: null
         });
         
-        (req.session as any).user = demoUser;
+        // Create JWT token
+        const token = jwt.sign(
+          { 
+            id: demoUser.id, 
+            email: demoUser.email, 
+            firstName: demoUser.firstName,
+            lastName: demoUser.lastName 
+          },
+          process.env.JWT_SECRET || 'filesanctum-secret',
+          { expiresIn: '24h' }
+        );
         
         await storage.createActivityLog({
           userId: demoUser.id,
@@ -75,14 +81,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
           userAgent: req.get('User-Agent') || 'unknown'
         });
         
-        // Save session explicitly
-        req.session.save((err: any) => {
-          if (err) {
-            console.error('Session save error:', err);
-            return res.status(500).json({ message: 'Session error' });
-          }
-          res.json({ message: 'Login successful', user: demoUser });
+        // Set cookie and send response
+        res.cookie('authToken', token, {
+          httpOnly: true,
+          secure: false,
+          maxAge: 24 * 60 * 60 * 1000, // 24 hours
+          sameSite: 'lax'
         });
+        
+        res.json({ message: 'Login successful', user: demoUser, token });
       } else {
         res.status(401).json({ message: 'Invalid credentials' });
       }
@@ -104,12 +111,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Logout route
   app.post('/api/auth/logout', (req: any, res) => {
-    req.session.destroy((err: any) => {
-      if (err) {
-        return res.status(500).json({ message: 'Could not log out' });
-      }
-      res.json({ message: 'Logged out successfully' });
-    });
+    res.clearCookie('authToken');
+    res.json({ message: 'Logged out successfully' });
   });
 
   // Node management routes

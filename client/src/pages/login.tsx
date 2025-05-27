@@ -28,18 +28,27 @@ export default function Login() {
         })
       });
       
+      console.log('Response status:', response.status);
+      
       if (response.ok) {
         const data = await response.json();
-        console.log('Login successful:', data);
-        // Store token in localStorage for persistence
-        localStorage.setItem('authToken', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        // Redirect to home page
-        window.location.href = '/';
+        console.log('Login response data:', data);
+        
+        if (data.token && data.user) {
+          // Store token in localStorage for persistence
+          localStorage.setItem('authToken', data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
+          console.log('Stored auth data, redirecting...');
+          // Redirect to home page
+          window.location.href = '/';
+        } else {
+          console.error('Missing token or user in response');
+          alert('Login response missing required data');
+        }
       } else {
-        const error = await response.json();
-        console.error('Login error:', error);
-        alert(error.message || 'Invalid credentials');
+        const errorText = await response.text();
+        console.error('Login failed:', response.status, errorText);
+        alert('Login failed: ' + errorText);
       }
     } catch (error) {
       console.error('Network error:', error);

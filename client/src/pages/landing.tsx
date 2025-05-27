@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Shield, Server, Lock, Zap, Mail, Phone, Sparkles, Menu, X, Users, HelpCircle, MessageCircle, Sun, Moon } from "lucide-react";
 import { useState, useEffect } from "react";
+import { Link } from "wouter";
 
 export default function Landing() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -87,19 +88,21 @@ export default function Landing() {
                 >
                   {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
                 </Button>
-                <Button 
-                  variant="ghost" 
-                  className="text-gray-600 dark:text-slate-300 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-700"
-                  onClick={() => window.location.href = '/api/login'}
-                >
-                  Log In
-                </Button>
-                <Button 
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
-                  onClick={() => window.location.href = '/api/login'}
-                >
-                  Sign Up
-                </Button>
+                <Link href="/login">
+                  <Button 
+                    variant="ghost" 
+                    className="text-gray-600 dark:text-slate-300 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-700"
+                  >
+                    Log In
+                  </Button>
+                </Link>
+                <Link href="/signup">
+                  <Button 
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                  >
+                    Sign Up
+                  </Button>
+                </Link>
               </div>
             </div>
 
@@ -171,13 +174,14 @@ export default function Landing() {
           </p>
           
           <div className="flex justify-center">
-            <Button 
-              size="lg" 
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-lg px-8 py-6"
-              onClick={() => window.location.href = '/api/login'}
-            >
-              Get Started Free
-            </Button>
+            <Link href="/signup">
+              <Button 
+                size="lg" 
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-lg px-8 py-6"
+              >
+                Get Started Free
+              </Button>
+            </Link>
           </div>
         </div>
 

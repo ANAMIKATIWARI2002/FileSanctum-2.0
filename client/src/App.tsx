@@ -6,6 +6,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "@/hooks/useAuth";
 import Landing from "@/pages/landing";
 import Dashboard from "@/pages/dashboard";
+import Login from "@/pages/login";
+import SignUp from "@/pages/signup";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -13,6 +15,11 @@ function Router() {
 
   return (
     <Switch>
+      {/* Public routes always available */}
+      <Route path="/login" component={Login} />
+      <Route path="/signup" component={SignUp} />
+      
+      {/* Protected routes - redirect to dashboard if authenticated */}
       {isLoading || !isAuthenticated ? (
         <Route path="/" component={Landing} />
       ) : (

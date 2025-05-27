@@ -12,78 +12,45 @@ export default function Landing() {
   const [loginType, setLoginType] = useState("email");
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700">
       <div className="container mx-auto px-4 py-16">
         {/* Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-12">
           <div className="flex items-center justify-center mb-6">
-            <div className="w-16 h-16 bg-primary rounded-xl flex items-center justify-center mr-4">
+            <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mr-4 shadow-lg">
               <Shield className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-4xl font-bold text-slate-900">FileSanctum</h1>
+            <h1 className="text-4xl font-bold text-white">FileSanctum</h1>
           </div>
-          <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+          <p className="text-xl text-slate-300 max-w-2xl mx-auto mb-8">
             Distributed File Storage System with advanced erasure coding, end-to-end encryption, and real-time monitoring
           </p>
         </div>
 
-        {/* Features */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-          <Card className="transition-all duration-300 hover:shadow-xl hover:scale-105 hover:bg-gradient-to-br hover:from-blue-50 hover:to-blue-100 cursor-pointer">
-            <CardContent className="p-6 text-center">
-              <Server className="w-12 h-12 text-primary mx-auto mb-4 transition-all duration-300 hover:text-blue-600" />
-              <h3 className="text-lg font-semibold mb-2">Distributed Architecture</h3>
-              <p className="text-slate-600">
-                Fault-tolerant distributed storage with automatic node recovery and load balancing
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="transition-all duration-300 hover:shadow-xl hover:scale-105 hover:bg-gradient-to-br hover:from-purple-50 hover:to-purple-100 cursor-pointer">
-            <CardContent className="p-6 text-center">
-              <Lock className="w-12 h-12 text-primary mx-auto mb-4 transition-all duration-300 hover:text-purple-600" />
-              <h3 className="text-lg font-semibold mb-2">End-to-End Encryption</h3>
-              <p className="text-slate-600">
-                AES-256 encryption with client-side key management for maximum security
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="transition-all duration-300 hover:shadow-xl hover:scale-105 hover:bg-gradient-to-br hover:from-green-50 hover:to-green-100 cursor-pointer">
-            <CardContent className="p-6 text-center">
-              <Zap className="w-12 h-12 text-primary mx-auto mb-4 transition-all duration-300 hover:text-green-600" />
-              <h3 className="text-lg font-semibold mb-2">Real-time Monitoring</h3>
-              <p className="text-slate-600">
-                Live system analytics, node health monitoring, and performance metrics
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Authentication Section */}
-        <div className="max-w-4xl mx-auto mb-12">
+        {/* Authentication Section - Moved here */}
+        <div className="max-w-4xl mx-auto mb-16">
           <Tabs defaultValue="login" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-8">
-              <TabsTrigger value="login">Sign In</TabsTrigger>
-              <TabsTrigger value="register">Register</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 mb-8 bg-slate-800 border-slate-600">
+              <TabsTrigger value="login" className="text-slate-200 data-[state=active]:bg-blue-600 data-[state=active]:text-white">Sign In</TabsTrigger>
+              <TabsTrigger value="register" className="text-slate-200 data-[state=active]:bg-purple-600 data-[state=active]:text-white">Register</TabsTrigger>
             </TabsList>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <TabsContent value="login" className="mt-0">
-                <Card>
+                <Card className="bg-slate-800/90 border-slate-600 backdrop-blur-sm">
                   <CardHeader>
-                    <CardTitle className="text-center">Sign In to FileSanctum</CardTitle>
+                    <CardTitle className="text-center text-white">Sign In to FileSanctum</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
-                      <Label>Login Method</Label>
+                      <Label className="text-slate-200">Login Method</Label>
                       <Tabs value={loginType} onValueChange={setLoginType}>
-                        <TabsList className="grid w-full grid-cols-2">
-                          <TabsTrigger value="email" className="flex items-center gap-2">
+                        <TabsList className="grid w-full grid-cols-2 bg-slate-700">
+                          <TabsTrigger value="email" className="flex items-center gap-2 text-slate-200 data-[state=active]:bg-blue-600 data-[state=active]:text-white">
                             <Mail className="w-4 h-4" />
                             Email
                           </TabsTrigger>
-                          <TabsTrigger value="phone" className="flex items-center gap-2">
+                          <TabsTrigger value="phone" className="flex items-center gap-2 text-slate-200 data-[state=active]:bg-blue-600 data-[state=active]:text-white">
                             <Phone className="w-4 h-4" />
                             Phone
                           </TabsTrigger>
@@ -93,18 +60,18 @@ export default function Landing() {
                     
                     {loginType === "email" ? (
                       <div className="space-y-2">
-                        <Label htmlFor="login-email">Email</Label>
-                        <Input id="login-email" type="email" placeholder="Enter your email" />
+                        <Label htmlFor="login-email" className="text-slate-200">Email</Label>
+                        <Input id="login-email" type="email" placeholder="Enter your email" className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400" />
                       </div>
                     ) : (
                       <div className="space-y-2">
-                        <Label htmlFor="login-phone">Phone Number</Label>
+                        <Label htmlFor="login-phone" className="text-slate-200">Phone Number</Label>
                         <div className="flex gap-2">
                           <Select value={countryCode} onValueChange={setCountryCode}>
-                            <SelectTrigger className="w-24">
+                            <SelectTrigger className="w-24 bg-slate-700 border-slate-600 text-white">
                               <SelectValue />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="bg-slate-700 border-slate-600">
                               <SelectItem value="+1">🇺🇸 +1</SelectItem>
                               <SelectItem value="+44">🇬🇧 +44</SelectItem>
                               <SelectItem value="+91">🇮🇳 +91</SelectItem>
@@ -113,19 +80,19 @@ export default function Landing() {
                               <SelectItem value="+33">🇫🇷 +33</SelectItem>
                             </SelectContent>
                           </Select>
-                          <Input id="login-phone" type="tel" placeholder="Enter phone number" className="flex-1" />
+                          <Input id="login-phone" type="tel" placeholder="Enter phone number" className="flex-1 bg-slate-700 border-slate-600 text-white placeholder:text-slate-400" />
                         </div>
                       </div>
                     )}
                     
                     <div className="space-y-2">
-                      <Label htmlFor="login-password">Password</Label>
-                      <Input id="login-password" type="password" placeholder="Enter your password" />
+                      <Label htmlFor="login-password" className="text-slate-200">Password</Label>
+                      <Input id="login-password" type="password" placeholder="Enter your password" className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400" />
                     </div>
                     
                     <Button 
                       onClick={() => window.location.href = '/api/login'}
-                      className="w-full"
+                      className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
                       size="lg"
                     >
                       Sign In to Dashboard
@@ -135,35 +102,35 @@ export default function Landing() {
               </TabsContent>
               
               <TabsContent value="register" className="mt-0">
-                <Card>
+                <Card className="bg-slate-800/90 border-slate-600 backdrop-blur-sm">
                   <CardHeader>
-                    <CardTitle className="text-center">Create Account</CardTitle>
+                    <CardTitle className="text-center text-white">Create Account</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="first-name">First Name</Label>
-                        <Input id="first-name" placeholder="John" />
+                        <Label htmlFor="first-name" className="text-slate-200">First Name</Label>
+                        <Input id="first-name" placeholder="John" className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400" />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="last-name">Last Name</Label>
-                        <Input id="last-name" placeholder="Doe" />
+                        <Label htmlFor="last-name" className="text-slate-200">Last Name</Label>
+                        <Input id="last-name" placeholder="Doe" className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400" />
                       </div>
                     </div>
                     
                     <div className="space-y-2">
-                      <Label htmlFor="reg-email">Email</Label>
-                      <Input id="reg-email" type="email" placeholder="john@example.com" />
+                      <Label htmlFor="reg-email" className="text-slate-200">Email</Label>
+                      <Input id="reg-email" type="email" placeholder="john@example.com" className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400" />
                     </div>
                     
                     <div className="space-y-2">
-                      <Label htmlFor="reg-phone">Phone Number</Label>
+                      <Label htmlFor="reg-phone" className="text-slate-200">Phone Number</Label>
                       <div className="flex gap-2">
                         <Select value={countryCode} onValueChange={setCountryCode}>
-                          <SelectTrigger className="w-24">
+                          <SelectTrigger className="w-24 bg-slate-700 border-slate-600 text-white">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent className="bg-slate-700 border-slate-600">
                             <SelectItem value="+1">🇺🇸 +1</SelectItem>
                             <SelectItem value="+44">🇬🇧 +44</SelectItem>
                             <SelectItem value="+91">🇮🇳 +91</SelectItem>
@@ -172,21 +139,21 @@ export default function Landing() {
                             <SelectItem value="+33">🇫🇷 +33</SelectItem>
                           </SelectContent>
                         </Select>
-                        <Input id="reg-phone" type="tel" placeholder="1234567890" className="flex-1" />
+                        <Input id="reg-phone" type="tel" placeholder="1234567890" className="flex-1 bg-slate-700 border-slate-600 text-white placeholder:text-slate-400" />
                       </div>
                     </div>
                     
                     <div className="space-y-2">
-                      <Label htmlFor="reg-password">Password</Label>
-                      <Input id="reg-password" type="password" placeholder="Create a strong password" />
+                      <Label htmlFor="reg-password" className="text-slate-200">Password</Label>
+                      <Input id="reg-password" type="password" placeholder="Create a strong password" className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400" />
                     </div>
                     
                     <div className="space-y-2">
-                      <Label htmlFor="confirm-password">Confirm Password</Label>
-                      <Input id="confirm-password" type="password" placeholder="Confirm your password" />
+                      <Label htmlFor="confirm-password" className="text-slate-200">Confirm Password</Label>
+                      <Input id="confirm-password" type="password" placeholder="Confirm your password" className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400" />
                     </div>
                     
-                    <Button className="w-full" size="lg">
+                    <Button className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800" size="lg">
                       Create Account
                     </Button>
                   </CardContent>
@@ -196,77 +163,112 @@ export default function Landing() {
           </Tabs>
         </div>
 
+        {/* Features */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+          <Card className="bg-slate-800/80 border-slate-600 transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/25 hover:scale-105 hover:bg-gradient-to-br hover:from-blue-900/50 hover:to-blue-800/50 cursor-pointer backdrop-blur-sm">
+            <CardContent className="p-6 text-center">
+              <Server className="w-12 h-12 text-blue-400 mx-auto mb-4 transition-all duration-300 hover:text-blue-300" />
+              <h3 className="text-lg font-semibold mb-2 text-white">Distributed Architecture</h3>
+              <p className="text-slate-300">
+                Fault-tolerant distributed storage with automatic node recovery and load balancing
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-slate-800/80 border-slate-600 transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/25 hover:scale-105 hover:bg-gradient-to-br hover:from-purple-900/50 hover:to-purple-800/50 cursor-pointer backdrop-blur-sm">
+            <CardContent className="p-6 text-center">
+              <Lock className="w-12 h-12 text-purple-400 mx-auto mb-4 transition-all duration-300 hover:text-purple-300" />
+              <h3 className="text-lg font-semibold mb-2 text-white">End-to-End Encryption</h3>
+              <p className="text-slate-300">
+                AES-256 encryption with client-side key management for maximum security
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-slate-800/80 border-slate-600 transition-all duration-300 hover:shadow-2xl hover:shadow-green-500/25 hover:scale-105 hover:bg-gradient-to-br hover:from-green-900/50 hover:to-green-800/50 cursor-pointer backdrop-blur-sm">
+            <CardContent className="p-6 text-center">
+              <Zap className="w-12 h-12 text-green-400 mx-auto mb-4 transition-all duration-300 hover:text-green-300" />
+              <h3 className="text-lg font-semibold mb-2 text-white">Real-time Monitoring</h3>
+              <p className="text-slate-300">
+                Live system analytics, node health monitoring, and performance metrics
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+
+
         {/* Technical Details */}
         <div className="mt-16 text-center">
           <div className="flex items-center justify-center mb-6">
-            <Sparkles className="w-6 h-6 text-primary mr-2" />
-            <h3 className="text-2xl font-bold text-slate-900">Technical Specifications</h3>
-            <Sparkles className="w-6 h-6 text-primary ml-2" />
+            <Sparkles className="w-6 h-6 text-blue-400 mr-2" />
+            <h3 className="text-2xl font-bold text-white">Technical Specifications</h3>
+            <Sparkles className="w-6 h-6 text-purple-400 ml-2" />
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
-            <div className="group relative overflow-hidden bg-gradient-to-br from-white via-blue-50 to-blue-100 rounded-xl p-6 shadow-lg hover:shadow-2xl transition-all duration-500 hover:scale-105 cursor-pointer">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-purple-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="group relative overflow-hidden bg-gradient-to-br from-slate-800/90 via-blue-900/30 to-blue-800/30 border border-slate-600 rounded-xl p-6 shadow-lg hover:shadow-2xl hover:shadow-blue-500/25 transition-all duration-500 hover:scale-105 cursor-pointer backdrop-blur-sm">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-400/10 to-purple-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               <div className="relative z-10">
-                <div className="text-3xl font-bold text-blue-600 mb-2 group-hover:text-blue-700 transition-colors">6+3</div>
-                <div className="text-sm font-medium text-slate-700">Erasure Coding</div>
-                <div className="text-xs text-slate-500 mt-1">Reed-Solomon</div>
+                <div className="text-3xl font-bold text-blue-400 mb-2 group-hover:text-blue-300 transition-colors">6+3</div>
+                <div className="text-sm font-medium text-slate-200">Erasure Coding</div>
+                <div className="text-xs text-slate-400 mt-1">Reed-Solomon</div>
               </div>
             </div>
             
-            <div className="group relative overflow-hidden bg-gradient-to-br from-white via-purple-50 to-purple-100 rounded-xl p-6 shadow-lg hover:shadow-2xl transition-all duration-500 hover:scale-105 cursor-pointer">
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-400/20 to-pink-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="group relative overflow-hidden bg-gradient-to-br from-slate-800/90 via-purple-900/30 to-purple-800/30 border border-slate-600 rounded-xl p-6 shadow-lg hover:shadow-2xl hover:shadow-purple-500/25 transition-all duration-500 hover:scale-105 cursor-pointer backdrop-blur-sm">
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-400/10 to-pink-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               <div className="relative z-10">
-                <div className="text-3xl font-bold text-purple-600 mb-2 group-hover:text-purple-700 transition-colors">AES-256</div>
-                <div className="text-sm font-medium text-slate-700">Encryption</div>
-                <div className="text-xs text-slate-500 mt-1">Client-Side Keys</div>
+                <div className="text-3xl font-bold text-purple-400 mb-2 group-hover:text-purple-300 transition-colors">AES-256</div>
+                <div className="text-sm font-medium text-slate-200">Encryption</div>
+                <div className="text-xs text-slate-400 mt-1">Client-Side Keys</div>
               </div>
             </div>
             
-            <div className="group relative overflow-hidden bg-gradient-to-br from-white via-green-50 to-green-100 rounded-xl p-6 shadow-lg hover:shadow-2xl transition-all duration-500 hover:scale-105 cursor-pointer">
-              <div className="absolute inset-0 bg-gradient-to-r from-green-400/20 to-emerald-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="group relative overflow-hidden bg-gradient-to-br from-slate-800/90 via-green-900/30 to-green-800/30 border border-slate-600 rounded-xl p-6 shadow-lg hover:shadow-2xl hover:shadow-green-500/25 transition-all duration-500 hover:scale-105 cursor-pointer backdrop-blur-sm">
+              <div className="absolute inset-0 bg-gradient-to-r from-green-400/10 to-emerald-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               <div className="relative z-10">
-                <div className="text-3xl font-bold text-green-600 mb-2 group-hover:text-green-700 transition-colors">99.9%</div>
-                <div className="text-sm font-medium text-slate-700">Uptime</div>
-                <div className="text-xs text-slate-500 mt-1">SLA Guaranteed</div>
+                <div className="text-3xl font-bold text-green-400 mb-2 group-hover:text-green-300 transition-colors">99.9%</div>
+                <div className="text-sm font-medium text-slate-200">Uptime</div>
+                <div className="text-xs text-slate-400 mt-1">SLA Guaranteed</div>
               </div>
             </div>
             
-            <div className="group relative overflow-hidden bg-gradient-to-br from-white via-orange-50 to-orange-100 rounded-xl p-6 shadow-lg hover:shadow-2xl transition-all duration-500 hover:scale-105 cursor-pointer">
-              <div className="absolute inset-0 bg-gradient-to-r from-orange-400/20 to-red-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="group relative overflow-hidden bg-gradient-to-br from-slate-800/90 via-orange-900/30 to-orange-800/30 border border-slate-600 rounded-xl p-6 shadow-lg hover:shadow-2xl hover:shadow-orange-500/25 transition-all duration-500 hover:scale-105 cursor-pointer backdrop-blur-sm">
+              <div className="absolute inset-0 bg-gradient-to-r from-orange-400/10 to-red-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               <div className="relative z-10">
-                <div className="text-3xl font-bold text-orange-600 mb-2 group-hover:text-orange-700 transition-colors">10GB</div>
-                <div className="text-sm font-medium text-slate-700">Max File Size</div>
-                <div className="text-xs text-slate-500 mt-1">Per Upload</div>
+                <div className="text-3xl font-bold text-orange-400 mb-2 group-hover:text-orange-300 transition-colors">10GB</div>
+                <div className="text-sm font-medium text-slate-200">Max File Size</div>
+                <div className="text-xs text-slate-400 mt-1">Per Upload</div>
               </div>
             </div>
           </div>
           
           {/* Additional tech specs row */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-6 max-w-3xl mx-auto mt-6">
-            <div className="group relative overflow-hidden bg-gradient-to-br from-white via-indigo-50 to-indigo-100 rounded-xl p-6 shadow-lg hover:shadow-2xl transition-all duration-500 hover:scale-105 cursor-pointer">
-              <div className="absolute inset-0 bg-gradient-to-r from-indigo-400/20 to-blue-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="group relative overflow-hidden bg-gradient-to-br from-slate-800/90 via-indigo-900/30 to-indigo-800/30 border border-slate-600 rounded-xl p-6 shadow-lg hover:shadow-2xl hover:shadow-indigo-500/25 transition-all duration-500 hover:scale-105 cursor-pointer backdrop-blur-sm">
+              <div className="absolute inset-0 bg-gradient-to-r from-indigo-400/10 to-blue-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               <div className="relative z-10">
-                <div className="text-3xl font-bold text-indigo-600 mb-2 group-hover:text-indigo-700 transition-colors">WebSocket</div>
-                <div className="text-sm font-medium text-slate-700">Real-time Updates</div>
-                <div className="text-xs text-slate-500 mt-1">Live Monitoring</div>
+                <div className="text-3xl font-bold text-indigo-400 mb-2 group-hover:text-indigo-300 transition-colors">WebSocket</div>
+                <div className="text-sm font-medium text-slate-200">Real-time Updates</div>
+                <div className="text-xs text-slate-400 mt-1">Live Monitoring</div>
               </div>
             </div>
             
-            <div className="group relative overflow-hidden bg-gradient-to-br from-white via-teal-50 to-teal-100 rounded-xl p-6 shadow-lg hover:shadow-2xl transition-all duration-500 hover:scale-105 cursor-pointer">
-              <div className="absolute inset-0 bg-gradient-to-r from-teal-400/20 to-cyan-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="group relative overflow-hidden bg-gradient-to-br from-slate-800/90 via-teal-900/30 to-teal-800/30 border border-slate-600 rounded-xl p-6 shadow-lg hover:shadow-2xl hover:shadow-teal-500/25 transition-all duration-500 hover:scale-105 cursor-pointer backdrop-blur-sm">
+              <div className="absolute inset-0 bg-gradient-to-r from-teal-400/10 to-cyan-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               <div className="relative z-10">
-                <div className="text-3xl font-bold text-teal-600 mb-2 group-hover:text-teal-700 transition-colors">Multi-Node</div>
-                <div className="text-sm font-medium text-slate-700">Distribution</div>
-                <div className="text-xs text-slate-500 mt-1">Fault Tolerant</div>
+                <div className="text-3xl font-bold text-teal-400 mb-2 group-hover:text-teal-300 transition-colors">Multi-Node</div>
+                <div className="text-sm font-medium text-slate-200">Distribution</div>
+                <div className="text-xs text-slate-400 mt-1">Fault Tolerant</div>
               </div>
             </div>
             
-            <div className="group relative overflow-hidden bg-gradient-to-br from-white via-rose-50 to-rose-100 rounded-xl p-6 shadow-lg hover:shadow-2xl transition-all duration-500 hover:scale-105 cursor-pointer">
-              <div className="absolute inset-0 bg-gradient-to-r from-rose-400/20 to-pink-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="group relative overflow-hidden bg-gradient-to-br from-slate-800/90 via-rose-900/30 to-rose-800/30 border border-slate-600 rounded-xl p-6 shadow-lg hover:shadow-2xl hover:shadow-rose-500/25 transition-all duration-500 hover:scale-105 cursor-pointer backdrop-blur-sm">
+              <div className="absolute inset-0 bg-gradient-to-r from-rose-400/10 to-pink-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               <div className="relative z-10">
-                <div className="text-3xl font-bold text-rose-600 mb-2 group-hover:text-rose-700 transition-colors">REST API</div>
-                <div className="text-sm font-medium text-slate-700">Integration</div>
-                <div className="text-xs text-slate-500 mt-1">Developer Ready</div>
+                <div className="text-3xl font-bold text-rose-400 mb-2 group-hover:text-rose-300 transition-colors">REST API</div>
+                <div className="text-sm font-medium text-slate-200">Integration</div>
+                <div className="text-xs text-slate-400 mt-1">Developer Ready</div>
               </div>
             </div>
           </div>

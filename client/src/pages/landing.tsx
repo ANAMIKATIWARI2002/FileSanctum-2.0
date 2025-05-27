@@ -224,69 +224,69 @@ export default function Landing() {
             <Sparkles className="w-6 h-6 text-purple-400 ml-2" />
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
-            <div className="group relative overflow-hidden bg-gradient-to-br from-slate-700/90 via-blue-900/60 to-blue-800/60 dark:from-slate-800/90 dark:via-blue-900/30 dark:to-blue-800/30 border border-slate-400 dark:border-slate-600 rounded-xl p-6 shadow-lg hover:shadow-2xl hover:shadow-blue-500/40 transition-all duration-500 hover:scale-105 cursor-pointer backdrop-blur-sm">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-purple-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="group relative overflow-hidden bg-gradient-to-br from-blue-400/80 via-blue-500/80 to-blue-600/80 dark:from-slate-800/90 dark:via-blue-900/30 dark:to-blue-800/30 border border-slate-300 dark:border-slate-600 rounded-xl p-6 shadow-lg hover:shadow-2xl hover:shadow-blue-500/40 transition-all duration-500 hover:scale-105 cursor-pointer backdrop-blur-sm">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-400/30 to-purple-400/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               <div className="relative z-10">
-                <div className="text-3xl font-bold text-blue-300 mb-2 group-hover:text-blue-200 transition-colors">6+3</div>
+                <div className="text-3xl font-bold text-white mb-2 group-hover:text-white transition-colors">6+3</div>
                 <div className="text-sm font-medium text-white">Erasure Coding</div>
-                <div className="text-xs text-slate-200 mt-1">Reed-Solomon</div>
+                <div className="text-xs text-white/90 mt-1">Reed-Solomon</div>
               </div>
             </div>
             
-            <div className="group relative overflow-hidden bg-gradient-to-br from-slate-700/90 via-purple-900/60 to-purple-800/60 dark:from-slate-800/90 dark:via-purple-900/30 dark:to-purple-800/30 border border-slate-400 dark:border-slate-600 rounded-xl p-6 shadow-lg hover:shadow-2xl hover:shadow-purple-500/40 transition-all duration-500 hover:scale-105 cursor-pointer backdrop-blur-sm">
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-400/20 to-pink-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="group relative overflow-hidden bg-gradient-to-br from-purple-400/80 via-purple-500/80 to-purple-600/80 dark:from-slate-800/90 dark:via-purple-900/30 dark:to-purple-800/30 border border-slate-300 dark:border-slate-600 rounded-xl p-6 shadow-lg hover:shadow-2xl hover:shadow-purple-500/40 transition-all duration-500 hover:scale-105 cursor-pointer backdrop-blur-sm">
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-400/30 to-pink-400/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               <div className="relative z-10">
-                <div className="text-3xl font-bold text-purple-300 mb-2 group-hover:text-purple-200 transition-colors">AES-256</div>
+                <div className="text-3xl font-bold text-white mb-2 group-hover:text-white transition-colors">AES-256</div>
                 <div className="text-sm font-medium text-white">Encryption</div>
-                <div className="text-xs text-slate-200 mt-1">Client-Side Keys</div>
+                <div className="text-xs text-white/90 mt-1">Client-Side Keys</div>
               </div>
             </div>
             
-            <div className="group relative overflow-hidden bg-gradient-to-br from-slate-700/90 via-green-900/60 to-green-800/60 dark:from-slate-800/90 dark:via-green-900/30 dark:to-green-800/30 border border-slate-400 dark:border-slate-600 rounded-xl p-6 shadow-lg hover:shadow-2xl hover:shadow-green-500/40 transition-all duration-500 hover:scale-105 cursor-pointer backdrop-blur-sm">
-              <div className="absolute inset-0 bg-gradient-to-r from-green-400/20 to-emerald-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="group relative overflow-hidden bg-gradient-to-br from-green-400/80 via-green-500/80 to-green-600/80 dark:from-slate-800/90 dark:via-green-900/30 dark:to-green-800/30 border border-slate-300 dark:border-slate-600 rounded-xl p-6 shadow-lg hover:shadow-2xl hover:shadow-green-500/40 transition-all duration-500 hover:scale-105 cursor-pointer backdrop-blur-sm">
+              <div className="absolute inset-0 bg-gradient-to-r from-green-400/30 to-emerald-400/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               <div className="relative z-10">
-                <div className="text-3xl font-bold text-green-300 mb-2 group-hover:text-green-200 transition-colors">99.9%</div>
+                <div className="text-3xl font-bold text-white mb-2 group-hover:text-white transition-colors">99.9%</div>
                 <div className="text-sm font-medium text-white">Uptime</div>
-                <div className="text-xs text-slate-200 mt-1">SLA Guaranteed</div>
+                <div className="text-xs text-white/90 mt-1">SLA Guaranteed</div>
               </div>
             </div>
             
-            <div className="group relative overflow-hidden bg-gradient-to-br from-slate-700/90 via-orange-900/60 to-orange-800/60 dark:from-slate-800/90 dark:via-orange-900/30 dark:to-orange-800/30 border border-slate-400 dark:border-slate-600 rounded-xl p-6 shadow-lg hover:shadow-2xl hover:shadow-orange-500/40 transition-all duration-500 hover:scale-105 cursor-pointer backdrop-blur-sm">
-              <div className="absolute inset-0 bg-gradient-to-r from-orange-400/20 to-red-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="group relative overflow-hidden bg-gradient-to-br from-orange-400/80 via-orange-500/80 to-orange-600/80 dark:from-slate-800/90 dark:via-orange-900/30 dark:to-orange-800/30 border border-slate-300 dark:border-slate-600 rounded-xl p-6 shadow-lg hover:shadow-2xl hover:shadow-orange-500/40 transition-all duration-500 hover:scale-105 cursor-pointer backdrop-blur-sm">
+              <div className="absolute inset-0 bg-gradient-to-r from-orange-400/30 to-red-400/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               <div className="relative z-10">
-                <div className="text-3xl font-bold text-orange-300 mb-2 group-hover:text-orange-200 transition-colors">10GB</div>
+                <div className="text-3xl font-bold text-white mb-2 group-hover:text-white transition-colors">10GB</div>
                 <div className="text-sm font-medium text-white">Max File Size</div>
-                <div className="text-xs text-slate-200 mt-1">Per Upload</div>
+                <div className="text-xs text-white/90 mt-1">Per Upload</div>
               </div>
             </div>
           </div>
           
           {/* Additional tech specs row */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-6 max-w-3xl mx-auto mt-6">
-            <div className="group relative overflow-hidden bg-gradient-to-br from-slate-800/90 via-indigo-900/30 to-indigo-800/30 border border-slate-600 rounded-xl p-6 shadow-lg hover:shadow-2xl hover:shadow-indigo-500/25 transition-all duration-500 hover:scale-105 cursor-pointer backdrop-blur-sm">
-              <div className="absolute inset-0 bg-gradient-to-r from-indigo-400/10 to-blue-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="group relative overflow-hidden bg-gradient-to-br from-indigo-400/80 via-indigo-500/80 to-indigo-600/80 dark:from-slate-800/90 dark:via-indigo-900/30 dark:to-indigo-800/30 border border-slate-300 dark:border-slate-600 rounded-xl p-6 shadow-lg hover:shadow-2xl hover:shadow-indigo-500/40 transition-all duration-500 hover:scale-105 cursor-pointer backdrop-blur-sm">
+              <div className="absolute inset-0 bg-gradient-to-r from-indigo-400/30 to-blue-400/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               <div className="relative z-10">
-                <div className="text-3xl font-bold text-indigo-400 mb-2 group-hover:text-indigo-300 transition-colors">WebSocket</div>
-                <div className="text-sm font-medium text-slate-200">Real-time Updates</div>
-                <div className="text-xs text-slate-400 mt-1">Live Monitoring</div>
+                <div className="text-3xl font-bold text-white mb-2 group-hover:text-white transition-colors">WebSocket</div>
+                <div className="text-sm font-medium text-white">Real-time Updates</div>
+                <div className="text-xs text-white/90 mt-1">Live Monitoring</div>
               </div>
             </div>
             
-            <div className="group relative overflow-hidden bg-gradient-to-br from-slate-800/90 via-teal-900/30 to-teal-800/30 border border-slate-600 rounded-xl p-6 shadow-lg hover:shadow-2xl hover:shadow-teal-500/25 transition-all duration-500 hover:scale-105 cursor-pointer backdrop-blur-sm">
-              <div className="absolute inset-0 bg-gradient-to-r from-teal-400/10 to-cyan-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="group relative overflow-hidden bg-gradient-to-br from-teal-400/80 via-teal-500/80 to-teal-600/80 dark:from-slate-800/90 dark:via-teal-900/30 dark:to-teal-800/30 border border-slate-300 dark:border-slate-600 rounded-xl p-6 shadow-lg hover:shadow-2xl hover:shadow-teal-500/40 transition-all duration-500 hover:scale-105 cursor-pointer backdrop-blur-sm">
+              <div className="absolute inset-0 bg-gradient-to-r from-teal-400/30 to-cyan-400/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               <div className="relative z-10">
-                <div className="text-3xl font-bold text-teal-400 mb-2 group-hover:text-teal-300 transition-colors">Multi-Node</div>
-                <div className="text-sm font-medium text-slate-200">Distribution</div>
-                <div className="text-xs text-slate-400 mt-1">Fault Tolerant</div>
+                <div className="text-3xl font-bold text-white mb-2 group-hover:text-white transition-colors">Multi-Node</div>
+                <div className="text-sm font-medium text-white">Distribution</div>
+                <div className="text-xs text-white/90 mt-1">Fault Tolerant</div>
               </div>
             </div>
             
-            <div className="group relative overflow-hidden bg-gradient-to-br from-slate-800/90 via-rose-900/30 to-rose-800/30 border border-slate-600 rounded-xl p-6 shadow-lg hover:shadow-2xl hover:shadow-rose-500/25 transition-all duration-500 hover:scale-105 cursor-pointer backdrop-blur-sm">
-              <div className="absolute inset-0 bg-gradient-to-r from-rose-400/10 to-pink-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="group relative overflow-hidden bg-gradient-to-br from-rose-400/80 via-rose-500/80 to-rose-600/80 dark:from-slate-800/90 dark:via-rose-900/30 dark:to-rose-800/30 border border-slate-300 dark:border-slate-600 rounded-xl p-6 shadow-lg hover:shadow-2xl hover:shadow-rose-500/40 transition-all duration-500 hover:scale-105 cursor-pointer backdrop-blur-sm">
+              <div className="absolute inset-0 bg-gradient-to-r from-rose-400/30 to-pink-400/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               <div className="relative z-10">
-                <div className="text-3xl font-bold text-rose-400 mb-2 group-hover:text-rose-300 transition-colors">REST API</div>
-                <div className="text-sm font-medium text-slate-200">Integration</div>
-                <div className="text-xs text-slate-400 mt-1">Developer Ready</div>
+                <div className="text-3xl font-bold text-white mb-2 group-hover:text-white transition-colors">REST API</div>
+                <div className="text-sm font-medium text-white">Integration</div>
+                <div className="text-xs text-white/90 mt-1">Developer Ready</div>
               </div>
             </div>
           </div>
@@ -295,8 +295,8 @@ export default function Landing() {
         {/* About Us Section */}
         <div className="mt-32" id="about">
           <div className="text-center mb-16">
-            <h3 className="text-4xl font-bold text-white mb-6">About FileSanctum</h3>
-            <p className="text-xl text-slate-300 max-w-4xl mx-auto">
+            <h3 className="text-4xl font-bold text-black dark:text-white mb-6">About FileSanctum</h3>
+            <p className="text-xl text-gray-700 dark:text-slate-300 max-w-4xl mx-auto">
               FileSanctum revolutionizes data storage with cutting-edge distributed file system technology. 
               Our platform ensures your files are secure, accessible, and protected across a global network 
               of nodes, providing enterprise-grade reliability for businesses and individuals alike.

@@ -29,8 +29,12 @@ export default function Login() {
       });
       
       if (response.ok) {
-        // Redirect to dashboard on successful login
-        window.location.href = '/';
+        const data = await response.json();
+        // Store token in localStorage for persistence
+        localStorage.setItem('authToken', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        // Force page reload to update auth state
+        window.location.reload();
       } else {
         const error = await response.json();
         alert(error.message || 'Login failed');

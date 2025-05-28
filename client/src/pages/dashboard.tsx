@@ -472,19 +472,19 @@ function QuickFileOperations({ onSectionChange }: { onSectionChange: (section: D
       <h3 className="text-lg font-semibold text-card-foreground mb-4">Quick File Operations</h3>
       <div className="space-y-4">
         <div 
-          className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors cursor-pointer"
+          className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary transition-colors cursor-pointer bg-background"
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           onClick={handleFileSelect}
         >
-          <div className="w-12 h-12 mx-auto mb-4 bg-blue-100 rounded-lg flex items-center justify-center">
-            <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="w-12 h-12 mx-auto mb-4 bg-primary/10 rounded-lg flex items-center justify-center">
+            <svg className="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
             </svg>
           </div>
-          <p className="text-gray-600 mb-2">Drag & drop files or click to browse</p>
-          <p className="text-sm text-gray-500 mb-4">Support for any file type up to 10GB per file</p>
-          <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+          <p className="text-foreground mb-2">Drag & drop files or click to browse</p>
+          <p className="text-sm text-muted-foreground mb-4">Support for any file type up to 10GB per file</p>
+          <button className="bg-primary text-primary-foreground px-6 py-2 rounded-lg hover:bg-primary/90 transition-colors">
             Choose Files
           </button>
         </div>

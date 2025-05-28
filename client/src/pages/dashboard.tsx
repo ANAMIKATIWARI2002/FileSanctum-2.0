@@ -12,6 +12,8 @@ import NodeManagement from "@/components/node-management";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
+import { Sun, Moon } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 type DashboardSection = 
   | "dashboard" 
@@ -25,7 +27,25 @@ type DashboardSection =
 export default function Dashboard() {
   const { section } = useParams();
   const [activeSection, setActiveSection] = useState<DashboardSection>("dashboard");
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const { user } = useAuth();
+
+  // Theme management
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      setIsDarkMode(savedTheme === 'dark');
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [isDarkMode]);
 
   // System stats
   const { data: systemStats } = useQuery({
@@ -262,6 +282,17 @@ export default function Dashboard() {
               <div className="text-sm text-gray-600">
                 Last login: {new Date().toLocaleString()}
               </div>
+              
+              {/* Theme Toggle */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsDarkMode(!isDarkMode)}
+                className="p-2"
+              >
+                {isDarkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              </Button>
+              
               <button 
                 onClick={() => {
                   // Clear local storage

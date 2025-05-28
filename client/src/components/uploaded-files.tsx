@@ -102,12 +102,37 @@ export default function UploadedFiles() {
     return matchesSearch && matchesType;
   });
 
-  const handleDownload = (file: File) => {
-    // In a real implementation, this would download the file
-    toast({
-      title: "Download started",
-      description: `Downloading ${file.originalName}`,
-    });
+  const handleDownload = async (file: File) => {
+    try {
+      const response = await fetch(`/api/files/${file.id}/download`, {
+        credentials: 'include'
+      });
+      
+      if (!response.ok) {
+        throw new Error('Download failed');
+      }
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = file.originalName;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      toast({
+        title: "Download started",
+        description: `Downloading ${file.originalName}`,
+      });
+    } catch (error) {
+      toast({
+        title: "Download failed",
+        description: `Failed to download ${file.originalName}`,
+        variant: "destructive",
+      });
+    }
   };
 
   const handleDelete = (fileId: number) => {

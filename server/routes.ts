@@ -186,7 +186,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         originalName: req.file.originalname,
         size: req.file.size.toString(),
         mimeType: req.file.mimetype,
-        uploadedBy: req.user.claims.sub,
+        uploadedBy: req.user.id || 'demo',
         status: "uploading",
         erasureCoding: {
           k: 6, // data chunks

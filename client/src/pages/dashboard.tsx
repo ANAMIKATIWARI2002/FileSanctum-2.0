@@ -214,12 +214,7 @@ export default function Dashboard() {
                   </div>
                   
                   <div className="space-y-2">
-                    <button 
-                      onClick={() => setActiveSection("node-monitoring")}
-                      className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors"
-                    >
-                      ➕ Add New Node
-                    </button>
+                    <AddNodeButton />
                     <button 
                       onClick={() => setActiveSection("node-monitoring")}
                       className="w-full bg-orange-600 text-white py-2 px-4 rounded-lg hover:bg-orange-700 transition-colors"
@@ -277,6 +272,60 @@ export default function Dashboard() {
         </main>
       </div>
     </div>
+  );
+}
+
+// Add Node Button Component
+function AddNodeButton() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const addNodeMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch('/api/nodes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: `Node${Date.now()}`,
+          ipAddress: `192.168.1.${Math.floor(Math.random() * 100) + 100}`,
+          status: 'healthy',
+          storageCapacity: `${Math.floor(Math.random() * 500) + 100}GB`,
+          storageUsed: '0GB',
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to add node');
+      }
+      
+      return await response.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/nodes"] });
+      toast({
+        title: "Node added successfully",
+        description: `${data.name} has been added to the cluster`,
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Failed to add node",
+        description: "Could not add the new node to the cluster",
+        variant: "destructive",
+      });
+    },
+  });
+
+  return (
+    <button 
+      onClick={() => addNodeMutation.mutate()}
+      disabled={addNodeMutation.isPending}
+      className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+    >
+      {addNodeMutation.isPending ? "Adding..." : "➕ Add New Node"}
+    </button>
   );
 }
 

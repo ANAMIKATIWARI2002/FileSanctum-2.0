@@ -139,7 +139,7 @@ export default function Notifications({ theme }: NotificationsProps) {
                   size="sm"
                   onClick={() => setIsOpen(false)}
                 >
-                  <X className={`w-4 h-4 ${theme === 'dark' ? 'text-black' : 'text-white'}`} />
+                  <X className="w-4 h-4 text-white" />
                 </Button>
               </div>
             </div>

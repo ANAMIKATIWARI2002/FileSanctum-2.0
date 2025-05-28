@@ -7,7 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { Download, Trash2, FileText, Image, Video, Music, File as FileIcon } from "lucide-react";
+import { Download, Trash2, FileText, Image, Video, Music, File as FileIcon, Server, CheckSquare, Square } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { format } from "date-fns";
 
 interface File {
@@ -24,11 +25,22 @@ interface File {
 export default function UploadedFiles() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState("all");
+  const [selectedFiles, setSelectedFiles] = useState<number[]>([]);
+  const [isNodeSelectionMode, setIsNodeSelectionMode] = useState(false);
+  const [selectedNodeId, setSelectedNodeId] = useState<string>("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const { data: files = [], isLoading } = useQuery<File[]>({
     queryKey: ["/api/files"],
+  });
+
+  // Fetch available nodes for selection
+  const { data: nodes = [] } = useQuery({
+    queryKey: ["/api/nodes"],
+    staleTime: 300000,
+    refetchInterval: false,
+    refetchOnWindowFocus: false,
   });
 
   const deleteMutation = useMutation({

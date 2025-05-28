@@ -10,7 +10,8 @@ import { z } from "zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { RotateCcw, Plus, Server } from "lucide-react";
+import { RotateCcw, Plus, Server, Star, StarOff } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 
 const nodeSchema = z.object({
   name: z.string().min(1, "Node name is required"),
@@ -24,6 +25,14 @@ export default function NodeManagement() {
   const [isAddNodeOpen, setIsAddNodeOpen] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Fetch all nodes to show default node status
+  const { data: nodes = [] } = useQuery({
+    queryKey: ["/api/nodes"],
+    staleTime: 300000,
+    refetchInterval: false,
+    refetchOnWindowFocus: false,
+  });
 
   const form = useForm<NodeForm>({
     resolver: zodResolver(nodeSchema),
@@ -86,12 +95,38 @@ export default function NodeManagement() {
     },
   });
 
+  // Set default node mutation
+  const setDefaultNodeMutation = useMutation({
+    mutationFn: async (nodeId: number) => {
+      const response = await apiRequest("PUT", `/api/nodes/${nodeId}/set-default`);
+      return await response.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/nodes"] });
+      toast({
+        title: "Default node updated",
+        description: `${data.name} is now the default storage node`,
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Failed to set default node",
+        description: "Could not update the default storage node",
+        variant: "destructive",
+      });
+    },
+  });
+
   const onSubmit = (data: NodeForm) => {
     addNodeMutation.mutate(data);
   };
 
   const handleNodeRecovery = () => {
     nodeRecoveryMutation.mutate();
+  };
+
+  const handleSetDefaultNode = (nodeId: number) => {
+    setDefaultNodeMutation.mutate(nodeId);
   };
 
   return (
@@ -103,7 +138,43 @@ export default function NodeManagement() {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
+        <div className="space-y-6">
+          {/* Default Node Status */}
+          {nodes.length > 0 && (
+            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+              <h4 className="font-semibold text-blue-800 dark:text-blue-200 mb-3 flex items-center">
+                <Star className="w-4 h-4 mr-2" />
+                Default Storage Node
+              </h4>
+              <div className="space-y-2">
+                {(nodes as any[]).map((node: any) => (
+                  <div key={node.id} className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <span className={`text-sm ${node.isDefault ? 'font-semibold text-blue-700 dark:text-blue-300' : 'text-gray-600 dark:text-gray-400'}`}>
+                        {node.name} ({node.ipAddress})
+                      </span>
+                      {node.isDefault && (
+                        <Star className="w-4 h-4 text-yellow-500 fill-current" />
+                      )}
+                    </div>
+                    {!node.isDefault && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleSetDefaultNode(node.id)}
+                        disabled={setDefaultNodeMutation.isPending}
+                        className="text-xs"
+                      >
+                        <StarOff className="w-3 h-3 mr-1" />
+                        Set Default
+                      </Button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <Button
             onClick={handleNodeRecovery}
             disabled={nodeRecoveryMutation.isPending}

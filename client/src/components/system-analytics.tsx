@@ -9,14 +9,14 @@ export default function SystemAnalytics() {
   const { data: metrics = [] } = useQuery({
     queryKey: ["/api/metrics"],
     staleTime: 300000, // Consider data fresh for 5 minutes
-    refetchInterval: 300000, // Refresh every 5 minutes instead of frequent updates
+    refetchInterval: false, // Disable automatic refresh
     refetchOnWindowFocus: false, // Don't refetch when window gains focus
   });
 
   const { data: systemStats } = useQuery({
     queryKey: ["/api/system/stats"],
-    staleTime: 60000, // Consider data fresh for 1 minute
-    refetchInterval: 60000, // Refresh every minute for stats
+    staleTime: 300000, // Consider data fresh for 5 minutes
+    refetchInterval: false, // Disable automatic refresh
     refetchOnWindowFocus: false, // Don't refetch when window gains focus
   });
 

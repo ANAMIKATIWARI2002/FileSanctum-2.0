@@ -49,10 +49,14 @@ export default function ActivityLogs() {
       const response = await apiRequest("DELETE", "/api/activity-logs/bulk", {
         logIds
       });
+      if (!response.ok) {
+        throw new Error('Failed to delete logs');
+      }
       return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/activity-logs"] });
+      queryClient.refetchQueries({ queryKey: ["/api/activity-logs"] });
       setSelectedLogs([]);
       setIsDeleteMode(false);
       toast({
@@ -60,7 +64,8 @@ export default function ActivityLogs() {
         description: "Selected activity logs have been removed successfully",
       });
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("Delete logs error:", error);
       toast({
         title: "Failed to delete logs",
         description: "Could not delete the selected activity logs",

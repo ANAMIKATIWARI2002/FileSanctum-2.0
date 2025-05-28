@@ -289,19 +289,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const invitationData = insertInvitationSchema.parse({
         ...req.body,
         invitedBy: 'demo-user',
+        token: 'demo-token-' + Date.now(),
       });
       
       const invitation = await storage.createInvitation(invitationData);
       
       // Log activity
       await storage.createActivityLog({
-        userId: req.user.claims.sub,
+        userId: 'demo-user',
         action: "user_invited",
         resource: "invitation",
         resourceId: invitation.id.toString(),
         details: { email: invitation.email, role: invitation.role },
-        ipAddress: req.ip,
-        userAgent: req.get('User-Agent'),
+        ipAddress: req.ip || '127.0.0.1',
+        userAgent: req.get('User-Agent') || 'Unknown',
       });
 
       res.json(invitation);

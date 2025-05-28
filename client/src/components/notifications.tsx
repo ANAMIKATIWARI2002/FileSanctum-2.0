@@ -140,7 +140,7 @@ export default function Notifications({ theme }: NotificationsProps) {
                   onClick={() => setIsOpen(false)}
                   className="hover:bg-gray-700 p-1"
                 >
-                  <X className={`w-5 h-5 font-bold stroke-2 ${theme === 'dark' ? 'text-white' : 'text-black'}`} />
+                  <X className={`w-5 h-5 font-bold stroke-2 ${theme === 'dark' ? 'text-black' : 'text-white'}`} />
                 </Button>
               </div>
             </div>

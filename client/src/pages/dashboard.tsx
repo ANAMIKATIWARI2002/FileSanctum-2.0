@@ -42,7 +42,16 @@ type NodeForm = z.infer<typeof nodeSchema>;
 
 // Real-time Node Visualization Component
 function RealTimeNodeVisualization() {
-  const { data: nodes = [], isLoading } = useQuery({
+  interface Node {
+    id: number;
+    name: string;
+    status: string;
+    storageUsed: string;
+    storageCapacity: string;
+    ipAddress: string;
+  }
+
+  const { data: nodes = [], isLoading } = useQuery<Node[]>({
     queryKey: ["/api/nodes"],
     refetchInterval: 5000, // Refresh every 5 seconds
   });
@@ -81,7 +90,7 @@ function RealTimeNodeVisualization() {
     <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Node Visualization</h3>
       <div className="space-y-3">
-        {nodes.map((node: any) => {
+        {nodes.map((node) => {
           const storagePercentage = getStoragePercentage(node.storageUsed, node.storageCapacity);
           return (
             <div key={node.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
@@ -106,11 +115,20 @@ function RealTimeNodeVisualization() {
 
 // Enhanced Node Health & Management Component
 function EnhancedNodeManagement() {
+  interface Node {
+    id: number;
+    name: string;
+    status: string;
+    storageUsed: string;
+    storageCapacity: string;
+    ipAddress: string;
+  }
+
   const [isAddNodeOpen, setIsAddNodeOpen] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
-  const { data: nodes = [] } = useQuery({
+  const { data: nodes = [] } = useQuery<Node[]>({
     queryKey: ["/api/nodes"],
     refetchInterval: 5000,
   });
@@ -163,11 +181,11 @@ function EnhancedNodeManagement() {
   const nodeRecoveryMutation = useMutation({
     mutationFn: async () => {
       // Recovery logic for degraded nodes
-      const degradedNodes = nodes.filter((node: any) => node.status === "degraded" || node.status === "failed");
+      const degradedNodes = nodes.filter((node) => node.status === "degraded" || node.status === "failed");
       for (const node of degradedNodes) {
         await apiRequest("PUT", `/api/nodes/${node.id}/recover`);
       }
-      return { success: true };
+      return { success: true, recoveredNodes: degradedNodes.length };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/nodes"] });
@@ -190,9 +208,9 @@ function EnhancedNodeManagement() {
     addNodeMutation.mutate(data);
   };
 
-  const healthyNodes = nodes.filter((node: any) => node.status === "healthy").length;
-  const degradedNodes = nodes.filter((node: any) => node.status === "degraded").length;
-  const failedNodes = nodes.filter((node: any) => node.status === "failed").length;
+  const healthyNodes = nodes.filter((node) => node.status === "healthy").length;
+  const degradedNodes = nodes.filter((node) => node.status === "degraded").length;
+  const failedNodes = nodes.filter((node) => node.status === "failed").length;
 
   return (
     <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">

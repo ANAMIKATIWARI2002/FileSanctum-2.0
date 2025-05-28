@@ -14,9 +14,29 @@ export default function SignUp() {
     email: "",
     password: "",
     confirmPassword: "",
-    country: "",
+    countryCode: "+1",
+    phoneNumber: "",
     agreeTerms: false
   });
+
+  const countryCodes = [
+    { code: "+1", country: "US", flag: "🇺🇸", name: "United States" },
+    { code: "+1", country: "CA", flag: "🇨🇦", name: "Canada" },
+    { code: "+44", country: "GB", flag: "🇬🇧", name: "United Kingdom" },
+    { code: "+49", country: "DE", flag: "🇩🇪", name: "Germany" },
+    { code: "+33", country: "FR", flag: "🇫🇷", name: "France" },
+    { code: "+39", country: "IT", flag: "🇮🇹", name: "Italy" },
+    { code: "+34", country: "ES", flag: "🇪🇸", name: "Spain" },
+    { code: "+31", country: "NL", flag: "🇳🇱", name: "Netherlands" },
+    { code: "+91", country: "IN", flag: "🇮🇳", name: "India" },
+    { code: "+86", country: "CN", flag: "🇨🇳", name: "China" },
+    { code: "+81", country: "JP", flag: "🇯🇵", name: "Japan" },
+    { code: "+82", country: "KR", flag: "🇰🇷", name: "South Korea" },
+    { code: "+61", country: "AU", flag: "🇦🇺", name: "Australia" },
+    { code: "+55", country: "BR", flag: "🇧🇷", name: "Brazil" },
+    { code: "+52", country: "MX", flag: "🇲🇽", name: "Mexico" },
+    { code: "+7", country: "RU", flag: "🇷🇺", name: "Russia" }
+  ];
 
   const handleSignUp = (e: React.FormEvent) => {
     e.preventDefault();
@@ -103,18 +123,31 @@ export default function SignUp() {
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="country" className="text-sm font-medium text-slate-300">
-                  Country
+                <label htmlFor="phoneNumber" className="text-sm font-medium text-slate-300">
+                  Phone Number
                 </label>
-                <Input
-                  id="country"
-                  type="text"
-                  placeholder="United States"
-                  value={signupForm.country}
-                  onChange={(e) => setSignupForm({ ...signupForm, country: e.target.value })}
-                  className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-blue-400"
-                  required
-                />
+                <div className="flex space-x-2">
+                  <select 
+                    value={signupForm.countryCode}
+                    onChange={(e) => setSignupForm({ ...signupForm, countryCode: e.target.value })}
+                    className="bg-slate-700 border border-slate-600 text-white rounded-md px-3 py-2 focus:border-blue-400 focus:outline-none w-24"
+                  >
+                    {countryCodes.map((country, index) => (
+                      <option key={index} value={country.code}>
+                        {country.flag} {country.code}
+                      </option>
+                    ))}
+                  </select>
+                  <Input
+                    id="phoneNumber"
+                    type="tel"
+                    placeholder="1234567890"
+                    value={signupForm.phoneNumber}
+                    onChange={(e) => setSignupForm({ ...signupForm, phoneNumber: e.target.value })}
+                    className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 focus:border-blue-400 flex-1"
+                    required
+                  />
+                </div>
               </div>
               
               <div className="space-y-2">

@@ -1,6 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useQuery } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { 
   Upload, 
   Download, 
@@ -11,9 +13,13 @@ import {
   Shield,
   AlertTriangle,
   CheckCircle,
-  XCircle
+  XCircle,
+  X
 } from "lucide-react";
 import { format } from "date-fns";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 
 interface ActivityLog {
   id: number;
@@ -28,10 +34,67 @@ interface ActivityLog {
 }
 
 export default function ActivityLogs() {
+  const [isDeleteMode, setIsDeleteMode] = useState(false);
+  const [selectedLogs, setSelectedLogs] = useState<number[]>([]);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
   const { data: logs = [], isLoading } = useQuery<ActivityLog[]>({
     queryKey: ["/api/activity-logs"],
     refetchInterval: 10000, // Refresh every 10 seconds
   });
+
+  const deleteLogsMutation = useMutation({
+    mutationFn: async (logIds: number[]) => {
+      const response = await apiRequest("DELETE", "/api/activity-logs/bulk", {
+        logIds
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/activity-logs"] });
+      setSelectedLogs([]);
+      setIsDeleteMode(false);
+      toast({
+        title: "Activity logs deleted",
+        description: "Selected activity logs have been removed successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Failed to delete logs",
+        description: "Could not delete the selected activity logs",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedLogs(logs.map((log: ActivityLog) => log.id));
+    } else {
+      setSelectedLogs([]);
+    }
+  };
+
+  const handleSelectLog = (logId: number, checked: boolean) => {
+    if (checked) {
+      setSelectedLogs(prev => [...prev, logId]);
+    } else {
+      setSelectedLogs(prev => prev.filter(id => id !== logId));
+    }
+  };
+
+  const handleDeleteSelected = () => {
+    if (selectedLogs.length > 0) {
+      deleteLogsMutation.mutate(selectedLogs);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setIsDeleteMode(false);
+    setSelectedLogs([]);
+  };
 
   const getActionIcon = (action: string) => {
     switch (action) {

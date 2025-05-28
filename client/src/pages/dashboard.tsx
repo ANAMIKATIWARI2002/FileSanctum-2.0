@@ -331,11 +331,15 @@ export default function Dashboard() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const { user } = useAuth();
 
-  // Theme management
+  // Theme management - Light theme as default
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme) {
       setIsDarkMode(savedTheme === 'dark');
+    } else {
+      // Set light theme as default
+      localStorage.setItem('theme', 'light');
+      setIsDarkMode(false);
     }
   }, []);
 

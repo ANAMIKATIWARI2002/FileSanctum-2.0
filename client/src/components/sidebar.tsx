@@ -18,10 +18,10 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
     { id: "dashboard", label: "Dashboard", icon: Gauge },
     { id: "file-upload", label: "File Upload", icon: Upload },
     { id: "uploaded-files", label: "Uploaded Files", icon: Folder },
-    { id: "activity-logs", label: "Activity Logs", icon: History },
     { id: "node-monitoring", label: "Node Monitoring", icon: Server },
     { id: "system-analytics", label: "System Analytics", icon: BarChart3 },
     { id: "user-invite", label: "User Invite", icon: UserPlus },
+    { id: "activity-logs", label: "Activity Logs", icon: History },
   ];
 
   const handleSectionChange = (section: string) => {

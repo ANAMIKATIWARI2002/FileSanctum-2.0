@@ -36,11 +36,12 @@ export default function NodeMonitoring() {
       }
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/nodes"] });
+      queryClient.refetchQueries({ queryKey: ["/api/nodes"] });
       toast({
         title: "Success",
-        description: "Node deleted successfully",
+        description: data.message || "Node deleted successfully",
       });
     },
     onError: () => {

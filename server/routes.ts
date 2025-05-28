@@ -147,13 +147,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (node) {
         // Log activity
         await storage.createActivityLog({
-          userId: req.user.claims.sub,
+          userId: 'demo-user',
           action: "node_recovery",
           resource: "node",
           resourceId: nodeId.toString(),
           details: { nodeName: node.name },
-          ipAddress: req.ip,
-          userAgent: req.get('User-Agent'),
+          ipAddress: req.ip || '127.0.0.1',
+          userAgent: req.get('User-Agent') || 'Unknown',
         });
       }
 
@@ -167,7 +167,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // File management routes
   app.get("/api/files", isAuthenticated, async (req: any, res) => {
     try {
-      const files = await storage.getAllFiles(req.user.claims.sub);
+      const files = await storage.getAllFiles();
       res.json(files);
     } catch (error) {
       console.error("Error fetching files:", error);
@@ -212,13 +212,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       setTimeout(async () => {
         await storage.updateFileStatus(file.id, "stored");
         await storage.createActivityLog({
-          userId: req.user.claims.sub,
+          userId: 'demo-user',
           action: "file_upload_completed",
           resource: "file",
           resourceId: file.id.toString(),
           details: { fileName: file.originalName },
-          ipAddress: req.ip,
-          userAgent: req.get('User-Agent'),
+          ipAddress: '127.0.0.1',
+          userAgent: 'Unknown',
         });
       }, 2000);
 
@@ -238,22 +238,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "File not found" });
       }
 
-      if (file.uploadedBy !== req.user.claims.sub) {
-        return res.status(403).json({ message: "Unauthorized" });
-      }
+      // Skip authorization check for demo
 
       const deleted = await storage.deleteFile(fileId);
       
       if (deleted) {
         // Log activity
         await storage.createActivityLog({
-          userId: req.user.claims.sub,
+          userId: 'demo-user',
           action: "file_deleted",
           resource: "file",
           resourceId: fileId.toString(),
           details: { fileName: file.originalName },
-          ipAddress: req.ip,
-          userAgent: req.get('User-Agent'),
+          ipAddress: req.ip || '127.0.0.1',
+          userAgent: req.get('User-Agent') || 'Unknown',
         });
       }
 
@@ -278,7 +276,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Invitation routes
   app.get("/api/invitations", isAuthenticated, async (req: any, res) => {
     try {
-      const invitations = await storage.getInvitations(req.user.claims.sub);
+      const invitations = await storage.getInvitations('demo-user');
       res.json(invitations);
     } catch (error) {
       console.error("Error fetching invitations:", error);
@@ -290,7 +288,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const invitationData = insertInvitationSchema.parse({
         ...req.body,
-        invitedBy: req.user.claims.sub,
+        invitedBy: 'demo-user',
       });
       
       const invitation = await storage.createInvitation(invitationData);

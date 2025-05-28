@@ -214,45 +214,45 @@ export default function NodeMonitoring() {
         <CardContent>
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-slate-50">
+              <thead className="bg-slate-50 dark:bg-slate-800">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">
+                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase">
                     Node
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">
+                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase">
                     Status
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">
+                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase">
                     CPU
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">
+                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase">
                     Memory
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">
+                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase">
                     Storage
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">
+                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase">
                     Network
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">
+                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase">
                     Uptime
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">
+                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-300 uppercase">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-200">
+              <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
                 {nodes.map((node) => (
                   <tr key={node.id}>
                     <td className="px-4 py-3">
                       <div className="flex items-center space-x-2">
-                        <Server className="w-4 h-4 text-slate-600" />
+                        <Server className="w-4 h-4 text-slate-600 dark:text-slate-400" />
                         <div>
-                          <div className="text-sm font-medium text-slate-900">
+                          <div className="text-sm font-medium text-slate-900 dark:text-white">
                             {node.name}
                           </div>
-                          <div className="text-xs text-slate-500">
+                          <div className="text-xs text-slate-500 dark:text-slate-300">
                             {node.ipAddress}
                           </div>
                         </div>
@@ -263,37 +263,37 @@ export default function NodeMonitoring() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center space-x-2">
-                        <Cpu className="w-4 h-4 text-slate-400" />
-                        <span className="text-sm text-slate-600">
+                        <Cpu className="w-4 h-4 text-slate-400 dark:text-slate-300" />
+                        <span className="text-sm text-slate-600 dark:text-white">
                           {parseFloat(node.cpuUsage).toFixed(0)}%
                         </span>
                       </div>
                     </td>
                     <td className="px-4 py-3">
-                      <span className="text-sm text-slate-600">
+                      <span className="text-sm text-slate-600 dark:text-white">
                         {parseFloat(node.memoryUsage).toFixed(0)}%
                       </span>
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center space-x-2">
-                        <HardDrive className="w-4 h-4 text-slate-400" />
-                        <span className="text-sm text-slate-600">
+                        <HardDrive className="w-4 h-4 text-slate-400 dark:text-slate-300" />
+                        <span className="text-sm text-slate-600 dark:text-white">
                           {Math.round(getStoragePercentage(node.storageUsed, node.storageCapacity))}%
                         </span>
                       </div>
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center space-x-2">
-                        <Wifi className="w-4 h-4 text-slate-400" />
-                        <span className="text-sm text-slate-600">
+                        <Wifi className="w-4 h-4 text-slate-400 dark:text-slate-300" />
+                        <span className="text-sm text-slate-600 dark:text-white">
                           {parseFloat(node.networkThroughput).toFixed(1)} Gbps
                         </span>
                       </div>
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center space-x-2">
-                        <Clock className="w-4 h-4 text-slate-400" />
-                        <span className="text-sm text-slate-600">
+                        <Clock className="w-4 h-4 text-slate-400 dark:text-slate-300" />
+                        <span className="text-sm text-slate-600 dark:text-white">
                           {parseFloat(node.uptime).toFixed(1)}%
                         </span>
                       </div>

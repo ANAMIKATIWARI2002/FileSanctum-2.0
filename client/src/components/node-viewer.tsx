@@ -16,7 +16,9 @@ interface Node {
 export default function NodeViewer() {
   const { data: nodes = [], isLoading } = useQuery<Node[]>({
     queryKey: ["/api/nodes"],
-    refetchInterval: 5000, // Refresh every 5 seconds
+    staleTime: 300000,
+    refetchInterval: false,
+    refetchOnWindowFocus: false,
   });
 
   const getStatusColor = (status: string) => {

@@ -321,7 +321,9 @@ function EnhancedNodeManagement() {
   
   const { data: nodes = [] } = useQuery<Node[]>({
     queryKey: ["/api/nodes"],
-    refetchInterval: 5000,
+    staleTime: 300000,
+    refetchInterval: false,
+    refetchOnWindowFocus: false,
   });
 
   const form = useForm<NodeForm>({
@@ -546,7 +548,9 @@ export default function Dashboard() {
   // System stats
   const { data: systemStats } = useQuery({
     queryKey: ["/api/system/stats"],
-    refetchInterval: 30000, // Refresh every 30 seconds
+    staleTime: 300000,
+    refetchInterval: false,
+    refetchOnWindowFocus: false,
   });
 
   useEffect(() => {

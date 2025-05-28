@@ -96,8 +96,7 @@ export default function SystemAnalytics() {
       const script = document.createElement('script');
       script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
       script.onload = () => {
-        // Recreate charts after Chart.js loads
-        window.location.reload();
+        // Charts will be created in next render cycle
       };
       document.head.appendChild(script);
     }

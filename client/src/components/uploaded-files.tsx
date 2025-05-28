@@ -63,6 +63,66 @@ export default function UploadedFiles() {
     },
   });
 
+  // Move files to selected node mutation
+  const moveFilesToNodeMutation = useMutation({
+    mutationFn: async ({ fileIds, nodeId }: { fileIds: number[], nodeId: number }) => {
+      const response = await apiRequest("PUT", "/api/files/move-to-node", {
+        fileIds,
+        nodeId,
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/files"] });
+      setSelectedFiles([]);
+      setIsNodeSelectionMode(false);
+      setSelectedNodeId("");
+      toast({
+        title: "Files moved successfully",
+        description: "Selected files have been moved to the chosen node",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Move failed",
+        description: "Failed to move files to the selected node",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Handle file selection
+  const handleSelectFile = (fileId: number, checked: boolean) => {
+    if (checked) {
+      setSelectedFiles(prev => [...prev, fileId]);
+    } else {
+      setSelectedFiles(prev => prev.filter(id => id !== fileId));
+    }
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedFiles(filteredFiles.map(file => file.id));
+    } else {
+      setSelectedFiles([]);
+    }
+  };
+
+  const handleMoveFiles = () => {
+    if (selectedFiles.length > 0 && selectedNodeId) {
+      moveFilesToNodeMutation.mutate({
+        fileIds: selectedFiles,
+        nodeId: parseInt(selectedNodeId),
+      });
+    }
+  };
+
+  const handleCancelNodeSelection = () => {
+    setIsNodeSelectionMode(false);
+    setSelectedFiles([]);
+    setSelectedNodeId("");
+  };
+
   const getFileIcon = (mimeType: string) => {
     if (mimeType.startsWith("image/")) return Image;
     if (mimeType.startsWith("video/")) return Video;
@@ -189,8 +249,74 @@ export default function UploadedFiles() {
                 <SelectItem value="audio">Audio</SelectItem>
               </SelectContent>
             </Select>
+            <Button
+              onClick={() => setIsNodeSelectionMode(!isNodeSelectionMode)}
+              variant="outline"
+              className="flex items-center space-x-2"
+            >
+              <Server className="w-4 h-4" />
+              <span>Move to Node</span>
+            </Button>
           </div>
         </div>
+
+        {/* Node Selection Mode Interface */}
+        {isNodeSelectionMode && (
+          <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="font-semibold text-blue-800 dark:text-blue-200 flex items-center">
+                <CheckSquare className="w-4 h-4 mr-2" />
+                Select Files to Move
+              </h4>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  checked={selectedFiles.length === filteredFiles.length && filteredFiles.length > 0}
+                  onCheckedChange={handleSelectAll}
+                />
+                <span className="text-sm text-blue-700 dark:text-blue-300">
+                  Select All ({selectedFiles.length} of {filteredFiles.length} selected)
+                </span>
+              </div>
+            </div>
+            
+            <div className="flex items-center space-x-4">
+              <Select value={selectedNodeId} onValueChange={setSelectedNodeId}>
+                <SelectTrigger className="w-64">
+                  <SelectValue placeholder="Choose target node..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {(nodes as any[]).map((node: any) => (
+                    <SelectItem key={node.id} value={node.id.toString()}>
+                      {node.name} ({node.ipAddress}) {node.isDefault && "⭐"}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              
+              <Button
+                onClick={handleMoveFiles}
+                disabled={selectedFiles.length === 0 || !selectedNodeId || moveFilesToNodeMutation.isPending}
+                className="bg-green-600 hover:bg-green-700 text-white"
+              >
+                {moveFilesToNodeMutation.isPending ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                    Moving...
+                  </>
+                ) : (
+                  <>Move Files</>
+                )}
+              </Button>
+              
+              <Button
+                onClick={handleCancelNodeSelection}
+                variant="outline"
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        )}
       </CardHeader>
       <CardContent>
         {filteredFiles.length === 0 ? (
@@ -209,6 +335,11 @@ export default function UploadedFiles() {
             <table className="w-full">
               <thead className="bg-slate-50">
                 <tr>
+                  {isNodeSelectionMode && (
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider w-12">
+                      Select
+                    </th>
+                  )}
                   <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider w-1/3">
                     Name
                   </th>
@@ -233,7 +364,15 @@ export default function UploadedFiles() {
                 {filteredFiles.map((file) => {
                   const FileIconComponent = getFileIcon(file.mimeType);
                   return (
-                    <tr key={file.id}>
+                    <tr key={file.id} className={selectedFiles.includes(file.id) ? 'bg-blue-50' : ''}>
+                      {isNodeSelectionMode && (
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <Checkbox
+                            checked={selectedFiles.includes(file.id)}
+                            onCheckedChange={(checked) => handleSelectFile(file.id, checked as boolean)}
+                          />
+                        </td>
+                      )}
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <FileIconComponent 

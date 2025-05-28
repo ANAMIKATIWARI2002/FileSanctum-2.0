@@ -344,6 +344,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Move files to different node
+  app.put("/api/files/move-to-node", isAuthenticated, async (req: any, res) => {
+    try {
+      const { fileIds, nodeId } = req.body;
+      
+      if (!fileIds || !Array.isArray(fileIds) || fileIds.length === 0) {
+        return res.status(400).json({ message: "File IDs are required" });
+      }
+      
+      if (!nodeId) {
+        return res.status(400).json({ message: "Node ID is required" });
+      }
+
+      // Update files to point to the new node
+      const updatedFiles = [];
+      for (const fileId of fileIds) {
+        const updatedFile = await storage.updateFile(fileId, { defaultNodeId: nodeId });
+        if (updatedFile) {
+          updatedFiles.push(updatedFile);
+        }
+      }
+
+      // Log activity
+      await storage.createActivityLog({
+        userId: 'demo-user',
+        action: "files_moved",
+        resource: "files",
+        resourceId: fileIds.join(','),
+        details: { 
+          fileCount: fileIds.length,
+          targetNodeId: nodeId,
+          movedFiles: updatedFiles.length
+        },
+        ipAddress: req.ip || '127.0.0.1',
+        userAgent: req.get('User-Agent') || 'Unknown',
+      });
+
+      res.json({ 
+        message: "Files moved successfully",
+        movedCount: updatedFiles.length,
+        files: updatedFiles
+      });
+    } catch (error) {
+      console.error("Error moving files:", error);
+      res.status(500).json({ message: "Failed to move files" });
+    }
+  });
+
   // Activity logs route
   app.get("/api/activity-logs", isAuthenticated, async (req, res) => {
     try {

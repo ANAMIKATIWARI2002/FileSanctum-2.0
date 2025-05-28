@@ -54,6 +54,7 @@ export interface IStorage {
   getAllFiles(userId?: string): Promise<File[]>;
   getFile(id: number): Promise<File | undefined>;
   createFile(file: InsertFile): Promise<File>;
+  updateFile(id: number, updates: Partial<InsertFile>): Promise<File | undefined>;
   updateFileStatus(id: number, status: string): Promise<File | undefined>;
   deleteFile(id: number): Promise<boolean>;
 
@@ -230,6 +231,15 @@ export class DatabaseStorage implements IStorage {
       );
     }
     await Promise.all(chunkPromises);
+  }
+
+  async updateFile(id: number, updates: Partial<InsertFile>): Promise<File | undefined> {
+    const [updatedFile] = await db
+      .update(files)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(files.id, id))
+      .returning();
+    return updatedFile;
   }
 
   async updateFileStatus(id: number, status: string): Promise<File | undefined> {

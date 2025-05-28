@@ -35,7 +35,46 @@ export default function SignUp() {
     { code: "+61", country: "AU", flag: "🇦🇺", name: "Australia" },
     { code: "+55", country: "BR", flag: "🇧🇷", name: "Brazil" },
     { code: "+52", country: "MX", flag: "🇲🇽", name: "Mexico" },
-    { code: "+7", country: "RU", flag: "🇷🇺", name: "Russia" }
+    { code: "+7", country: "RU", flag: "🇷🇺", name: "Russia" },
+    { code: "+92", country: "PK", flag: "🇵🇰", name: "Pakistan" },
+    { code: "+880", country: "BD", flag: "🇧🇩", name: "Bangladesh" },
+    { code: "+62", country: "ID", flag: "🇮🇩", name: "Indonesia" },
+    { code: "+60", country: "MY", flag: "🇲🇾", name: "Malaysia" },
+    { code: "+65", country: "SG", flag: "🇸🇬", name: "Singapore" },
+    { code: "+66", country: "TH", flag: "🇹🇭", name: "Thailand" },
+    { code: "+84", country: "VN", flag: "🇻🇳", name: "Vietnam" },
+    { code: "+63", country: "PH", flag: "🇵🇭", name: "Philippines" },
+    { code: "+94", country: "LK", flag: "🇱🇰", name: "Sri Lanka" },
+    { code: "+977", country: "NP", flag: "🇳🇵", name: "Nepal" },
+    { code: "+20", country: "EG", flag: "🇪🇬", name: "Egypt" },
+    { code: "+27", country: "ZA", flag: "🇿🇦", name: "South Africa" },
+    { code: "+234", country: "NG", flag: "🇳🇬", name: "Nigeria" },
+    { code: "+254", country: "KE", flag: "🇰🇪", name: "Kenya" },
+    { code: "+971", country: "AE", flag: "🇦🇪", name: "UAE" },
+    { code: "+966", country: "SA", flag: "🇸🇦", name: "Saudi Arabia" },
+    { code: "+972", country: "IL", flag: "🇮🇱", name: "Israel" },
+    { code: "+90", country: "TR", flag: "🇹🇷", name: "Turkey" },
+    { code: "+98", country: "IR", flag: "🇮🇷", name: "Iran" },
+    { code: "+351", country: "PT", flag: "🇵🇹", name: "Portugal" },
+    { code: "+32", country: "BE", flag: "🇧🇪", name: "Belgium" },
+    { code: "+41", country: "CH", flag: "🇨🇭", name: "Switzerland" },
+    { code: "+43", country: "AT", flag: "🇦🇹", name: "Austria" },
+    { code: "+45", country: "DK", flag: "🇩🇰", name: "Denmark" },
+    { code: "+46", country: "SE", flag: "🇸🇪", name: "Sweden" },
+    { code: "+47", country: "NO", flag: "🇳🇴", name: "Norway" },
+    { code: "+358", country: "FI", flag: "🇫🇮", name: "Finland" },
+    { code: "+48", country: "PL", flag: "🇵🇱", name: "Poland" },
+    { code: "+420", country: "CZ", flag: "🇨🇿", name: "Czech Republic" },
+    { code: "+36", country: "HU", flag: "🇭🇺", name: "Hungary" },
+    { code: "+30", country: "GR", flag: "🇬🇷", name: "Greece" },
+    { code: "+351", country: "PT", flag: "🇵🇹", name: "Portugal" },
+    { code: "+54", country: "AR", flag: "🇦🇷", name: "Argentina" },
+    { code: "+56", country: "CL", flag: "🇨🇱", name: "Chile" },
+    { code: "+51", country: "PE", flag: "🇵🇪", name: "Peru" },
+    { code: "+57", country: "CO", flag: "🇨🇴", name: "Colombia" },
+    { code: "+58", country: "VE", flag: "🇻🇪", name: "Venezuela" },
+    { code: "+593", country: "EC", flag: "🇪🇨", name: "Ecuador" },
+    { code: "+64", country: "NZ", flag: "🇳🇿", name: "New Zealand" }
   ];
 
   const handleSignUp = (e: React.FormEvent) => {
@@ -130,10 +169,11 @@ export default function SignUp() {
                   <select 
                     value={signupForm.countryCode}
                     onChange={(e) => setSignupForm({ ...signupForm, countryCode: e.target.value })}
-                    className="bg-slate-700 border border-slate-600 text-white rounded-md px-3 py-2 focus:border-blue-400 focus:outline-none w-24"
+                    className="bg-slate-700 border border-slate-600 text-white rounded-md px-3 py-2 focus:border-blue-400 focus:outline-none w-32 text-sm"
+                    style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
                   >
                     {countryCodes.map((country, index) => (
-                      <option key={index} value={country.code}>
+                      <option key={index} value={country.code} className="bg-slate-700 text-white">
                         {country.flag} {country.code}
                       </option>
                     ))}

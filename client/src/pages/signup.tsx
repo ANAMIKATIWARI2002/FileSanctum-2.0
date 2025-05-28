@@ -379,14 +379,17 @@ export default function SignUp() {
                     <button
                       type="button"
                       onClick={() => setIsCountryDropdownOpen(!isCountryDropdownOpen)}
-                      className="bg-slate-700 border border-slate-600 text-white rounded-md px-3 py-2 focus:border-blue-400 focus:outline-none w-20 text-sm flex items-center justify-between"
+                      className="bg-slate-700 border border-slate-600 text-white rounded-md px-3 py-2 focus:border-blue-400 focus:outline-none min-w-[100px] text-sm flex items-center justify-between"
                     >
-                      <span>{selectedCountry.flag}</span>
-                      <ChevronDown className="w-4 h-4 ml-1" />
+                      <div className="flex items-center space-x-2">
+                        <span className="text-lg">{selectedCountry.flag}</span>
+                        <span className="text-xs text-slate-300">{selectedCountry.code}</span>
+                      </div>
+                      <ChevronDown className="w-4 h-4 ml-2" />
                     </button>
                     
                     {isCountryDropdownOpen && (
-                      <div className="absolute top-full left-0 w-80 bg-slate-700 border border-slate-600 rounded-md shadow-lg z-50 mt-1">
+                      <div className="absolute top-full left-0 w-80 bg-slate-700 border border-slate-600 rounded-md shadow-lg z-50 mt-1" style={{ fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif' }}>
                         {/* Search Input */}
                         <div className="p-3 border-b border-slate-600">
                           <div className="relative">

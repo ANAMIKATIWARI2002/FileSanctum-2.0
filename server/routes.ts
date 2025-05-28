@@ -12,25 +12,11 @@ const upload = multer({
   limits: { fileSize: 10 * 1024 * 1024 * 1024 } // 10GB limit
 });
 
-// Token-based authentication middleware
+// Simple authentication middleware - allow all requests for demo
 const isAuthenticated = (req: any, res: any, next: any) => {
-  const token = req.headers.authorization?.replace('Bearer ', '') || req.cookies?.authToken;
-  
-  if (!token) {
-    // For demo purposes, allow access without strict authentication
-    req.user = { id: 'demo', email: 'demo@example.com' };
-    return next();
-  }
-  
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'filesanctum-secret') as any;
-    req.user = decoded;
-    next();
-  } catch (error) {
-    // For demo purposes, allow access with demo user
-    req.user = { id: 'demo', email: 'demo@example.com' };
-    next();
-  }
+  // Set demo user for all requests
+  req.user = { id: 'demo', email: 'demo@example.com' };
+  next();
 };
 
 export async function registerRoutes(app: Express): Promise<Server> {

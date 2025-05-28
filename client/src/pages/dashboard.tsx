@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams } from "wouter";
 import Sidebar from "@/components/sidebar";
 import FileUpload from "@/components/file-upload";
@@ -10,7 +10,8 @@ import UserInvite from "@/components/user-invite";
 import NodeViewer from "@/components/node-viewer";
 import NodeManagement from "@/components/node-management";
 import { useAuth } from "@/hooks/useAuth";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
 
 type DashboardSection = 
   | "dashboard" 
@@ -135,40 +136,7 @@ export default function Dashboard() {
             {/* Four Main Sections Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Section 1: Quick File Operations */}
-              <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick File Operations</h3>
-                <div className="space-y-4">
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
-                    <div className="w-12 h-12 mx-auto mb-4 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                      </svg>
-                    </div>
-                    <p className="text-gray-600 mb-2">Drag & drop files or click to browse</p>
-                    <p className="text-sm text-gray-500 mb-4">Support for any file type up to 10GB per file</p>
-                    <button 
-                      onClick={() => setActiveSection("file-upload")}
-                      className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                    >
-                      Choose Files
-                    </button>
-                  </div>
-                  <div className="flex space-x-3">
-                    <button 
-                      onClick={() => setActiveSection("uploaded-files")}
-                      className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors"
-                    >
-                      📁 View Files
-                    </button>
-                    <button 
-                      onClick={() => setActiveSection("uploaded-files")}
-                      className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors"
-                    >
-                      ⬇️ Download
-                    </button>
-                  </div>
-                </div>
-              </div>
+              <QuickFileOperations />
 
               {/* Section 2: System Analytics */}
               <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
@@ -308,6 +276,167 @@ export default function Dashboard() {
           {renderContent()}
         </main>
       </div>
+    </div>
+  );
+}
+
+// Quick File Operations Component
+function QuickFileOperations() {
+  const [uploadingFiles, setUploadingFiles] = useState<any[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const uploadMutation = useMutation({
+    mutationFn: async (file: File) => {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('redundancyLevel', 'standard');
+      formData.append('encryption', 'aes256');
+      
+      const response = await fetch('/api/files/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Upload failed: ${response.statusText}`);
+      }
+      
+      return await response.json();
+    },
+    onSuccess: (data, file) => {
+      setUploadingFiles(prev => 
+        prev.map(uf => 
+          uf.file === file 
+            ? { ...uf, status: "completed", progress: 100, id: data.id }
+            : uf
+        )
+      );
+      queryClient.invalidateQueries({ queryKey: ["/api/files"] });
+      toast({
+        title: "File uploaded successfully",
+        description: `${file.name} has been stored securely`,
+      });
+    },
+    onError: (error, file) => {
+      setUploadingFiles(prev => 
+        prev.map(uf => 
+          uf.file === file 
+            ? { ...uf, status: "error", progress: 0 }
+            : uf
+        )
+      );
+      toast({
+        title: "Upload failed",
+        description: `Failed to upload ${file.name}`,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleFileSelect = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
+    files.forEach(file => {
+      const uploadingFile = {
+        file,
+        progress: 0,
+        status: "uploading" as const,
+      };
+      setUploadingFiles(prev => [...prev, uploadingFile]);
+      uploadMutation.mutate(file);
+    });
+  };
+
+  const handleDrop = (event: React.DragEvent) => {
+    event.preventDefault();
+    const files = Array.from(event.dataTransfer.files);
+    files.forEach(file => {
+      const uploadingFile = {
+        file,
+        progress: 0,
+        status: "uploading" as const,
+      };
+      setUploadingFiles(prev => [...prev, uploadingFile]);
+      uploadMutation.mutate(file);
+    });
+  };
+
+  const handleDragOver = (event: React.DragEvent) => {
+    event.preventDefault();
+  };
+
+  return (
+    <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+      <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick File Operations</h3>
+      <div className="space-y-4">
+        <div 
+          className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors cursor-pointer"
+          onDrop={handleDrop}
+          onDragOver={handleDragOver}
+          onClick={handleFileSelect}
+        >
+          <div className="w-12 h-12 mx-auto mb-4 bg-blue-100 rounded-lg flex items-center justify-center">
+            <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            </svg>
+          </div>
+          <p className="text-gray-600 mb-2">Drag & drop files or click to browse</p>
+          <p className="text-sm text-gray-500 mb-4">Support for any file type up to 10GB per file</p>
+          <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+            Choose Files
+          </button>
+        </div>
+        
+        {/* Upload Progress */}
+        {uploadingFiles.length > 0 && (
+          <div className="space-y-2">
+            {uploadingFiles.map((uploadingFile, index) => (
+              <div key={index} className="bg-gray-50 p-3 rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-gray-900">{uploadingFile.file.name}</span>
+                  <span className="text-sm text-gray-500">
+                    {uploadingFile.status === "completed" ? "✅ Completed" : 
+                     uploadingFile.status === "error" ? "❌ Failed" : "⏳ Uploading..."}
+                  </span>
+                </div>
+                {uploadingFile.status === "uploading" && (
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="bg-blue-600 h-2 rounded-full transition-all duration-300" style={{ width: `${uploadingFile.progress}%` }}></div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+        
+        <div className="flex space-x-3">
+          <button 
+            onClick={() => window.location.href = '#uploaded-files'}
+            className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors"
+          >
+            📁 View Files
+          </button>
+          <button 
+            onClick={() => window.location.href = '#uploaded-files'}
+            className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors"
+          >
+            ⬇️ Download
+          </button>
+        </div>
+      </div>
+      
+      <input
+        ref={fileInputRef}
+        type="file"
+        multiple
+        className="hidden"
+        onChange={handleFileChange}
+      />
     </div>
   );
 }

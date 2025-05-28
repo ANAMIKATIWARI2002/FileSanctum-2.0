@@ -40,6 +40,97 @@ const nodeSchema = z.object({
 
 type NodeForm = z.infer<typeof nodeSchema>;
 
+// Dynamic Stats Cards Component
+function DynamicStatsCards() {
+  const { data: nodes = [] } = useQuery({
+    queryKey: ["/api/nodes"],
+    refetchInterval: 30000, // Refresh every 30 seconds
+  });
+
+  const { data: files = [] } = useQuery({
+    queryKey: ["/api/files"],
+    refetchInterval: 30000, // Refresh every 30 seconds
+  });
+
+  const { data: systemStats } = useQuery({
+    queryKey: ["/api/system/stats"],
+    refetchInterval: 30000, // Refresh every 30 seconds
+  });
+
+  // Calculate real-time statistics
+  const activeNodes = nodes.filter((node: any) => node.status === "healthy").length;
+  const totalNodes = nodes.length;
+  const totalFiles = files.length;
+  const totalStorageUsed = systemStats?.totalStorage || "0.0 GB";
+  const storageUsagePercent = systemStats?.storageUsagePercent || 0;
+
+  // Calculate total storage capacity from all nodes
+  const totalCapacity = nodes.reduce((sum: number, node: any) => {
+    const capacity = parseFloat(node.storageCapacity?.replace(' GB', '') || '0');
+    return sum + capacity;
+  }, 0);
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      {/* Active Nodes Card */}
+      <div className="bg-blue-50 p-4 rounded-lg border border-blue-200 transition-all duration-300 hover:shadow-md">
+        <div className="flex items-center">
+          <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+            <div className="w-2 h-2 bg-blue-300 rounded-full"></div>
+          </div>
+          <div className="ml-3">
+            <p className="text-sm text-blue-600 font-medium">Active Nodes</p>
+            <p className="text-2xl font-bold text-blue-900">{activeNodes}</p>
+            <p className="text-xs text-blue-500">of {totalNodes} total</p>
+          </div>
+        </div>
+      </div>
+      
+      {/* Storage Used Card */}
+      <div className="bg-orange-50 p-4 rounded-lg border border-orange-200 transition-all duration-300 hover:shadow-md">
+        <div className="flex items-center">
+          <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center">
+            <div className="w-4 h-4 bg-orange-300 rounded"></div>
+          </div>
+          <div className="ml-3">
+            <p className="text-sm text-orange-600 font-medium">Storage Used</p>
+            <p className="text-2xl font-bold text-orange-900">{totalStorageUsed}</p>
+            <p className="text-xs text-orange-500">of {totalCapacity.toFixed(1)} GB capacity</p>
+          </div>
+        </div>
+      </div>
+      
+      {/* Total Files Card */}
+      <div className="bg-purple-50 p-4 rounded-lg border border-purple-200 transition-all duration-300 hover:shadow-md">
+        <div className="flex items-center">
+          <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center">
+            <div className="w-3 h-4 bg-purple-300 rounded-sm"></div>
+          </div>
+          <div className="ml-3">
+            <p className="text-sm text-purple-600 font-medium">Total Files</p>
+            <p className="text-2xl font-bold text-purple-900">{totalFiles.toLocaleString()}</p>
+            <p className="text-xs text-purple-500">securely stored</p>
+          </div>
+        </div>
+      </div>
+      
+      {/* Encryption Card */}
+      <div className="bg-green-50 p-4 rounded-lg border border-green-200 transition-all duration-300 hover:shadow-md">
+        <div className="flex items-center">
+          <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center">
+            <div className="w-4 h-4 bg-green-300 rounded-full"></div>
+          </div>
+          <div className="ml-3">
+            <p className="text-sm text-green-600 font-medium">Encryption</p>
+            <p className="text-lg font-bold text-green-900">AES-256</p>
+            <p className="text-xs text-green-500">end-to-end secure</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // Real-time Node Visualization Component
 function RealTimeNodeVisualization() {
   interface Node {
@@ -407,56 +498,8 @@ export default function Dashboard() {
       default:
         return (
           <div className="space-y-6">
-            {/* Top Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                <div className="flex items-center">
-                  <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
-                    <div className="w-2 h-2 bg-blue-300 rounded-full"></div>
-                  </div>
-                  <div className="ml-3">
-                    <p className="text-sm text-blue-600 font-medium">Active Nodes</p>
-                    <p className="text-2xl font-bold text-blue-900">6</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
-                <div className="flex items-center">
-                  <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center">
-                    <div className="w-4 h-4 bg-orange-300 rounded"></div>
-                  </div>
-                  <div className="ml-3">
-                    <p className="text-sm text-orange-600 font-medium">Storage Used</p>
-                    <p className="text-2xl font-bold text-orange-900">56.0 GB</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
-                <div className="flex items-center">
-                  <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center">
-                    <div className="w-3 h-4 bg-purple-300 rounded-sm"></div>
-                  </div>
-                  <div className="ml-3">
-                    <p className="text-sm text-purple-600 font-medium">Total Files</p>
-                    <p className="text-2xl font-bold text-purple-900">2,568</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-                <div className="flex items-center">
-                  <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center">
-                    <div className="w-4 h-4 bg-green-300 rounded-full"></div>
-                  </div>
-                  <div className="ml-3">
-                    <p className="text-sm text-green-600 font-medium">Encryption</p>
-                    <p className="text-lg font-bold text-green-900">AES-256</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+            {/* Dynamic Stats Cards */}
+            <DynamicStatsCards />
 
             {/* Four Main Sections Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

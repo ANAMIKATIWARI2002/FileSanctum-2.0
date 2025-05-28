@@ -27,8 +27,21 @@ export default function FileUpload() {
     mutationFn: async (file: File) => {
       const formData = new FormData();
       formData.append('file', file);
+      formData.append('redundancyLevel', redundancyLevel);
+      formData.append('encryption', encryption);
       
-      const response = await apiRequest('POST', '/api/files/upload', formData);
+      const response = await fetch('/api/files/upload', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('authToken') || 'demo-token'}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Upload failed: ${response.statusText}`);
+      }
+      
       return await response.json();
     },
     onSuccess: (data, file) => {

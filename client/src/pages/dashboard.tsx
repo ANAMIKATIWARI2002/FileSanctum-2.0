@@ -146,15 +146,24 @@ export default function Dashboard() {
                     </div>
                     <p className="text-gray-600 mb-2">Drag & drop files or click to browse</p>
                     <p className="text-sm text-gray-500 mb-4">Support for any file type up to 10GB per file</p>
-                    <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                    <button 
+                      onClick={() => setActiveSection("file-upload")}
+                      className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                    >
                       Choose Files
                     </button>
                   </div>
                   <div className="flex space-x-3">
-                    <button className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors">
+                    <button 
+                      onClick={() => setActiveSection("uploaded-files")}
+                      className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors"
+                    >
                       📁 View Files
                     </button>
-                    <button className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors">
+                    <button 
+                      onClick={() => setActiveSection("uploaded-files")}
+                      className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors"
+                    >
                       ⬇️ Download
                     </button>
                   </div>
@@ -237,10 +246,16 @@ export default function Dashboard() {
                   </div>
                   
                   <div className="space-y-2">
-                    <button className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">
+                    <button 
+                      onClick={() => setActiveSection("node-monitoring")}
+                      className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors"
+                    >
                       ➕ Add New Node
                     </button>
-                    <button className="w-full bg-orange-600 text-white py-2 px-4 rounded-lg hover:bg-orange-700 transition-colors">
+                    <button 
+                      onClick={() => setActiveSection("node-monitoring")}
+                      className="w-full bg-orange-600 text-white py-2 px-4 rounded-lg hover:bg-orange-700 transition-colors"
+                    >
                       🔧 Node Recovery
                     </button>
                   </div>

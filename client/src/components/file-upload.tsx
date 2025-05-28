@@ -53,10 +53,7 @@ export default function FileUpload() {
         )
       );
       queryClient.invalidateQueries({ queryKey: ["/api/files"] });
-      toast({
-        title: "File uploaded successfully",
-        description: `${file.name} has been stored securely`,
-      });
+      // Success message will be shown in the upload box itself
     },
     onError: (error, file) => {
       setUploadingFiles(prev => 
@@ -173,7 +170,13 @@ export default function FileUpload() {
               {uploadingFiles.map((uploadingFile, index) => (
                 <div
                   key={index}
-                  className="bg-slate-50 border border-slate-200 rounded-lg p-4"
+                  className={`border rounded-lg p-4 transition-all duration-500 ${
+                    uploadingFile.status === "completed" 
+                      ? "bg-green-50 border-green-200" 
+                      : uploadingFile.status === "error"
+                      ? "bg-red-50 border-red-200"
+                      : "bg-slate-50 border-slate-200"
+                  }`}
                 >
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center space-x-2">
@@ -195,16 +198,28 @@ export default function FileUpload() {
                       </Button>
                     </div>
                   </div>
-                  <Progress value={uploadingFile.progress} className="mb-2" />
-                  <div className="flex justify-between text-xs text-slate-600">
-                    <span>
-                      {uploadingFile.status === "uploading" && "Uploading..."}
-                      {uploadingFile.status === "processing" && "Applying erasure coding..."}
-                      {uploadingFile.status === "completed" && "Upload complete"}
-                      {uploadingFile.status === "error" && "Upload failed"}
-                    </span>
-                    <span>{uploadingFile.progress}%</span>
-                  </div>
+                  {uploadingFile.status === "completed" ? (
+                    <div className="flex items-center justify-center py-2 bg-green-100 rounded border border-green-200">
+                      <div className="flex items-center space-x-2 text-green-700">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                        <span className="text-sm font-medium">Upload complete - File stored securely!</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <Progress value={uploadingFile.progress} className="mb-2" />
+                      <div className="flex justify-between text-xs text-slate-600">
+                        <span>
+                          {uploadingFile.status === "uploading" && "Uploading..."}
+                          {uploadingFile.status === "processing" && "Applying erasure coding..."}
+                          {uploadingFile.status === "error" && "Upload failed"}
+                        </span>
+                        <span>{uploadingFile.progress}%</span>
+                      </div>
+                    </>
+                  )}
                 </div>
               ))}
             </div>

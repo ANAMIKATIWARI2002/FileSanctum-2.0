@@ -58,9 +58,9 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
             variant="ghost"
             size="sm"
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="p-1 h-8 w-8"
+            className="p-1 h-8 w-8 hover:bg-secondary"
           >
-            {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+            {isCollapsed ? <ChevronRight className="h-4 w-4 text-card-foreground" /> : <ChevronLeft className="h-4 w-4 text-card-foreground" />}
           </Button>
         </div>
       </div>

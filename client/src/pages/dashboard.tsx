@@ -472,7 +472,7 @@ function QuickFileOperations({ onSectionChange }: { onSectionChange: (section: D
       <h3 className="text-lg font-semibold text-card-foreground mb-4">Quick File Operations</h3>
       <div className="space-y-4">
         <div 
-          className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary transition-colors cursor-pointer bg-background"
+          className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary transition-colors cursor-pointer bg-card"
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           onClick={handleFileSelect}

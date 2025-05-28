@@ -138,9 +138,13 @@ export default function Notifications({ theme }: NotificationsProps) {
                   variant="ghost"
                   size="sm"
                   onClick={() => setIsOpen(false)}
-                  className="hover:bg-gray-700 p-1"
+                  className={`p-2 rounded-md border-2 ${
+                    theme === 'dark' 
+                      ? 'bg-gray-100 border-gray-300 hover:bg-gray-200' 
+                      : 'bg-gray-100 border-gray-300 hover:bg-gray-200'
+                  }`}
                 >
-                  <X className={`w-5 h-5 font-bold stroke-2 ${theme === 'dark' ? 'text-black' : 'text-white'}`} />
+                  <X className="w-4 h-4 text-black font-bold" />
                 </Button>
               </div>
             </div>

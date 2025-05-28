@@ -139,6 +139,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get default node
+  app.get("/api/nodes/default", isAuthenticated, async (req, res) => {
+    try {
+      const defaultNode = await storage.getDefaultNode();
+      res.json(defaultNode);
+    } catch (error) {
+      console.error("Error fetching default node:", error);
+      res.status(500).json({ message: "Failed to fetch default node" });
+    }
+  });
+
+  // Set default node
+  app.put("/api/nodes/:id/set-default", isAuthenticated, async (req: any, res) => {
+    try {
+      const nodeId = parseInt(req.params.id);
+      const defaultNode = await storage.setDefaultNode(nodeId);
+      
+      if (defaultNode) {
+        res.json(defaultNode);
+      } else {
+        res.status(404).json({ message: "Node not found" });
+      }
+    } catch (error) {
+      console.error("Error setting default node:", error);
+      res.status(500).json({ message: "Failed to set default node" });
+    }
+  });
+
   app.put("/api/nodes/:id/recover", isAuthenticated, async (req: any, res) => {
     try {
       const nodeId = parseInt(req.params.id);

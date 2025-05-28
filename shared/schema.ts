@@ -51,6 +51,7 @@ export const nodes = pgTable("nodes", {
   memoryUsage: decimal("memory_usage").default("0"),
   networkThroughput: decimal("network_throughput").default("0"),
   uptime: decimal("uptime").default("0"),
+  isDefault: boolean("is_default").default(false), // Mark default node for file storage
   lastHeartbeat: timestamp("last_heartbeat").defaultNow(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -64,6 +65,7 @@ export const files = pgTable("files", {
   size: decimal("size").notNull(), // in bytes
   mimeType: varchar("mime_type"),
   uploadedBy: varchar("uploaded_by").notNull().references(() => users.id),
+  defaultNodeId: integer("default_node_id").references(() => nodes.id), // Primary storage node
   status: varchar("status").default("uploading"), // uploading, stored, replicating, failed
   erasureCoding: jsonb("erasure_coding"), // k, m, chunks info
   encryptionKey: varchar("encryption_key"),

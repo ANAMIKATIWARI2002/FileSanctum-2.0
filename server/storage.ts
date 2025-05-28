@@ -37,9 +37,11 @@ export interface IStorage {
   // Node operations
   getAllNodes(): Promise<Node[]>;
   getNode(id: number): Promise<Node | undefined>;
+  getDefaultNode(): Promise<Node | undefined>;
   createNode(node: InsertNode): Promise<Node>;
   updateNode(id: number, updates: Partial<InsertNode>): Promise<Node | undefined>;
   deleteNode(id: number): Promise<boolean>;
+  setDefaultNode(id: number): Promise<Node | undefined>;
   updateNodeMetrics(id: number, metrics: {
     cpuUsage?: string;
     memoryUsage?: string;
@@ -110,9 +112,27 @@ export class DatabaseStorage implements IStorage {
     return node;
   }
 
+  async getDefaultNode(): Promise<Node | undefined> {
+    const [defaultNode] = await db.select().from(nodes).where(eq(nodes.isDefault, true));
+    return defaultNode;
+  }
+
   async createNode(node: InsertNode): Promise<Node> {
     const [newNode] = await db.insert(nodes).values(node).returning();
     return newNode;
+  }
+
+  async setDefaultNode(id: number): Promise<Node | undefined> {
+    // First remove default flag from all nodes
+    await db.update(nodes).set({ isDefault: false });
+    
+    // Then set the specified node as default
+    const [defaultNode] = await db
+      .update(nodes)
+      .set({ isDefault: true, updatedAt: new Date() })
+      .where(eq(nodes.id, id))
+      .returning();
+    return defaultNode;
   }
 
   async updateNode(id: number, updates: Partial<InsertNode>): Promise<Node | undefined> {
@@ -170,8 +190,46 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createFile(file: InsertFile): Promise<File> {
-    const [newFile] = await db.insert(files).values(file).returning();
+    // Get default node if not specified
+    let defaultNodeId = file.defaultNodeId;
+    if (!defaultNodeId) {
+      const defaultNode = await this.getDefaultNode();
+      if (defaultNode) {
+        defaultNodeId = defaultNode.id;
+      }
+    }
+
+    const fileData = {
+      ...file,
+      defaultNodeId,
+    };
+
+    const [newFile] = await db.insert(files).values(fileData).returning();
+
+    // Create file chunks automatically for the default node
+    if (defaultNodeId) {
+      await this.createFileChunksForNode(newFile.id, defaultNodeId);
+    }
+
     return newFile;
+  }
+
+  private async createFileChunksForNode(fileId: number, nodeId: number): Promise<void> {
+    // Create 4 chunks by default for file distribution
+    const chunkPromises = [];
+    for (let i = 0; i < 4; i++) {
+      chunkPromises.push(
+        this.createFileChunk({
+          fileId,
+          nodeId,
+          chunkIndex: i,
+          chunkType: "data",
+          size: "256", // Size in MB
+          checksum: `chunk_${i}_${Date.now()}`, // Simple checksum for demo
+        })
+      );
+    }
+    await Promise.all(chunkPromises);
   }
 
   async updateFileStatus(id: number, status: string): Promise<File | undefined> {

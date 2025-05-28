@@ -262,9 +262,9 @@ export default function Dashboard() {
     <div className="flex h-screen bg-gray-50">
       <Sidebar activeSection={activeSection} onSectionChange={(section: string) => setActiveSection(section as DashboardSection)} />
       
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
+        <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4 flex-shrink-0">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-2xl font-bold text-gray-900">
@@ -311,9 +311,11 @@ export default function Dashboard() {
         </header>
 
         {/* Content */}
-        <main className="flex-1 p-6 overflow-y-auto bg-gray-50">
-          <div className="max-w-7xl mx-auto pb-8">
-            {renderContent()}
+        <main className="flex-1 overflow-y-auto bg-gray-50">
+          <div className="p-6">
+            <div className="max-w-7xl mx-auto">
+              {renderContent()}
+            </div>
           </div>
         </main>
       </div>

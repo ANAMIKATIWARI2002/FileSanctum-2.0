@@ -39,29 +39,29 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
   };
 
   return (
-    <div className={`${isCollapsed ? 'w-16' : 'w-72'} bg-card text-card-foreground flex flex-col border-r border-border transition-all duration-300`}>
+    <div className={`${isCollapsed ? 'w-16' : 'w-72'} bg-card text-card-foreground flex flex-col border-r border-border transition-all duration-300 relative`}>
+      {/* Collapse/Expand Button - positioned in middle of right border */}
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => setIsCollapsed(!isCollapsed)}
+        className="absolute -right-3 top-1/2 transform -translate-y-1/2 z-10 p-1 h-6 w-6 bg-card border border-border rounded-full hover:bg-secondary shadow-sm"
+      >
+        {isCollapsed ? <ChevronRight className="h-3 w-3 text-card-foreground" /> : <ChevronLeft className="h-3 w-3 text-card-foreground" />}
+      </Button>
+
       {/* Header */}
       <div className="p-6 border-b border-border">
-        <div className="flex items-center justify-between">
-          <div className={`flex items-center space-x-3 ${isCollapsed ? 'justify-center' : ''}`}>
-            <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-              <Shield className="w-6 h-6 text-white" />
-            </div>
-            {!isCollapsed && (
-              <div>
-                <h1 className="text-xl font-bold text-card-foreground">FileSanctum</h1>
-                <p className="text-muted-foreground text-sm">DFSS Dashboard</p>
-              </div>
-            )}
+        <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'}`}>
+          <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+            <Shield className="w-6 h-6 text-white" />
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className="p-1 h-8 w-8 hover:bg-secondary"
-          >
-            {isCollapsed ? <ChevronRight className="h-4 w-4 text-card-foreground" /> : <ChevronLeft className="h-4 w-4 text-card-foreground" />}
-          </Button>
+          {!isCollapsed && (
+            <div>
+              <h1 className="text-xl font-bold text-card-foreground">FileSanctum</h1>
+              <p className="text-muted-foreground text-sm">DFSS Dashboard</p>
+            </div>
+          )}
         </div>
       </div>
 

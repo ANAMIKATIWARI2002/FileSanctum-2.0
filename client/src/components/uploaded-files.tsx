@@ -78,10 +78,10 @@ export default function UploadedFiles() {
 
   const getStatusBadge = (status: string) => {
     const variants = {
-      stored: "default",
-      uploading: "secondary",
-      replicating: "outline",
-      failed: "destructive",
+      stored: "default" as const,
+      uploading: "secondary" as const,
+      replicating: "outline" as const,
+      failed: "destructive" as const,
     };
     
     return (

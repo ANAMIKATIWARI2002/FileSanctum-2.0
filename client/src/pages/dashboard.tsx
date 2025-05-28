@@ -311,8 +311,10 @@ export default function Dashboard() {
         </header>
 
         {/* Content */}
-        <main className="p-6 overflow-y-auto h-full bg-gray-50">
-          {renderContent()}
+        <main className="flex-1 p-6 overflow-y-auto bg-gray-50">
+          <div className="max-w-7xl mx-auto pb-8">
+            {renderContent()}
+          </div>
         </main>
       </div>
     </div>

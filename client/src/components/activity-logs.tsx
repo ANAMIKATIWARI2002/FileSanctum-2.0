@@ -41,7 +41,9 @@ export default function ActivityLogs() {
 
   const { data: logs = [], isLoading } = useQuery<ActivityLog[]>({
     queryKey: ["/api/activity-logs"],
-    refetchInterval: 10000, // Refresh every 10 seconds
+    staleTime: 300000, // Consider data fresh for 5 minutes
+    refetchInterval: false, // Disable automatic refresh
+    refetchOnWindowFocus: false,
   });
 
   const deleteLogsMutation = useMutation({

@@ -156,7 +156,7 @@ export default function Dashboard() {
             {/* Four Main Sections Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Section 1: Quick File Operations */}
-              <QuickFileOperations />
+              <QuickFileOperations onSectionChange={setActiveSection} />
 
               {/* Section 2: System Analytics */}
               <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
@@ -378,7 +378,7 @@ function AddNodeButton() {
 }
 
 // Quick File Operations Component
-function QuickFileOperations() {
+function QuickFileOperations({ onSectionChange }: { onSectionChange: (section: DashboardSection) => void }) {
   const [uploadingFiles, setUploadingFiles] = useState<any[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -468,8 +468,8 @@ function QuickFileOperations() {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick File Operations</h3>
+    <div className="bg-card p-6 rounded-lg shadow-sm border border-border">
+      <h3 className="text-lg font-semibold text-card-foreground mb-4">Quick File Operations</h3>
       <div className="space-y-4">
         <div 
           className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors cursor-pointer"
@@ -514,7 +514,7 @@ function QuickFileOperations() {
         <div className="flex space-x-3">
           <button 
             onClick={() => {
-              setActiveSection('uploaded-files');
+              onSectionChange('uploaded-files');
               window.history.pushState({}, '', '/dashboard/uploaded-files');
             }}
             className="flex-1 bg-secondary text-secondary-foreground py-2 px-4 rounded-lg hover:bg-secondary/80 hover:shadow-md transition-all duration-200 transform hover:scale-105"

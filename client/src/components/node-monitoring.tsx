@@ -46,7 +46,8 @@ export default function NodeMonitoring() {
         description: data.message || "Node deleted successfully",
       });
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("Delete error:", error);
       toast({
         title: "Error",
         description: "Failed to delete node",

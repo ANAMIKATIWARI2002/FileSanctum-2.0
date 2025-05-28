@@ -81,150 +81,175 @@ export default function Dashboard() {
       default:
         return (
           <div className="space-y-6">
-            {/* Dashboard Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+            {/* Top Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
                 <div className="flex items-center">
-                  <div className="p-2 bg-primary bg-opacity-10 rounded-lg">
-                    <i className="fas fa-server text-primary text-xl"></i>
+                  <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+                    <div className="w-2 h-2 bg-blue-300 rounded-full"></div>
                   </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-slate-600">Active Nodes</p>
-                    <p className="text-2xl font-bold text-slate-900">
-                      {systemStats?.activeNodes || 0}
-                    </p>
+                  <div className="ml-3">
+                    <p className="text-sm text-blue-600 font-medium">Active Nodes</p>
+                    <p className="text-2xl font-bold text-blue-900">6</p>
                   </div>
                 </div>
               </div>
-
-              <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-                <div className="flex items-center">
-                  <div className="p-2 bg-green-100 rounded-lg">
-                    <i className="fas fa-hdd text-green-600 text-xl"></i>
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-slate-600">Storage Used</p>
-                    <p className="text-2xl font-bold text-slate-900">
-                      {systemStats?.totalStorage || "0 GB"}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-                <div className="flex items-center">
-                  <div className="p-2 bg-yellow-100 rounded-lg">
-                    <i className="fas fa-file text-yellow-600 text-xl"></i>
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-slate-600">Total Files</p>
-                    <p className="text-2xl font-bold text-slate-900">
-                      {systemStats?.totalFiles || 0}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-                <div className="flex items-center">
-                  <div className="p-2 bg-red-100 rounded-lg">
-                    <i className="fas fa-shield-alt text-red-600 text-xl"></i>
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-slate-600">Encryption</p>
-                    <p className="text-2xl font-bold text-slate-900">
-                      {systemStats?.encryptionLevel || "AES-256"}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Node Management and Status */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <NodeManagement />
               
-              <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-                <h3 className="text-lg font-semibold text-slate-900 mb-4">Node Status Overview</h3>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-slate-600">Healthy Nodes</span>
-                    <span className="text-sm font-medium text-green-600">
-                      {systemStats?.nodeStatus?.healthy || 0}
-                    </span>
+              <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
+                <div className="flex items-center">
+                  <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center">
+                    <div className="w-4 h-4 bg-orange-300 rounded"></div>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-slate-600">Degraded Nodes</span>
-                    <span className="text-sm font-medium text-yellow-600">
-                      {systemStats?.nodeStatus?.degraded || 0}
-                    </span>
+                  <div className="ml-3">
+                    <p className="text-sm text-orange-600 font-medium">Storage Used</p>
+                    <p className="text-2xl font-bold text-orange-900">56.0 GB</p>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-slate-600">Failed Nodes</span>
-                    <span className="text-sm font-medium text-red-600">
-                      {systemStats?.nodeStatus?.failed || 0}
-                    </span>
+                </div>
+              </div>
+              
+              <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                <div className="flex items-center">
+                  <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center">
+                    <div className="w-3 h-4 bg-purple-300 rounded-sm"></div>
                   </div>
-                  <div className="w-full bg-slate-200 rounded-full h-2 mt-4">
-                    <div 
-                      className="bg-green-600 h-2 rounded-full transition-all duration-300" 
-                      style={{ 
-                        width: systemStats?.nodeStatus 
-                          ? `${(systemStats.nodeStatus.healthy / (systemStats.nodeStatus.healthy + systemStats.nodeStatus.degraded + systemStats.nodeStatus.failed)) * 100}%`
-                          : "0%"
-                      }}
-                    />
+                  <div className="ml-3">
+                    <p className="text-sm text-purple-600 font-medium">Total Files</p>
+                    <p className="text-2xl font-bold text-purple-900">2,568</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                <div className="flex items-center">
+                  <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center">
+                    <div className="w-4 h-4 bg-green-300 rounded-full"></div>
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm text-green-600 font-medium">Encryption</p>
+                    <p className="text-lg font-bold text-green-900">AES-256</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Node Viewer */}
-            <NodeViewer />
+            {/* Four Main Sections Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Section 1: Quick File Operations */}
+              <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick File Operations</h3>
+                <div className="space-y-4">
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
+                    <div className="w-12 h-12 mx-auto mb-4 bg-blue-100 rounded-lg flex items-center justify-center">
+                      <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                      </svg>
+                    </div>
+                    <p className="text-gray-600 mb-2">Drag & drop files or click to browse</p>
+                    <p className="text-sm text-gray-500 mb-4">Support for any file type up to 10GB per file</p>
+                    <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                      Choose Files
+                    </button>
+                  </div>
+                  <div className="flex space-x-3">
+                    <button className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors">
+                      📁 View Files
+                    </button>
+                    <button className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors">
+                      ⬇️ Download
+                    </button>
+                  </div>
+                </div>
+              </div>
 
-            {/* Erasure Coding Info */}
-            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-              <h3 className="text-lg font-semibold text-slate-900 mb-4">Erasure Coding & Encryption Status</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h4 className="font-medium text-slate-900 mb-3">Erasure Coding</h4>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-sm text-slate-600">Data Chunks (k)</span>
-                      <span className="text-sm font-medium">6</span>
+              {/* Section 2: System Analytics */}
+              <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">System Analytics</h3>
+                <div className="space-y-4">
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm text-gray-600">Storage Usage</span>
+                      <span className="text-sm font-semibold text-gray-900">46.7%</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-slate-600">Parity Chunks (m)</span>
-                      <span className="text-sm font-medium">3</span>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="bg-blue-600 h-2 rounded-full" style={{ width: '46.7%' }}></div>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-slate-600">Fault Tolerance</span>
-                      <span className="text-sm font-medium text-green-600">3 node failures</span>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm text-gray-600">Network I/O</span>
+                      <span className="text-sm font-semibold text-gray-900">32.1%</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-slate-600">Storage Efficiency</span>
-                      <span className="text-sm font-medium">66.7%</span>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="bg-green-600 h-2 rounded-full" style={{ width: '32.1%' }}></div>
+                    </div>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-sm text-gray-600">CPU Usage</span>
+                      <span className="text-sm font-semibold text-gray-900">28.4%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="bg-orange-600 h-2 rounded-full" style={{ width: '28.4%' }}></div>
                     </div>
                   </div>
                 </div>
-                <div>
-                  <h4 className="font-medium text-slate-900 mb-3">End-to-End Encryption</h4>
+              </div>
+
+              {/* Section 3: Node Visualization */}
+              <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Node Visualization</h3>
+                <div className="space-y-3">
+                  {Array.from({ length: 6 }, (_, i) => (
+                    <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                      <div className="flex items-center space-x-3">
+                        <div className={`w-3 h-3 rounded-full ${i < 4 ? 'bg-green-500' : i === 4 ? 'bg-yellow-500' : 'bg-red-500'}`}></div>
+                        <span className="font-medium text-gray-900">Node{i + 1}</span>
+                        <span className="text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded">
+                          {i < 4 ? 'Healthy' : i === 4 ? 'Warning' : 'Failed'}
+                        </span>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm text-gray-600">{Math.round(Math.random() * 40 + 20)}% Used</div>
+                        <div className="text-xs text-gray-500">{(Math.random() * 50 + 10).toFixed(1)} GB</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Section 4: Node Health & Management */}
+              <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Node Health & Management</h3>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-3 gap-4 text-center">
+                    <div className="bg-green-50 p-3 rounded-lg">
+                      <div className="text-2xl font-bold text-green-600">4</div>
+                      <div className="text-sm text-gray-600">Healthy</div>
+                    </div>
+                    <div className="bg-yellow-50 p-3 rounded-lg">
+                      <div className="text-2xl font-bold text-yellow-600">1</div>
+                      <div className="text-sm text-gray-600">Warning</div>
+                    </div>
+                    <div className="bg-red-50 p-3 rounded-lg">
+                      <div className="text-2xl font-bold text-red-600">1</div>
+                      <div className="text-sm text-gray-600">Failed</div>
+                    </div>
+                  </div>
+                  
                   <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-sm text-slate-600">Algorithm</span>
-                      <span className="text-sm font-medium">AES-256-GCM</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-slate-600">Key Management</span>
-                      <span className="text-sm font-medium">Client-side</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-slate-600">Encrypted Files</span>
-                      <span className="text-sm font-medium text-green-600">100%</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-slate-600">Status</span>
-                      <span className="text-sm font-medium text-green-600">Active</span>
+                    <button className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">
+                      ➕ Add New Node
+                    </button>
+                    <button className="w-full bg-orange-600 text-white py-2 px-4 rounded-lg hover:bg-orange-700 transition-colors">
+                      🔧 Node Recovery
+                    </button>
+                  </div>
+
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <div className="text-sm text-gray-600 mb-1">System Status</div>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span className="text-sm font-medium text-gray-900">All systems operational</span>
                     </div>
                   </div>
                 </div>
@@ -236,27 +261,27 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex h-screen bg-slate-50">
+    <div className="flex h-screen bg-gray-50">
       <Sidebar activeSection={activeSection} onSectionChange={setActiveSection} />
       
       <div className="flex-1 overflow-hidden">
         {/* Header */}
-        <header className="bg-white shadow-sm border-b border-slate-200 px-6 py-4">
+        <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-2xl font-bold text-slate-900">
+              <h2 className="text-2xl font-bold text-gray-900">
                 {getSectionTitle(activeSection)}
               </h2>
-              <p className="text-slate-600">
+              <p className="text-gray-600">
                 {getSectionSubtitle(activeSection)}
               </p>
             </div>
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2 text-sm">
                 <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-slate-600">System Online</span>
+                <span className="text-gray-600">System Online</span>
               </div>
-              <div className="text-sm text-slate-600">
+              <div className="text-sm text-gray-600">
                 Last updated: {new Date().toLocaleTimeString()}
               </div>
             </div>
@@ -264,7 +289,7 @@ export default function Dashboard() {
         </header>
 
         {/* Content */}
-        <main className="p-6 overflow-y-auto h-full">
+        <main className="p-6 overflow-y-auto h-full bg-gray-50">
           {renderContent()}
         </main>
       </div>

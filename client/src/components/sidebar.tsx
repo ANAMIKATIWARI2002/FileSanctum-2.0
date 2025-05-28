@@ -37,16 +37,16 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
   };
 
   return (
-    <div className="w-72 bg-slate-800 text-white flex flex-col">
+    <div className="w-72 bg-white text-gray-900 flex flex-col border-r border-gray-200">
       {/* Header */}
-      <div className="p-6 border-b border-slate-700">
+      <div className="p-6 border-b border-gray-200">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+          <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
             <Shield className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-xl font-bold">FileSanctum</h1>
-            <p className="text-slate-400 text-sm">DFSS Dashboard</p>
+            <h1 className="text-xl font-bold text-gray-900">FileSanctum</h1>
+            <p className="text-gray-500 text-sm">DFSS Dashboard</p>
           </div>
         </div>
       </div>
@@ -64,8 +64,8 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
                   variant="ghost"
                   className={`w-full justify-start space-x-3 h-12 ${
                     isActive
-                      ? "bg-primary text-white hover:bg-primary/90"
-                      : "text-slate-300 hover:bg-slate-700 hover:text-white"
+                      ? "bg-blue-600 text-white hover:bg-blue-700"
+                      : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                   }`}
                   onClick={() => handleSectionChange(item.id)}
                 >
@@ -79,7 +79,7 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
       </nav>
 
       {/* User Section */}
-      <div className="p-4 border-t border-slate-700">
+      <div className="p-4 border-t border-gray-200">
         <div className="flex items-center space-x-3 mb-4">
           {user?.profileImageUrl ? (
             <img
@@ -88,25 +88,25 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
               className="w-10 h-10 rounded-full object-cover"
             />
           ) : (
-            <div className="w-10 h-10 bg-slate-600 rounded-full flex items-center justify-center">
-              <span className="text-sm font-medium">
+            <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
+              <span className="text-sm font-medium text-gray-700">
                 {user?.firstName?.[0] || user?.email?.[0] || "U"}
               </span>
             </div>
           )}
           <div>
-            <p className="font-medium">
+            <p className="font-medium text-gray-900">
               {user?.firstName && user?.lastName 
                 ? `${user.firstName} ${user.lastName}`
                 : user?.email
               }
             </p>
-            <p className="text-slate-400 text-sm">{user?.role || "User"}</p>
+            <p className="text-gray-500 text-sm">{user?.role || "User"}</p>
           </div>
         </div>
         <Button
           variant="ghost"
-          className="w-full justify-start space-x-2 text-slate-300 hover:bg-slate-700 hover:text-white"
+          className="w-full justify-start space-x-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900"
           onClick={handleLogout}
         >
           <i className="fas fa-sign-out-alt"></i>

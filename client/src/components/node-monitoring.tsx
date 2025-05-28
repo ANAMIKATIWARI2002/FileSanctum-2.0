@@ -30,26 +30,27 @@ export default function NodeMonitoring() {
 
   const deleteNodeMutation = useMutation({
     mutationFn: async (nodeId: number) => {
-      const response = await apiRequest("DELETE", `/api/nodes/${nodeId}`);
+      const response = await fetch(`/api/nodes/${nodeId}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      });
+      
       if (!response.ok) {
-        throw new Error("Failed to delete node");
+        throw new Error(`HTTP ${response.status}`);
       }
-      const result = await response.json();
-      console.log("Delete response:", result);
-      return result;
+      
+      return await response.json();
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/nodes"] });
-      queryClient.refetchQueries({ queryKey: ["/api/nodes"] });
       toast({
         title: "Success",
-        description: data.message || "Node deleted successfully",
+        description: "Node deleted successfully",
       });
     },
-    onError: (error) => {
-      console.error("Delete error:", error);
+    onError: () => {
       toast({
-        title: "Error",
+        title: "Error", 
         description: "Failed to delete node",
         variant: "destructive",
       });

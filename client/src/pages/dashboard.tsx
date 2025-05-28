@@ -242,7 +242,9 @@ function RealTimeNodeVisualization() {
 
   const { data: nodes = [], isLoading } = useQuery<Node[]>({
     queryKey: ["/api/nodes"],
-    refetchInterval: 5000, // Refresh every 5 seconds
+    staleTime: 300000, // Consider data fresh for 5 minutes
+    refetchInterval: false, // Disable automatic refresh
+    refetchOnWindowFocus: false,
   });
 
   const getStatusColor = (status: string) => {

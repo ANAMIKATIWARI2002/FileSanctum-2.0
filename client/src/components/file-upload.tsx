@@ -139,11 +139,11 @@ export default function FileUpload() {
   return (
     <div className="space-y-6">
       {/* Upload Area */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Upload Files</CardTitle>
+      <Card className="bg-white border border-gray-200 shadow-sm">
+        <CardHeader className="bg-gray-50 border-b border-gray-200">
+          <CardTitle className="text-gray-900">Upload Files</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="bg-white">
           <div
             className="border-2 border-dashed border-slate-300 rounded-lg p-8 text-center hover:border-primary transition-colors cursor-pointer"
             onDrop={handleDrop}
@@ -213,11 +213,11 @@ export default function FileUpload() {
       </Card>
 
       {/* Upload Settings */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Upload Settings</CardTitle>
+      <Card className="bg-white border border-gray-200 shadow-sm">
+        <CardHeader className="bg-gray-50 border-b border-gray-200">
+          <CardTitle className="text-gray-900">Upload Settings</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="bg-white">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">

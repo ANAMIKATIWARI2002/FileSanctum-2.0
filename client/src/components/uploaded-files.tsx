@@ -129,10 +129,10 @@ export default function UploadedFiles() {
   }
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="bg-white border border-gray-200 shadow-sm">
+      <CardHeader className="bg-gray-50 border-b border-gray-200">
         <div className="flex items-center justify-between">
-          <CardTitle>Uploaded Files</CardTitle>
+          <CardTitle className="text-gray-900">Uploaded Files</CardTitle>
           <div className="flex items-center space-x-4">
             <Input
               placeholder="Search files..."

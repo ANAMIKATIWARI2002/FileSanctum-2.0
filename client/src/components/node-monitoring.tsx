@@ -31,6 +31,9 @@ export default function NodeMonitoring() {
   const deleteNodeMutation = useMutation({
     mutationFn: async (nodeId: number) => {
       const response = await apiRequest("DELETE", `/api/nodes/${nodeId}`);
+      if (!response.ok) {
+        throw new Error("Failed to delete node");
+      }
       return response.json();
     },
     onSuccess: () => {

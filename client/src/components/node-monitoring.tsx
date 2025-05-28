@@ -55,9 +55,12 @@ export default function NodeMonitoring() {
 
   const recoverNodeMutation = useMutation({
     mutationFn: async (nodeId: number) => {
-      return apiRequest(`/api/nodes/${nodeId}/recover`, {
+      const response = await fetch(`/api/nodes/${nodeId}/recover`, {
         method: "PUT",
+        headers: { "Content-Type": "application/json" },
       });
+      if (!response.ok) throw new Error("Failed to recover node");
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/nodes"] });
@@ -289,6 +292,34 @@ export default function NodeMonitoring() {
                         <span className="text-sm text-slate-600">
                           {parseFloat(node.uptime).toFixed(1)}%
                         </span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center space-x-2">
+                        {node.status === "degraded" || node.status === "failed" ? (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => recoverNodeMutation.mutate(node.id)}
+                            disabled={recoverNodeMutation.isPending}
+                            className="text-orange-600 border-orange-600 hover:bg-orange-50"
+                          >
+                            <RefreshCw className="w-3 h-3 mr-1" />
+                            {recoverNodeMutation.isPending ? "Recovering..." : "Recover"}
+                          </Button>
+                        ) : (
+                          <span className="text-xs text-slate-400">Healthy</span>
+                        )}
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => deleteNodeMutation.mutate(node.id)}
+                          disabled={deleteNodeMutation.isPending}
+                          className="text-red-600 border-red-600 hover:bg-red-50"
+                        >
+                          <Trash2 className="w-3 h-3 mr-1" />
+                          {deleteNodeMutation.isPending ? "Deleting..." : "Delete"}
+                        </Button>
                       </div>
                     </td>
                   </tr>

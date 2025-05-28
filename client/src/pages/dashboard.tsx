@@ -263,7 +263,14 @@ export default function Dashboard() {
                 Last login: {new Date().toLocaleString()}
               </div>
               <button 
-                onClick={() => window.location.href = '/api/logout'}
+                onClick={() => {
+                  // Clear local storage
+                  localStorage.removeItem('authToken');
+                  localStorage.removeItem('user');
+                  
+                  // Redirect to landing page
+                  window.location.href = '/';
+                }}
                 className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors shadow-lg border-2 border-red-600 hover:border-red-700"
               >
                 🚪 Logout

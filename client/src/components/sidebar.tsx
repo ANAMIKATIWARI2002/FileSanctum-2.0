@@ -104,14 +104,7 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
             <p className="text-gray-500 text-sm">{user?.role || "User"}</p>
           </div>
         </div>
-        <Button
-          variant="ghost"
-          className="w-full justify-start space-x-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-          onClick={handleLogout}
-        >
-          <i className="fas fa-sign-out-alt"></i>
-          <span>Logout</span>
-        </Button>
+
       </div>
     </div>
   );

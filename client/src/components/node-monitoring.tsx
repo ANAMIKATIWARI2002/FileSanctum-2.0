@@ -146,8 +146,8 @@ export default function NodeMonitoring() {
           <CardContent>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-slate-600">Overall Health</span>
-                <span className="text-sm font-medium text-green-600">
+                <span className="text-sm text-slate-600 dark:text-slate-300">Overall Health</span>
+                <span className="text-sm font-medium text-green-600 dark:text-green-400">
                   {totalNodes > 0 ? `${Math.round((healthyNodes / totalNodes) * 100)}%` : "0%"}
                 </span>
               </div>
@@ -157,16 +157,16 @@ export default function NodeMonitoring() {
               />
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div>
-                  <p className="text-2xl font-bold text-green-600">{healthyNodes}</p>
-                  <p className="text-xs text-slate-600">Healthy</p>
+                  <p className="text-2xl font-bold text-green-600 dark:text-green-400">{healthyNodes}</p>
+                  <p className="text-xs text-slate-600 dark:text-slate-300">Healthy</p>
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-yellow-600">{degradedNodes}</p>
-                  <p className="text-xs text-slate-600">Degraded</p>
+                  <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{degradedNodes}</p>
+                  <p className="text-xs text-slate-600 dark:text-slate-300">Degraded</p>
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-red-600">{failedNodes}</p>
-                  <p className="text-xs text-slate-600">Failed</p>
+                  <p className="text-2xl font-bold text-red-600 dark:text-red-400">{failedNodes}</p>
+                  <p className="text-xs text-slate-600 dark:text-slate-300">Failed</p>
                 </div>
               </div>
             </div>
@@ -183,9 +183,9 @@ export default function NodeMonitoring() {
                 const storagePercentage = getStoragePercentage(node.storageUsed, node.storageCapacity);
                 return (
                   <div key={node.id} className="flex items-center justify-between">
-                    <span className="text-sm text-slate-600">{node.name}</span>
+                    <span className="text-sm text-slate-600 dark:text-slate-300">{node.name}</span>
                     <div className="flex items-center space-x-2">
-                      <div className="w-24 bg-slate-200 rounded-full h-2">
+                      <div className="w-24 bg-slate-200 dark:bg-slate-700 rounded-full h-2">
                         <div 
                           className={`h-2 rounded-full ${
                             storagePercentage > 90 ? 'bg-red-500' : 
@@ -194,7 +194,7 @@ export default function NodeMonitoring() {
                           style={{ width: `${storagePercentage}%` }}
                         />
                       </div>
-                      <span className="text-xs text-slate-600 w-8">
+                      <span className="text-xs text-slate-600 dark:text-slate-300 w-8">
                         {Math.round(storagePercentage)}%
                       </span>
                     </div>

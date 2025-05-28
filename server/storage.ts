@@ -124,8 +124,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteNode(id: number): Promise<boolean> {
-    const result = await db.delete(nodes).where(eq(nodes.id, id));
-    return (result.rowCount || 0) > 0;
+    try {
+      const result = await db.delete(nodes).where(eq(nodes.id, id));
+      console.log(`Delete node ${id} result:`, result);
+      return (result.rowCount || 0) > 0;
+    } catch (error) {
+      console.error(`Error deleting node ${id}:`, error);
+      return false;
+    }
   }
 
   async updateNodeMetrics(id: number, metrics: {

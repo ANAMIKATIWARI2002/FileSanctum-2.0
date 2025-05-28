@@ -34,7 +34,12 @@ export default function NodeMonitoring() {
       if (!response.ok) {
         throw new Error("Failed to delete node");
       }
-      return response.json();
+      const result = await response.json();
+      console.log("Delete response:", result);
+      if (!result.success) {
+        throw new Error(result.message || "Failed to delete node");
+      }
+      return result;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/nodes"] });

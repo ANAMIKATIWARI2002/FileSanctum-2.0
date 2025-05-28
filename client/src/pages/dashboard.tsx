@@ -240,7 +240,7 @@ export default function Dashboard() {
 
   return (
     <div className="flex h-screen bg-gray-50">
-      <Sidebar activeSection={activeSection} onSectionChange={setActiveSection} />
+      <Sidebar activeSection={activeSection} onSectionChange={(section: string) => setActiveSection(section as DashboardSection)} />
       
       <div className="flex-1 overflow-hidden">
         {/* Header */}
@@ -291,8 +291,8 @@ function AddNodeButton() {
           name: `Node${Date.now()}`,
           ipAddress: `192.168.1.${Math.floor(Math.random() * 100) + 100}`,
           status: 'healthy',
-          storageCapacity: `${Math.floor(Math.random() * 500) + 100}GB`,
-          storageUsed: '0GB',
+          storageCapacity: Math.floor(Math.random() * 500) + 100,
+          storageUsed: 0,
         }),
       });
       

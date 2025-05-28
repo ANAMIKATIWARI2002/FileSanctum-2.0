@@ -199,13 +199,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Log activity
       await storage.createActivityLog({
-        userId: req.user.claims.sub,
+        userId: req.user.id || 'demo',
         action: "file_upload_started",
         resource: "file",
         resourceId: file.id.toString(),
         details: { fileName: file.originalName, fileSize: file.size },
-        ipAddress: req.ip,
-        userAgent: req.get('User-Agent'),
+        ipAddress: req.ip || '127.0.0.1',
+        userAgent: req.get('User-Agent') || 'Unknown',
       });
 
       // Simulate file processing and update status

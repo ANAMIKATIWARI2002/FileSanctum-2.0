@@ -28,7 +28,12 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
   };
 
   const handleLogout = () => {
-    window.location.href = "/api/logout";
+    // Clear local storage
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('user');
+    
+    // Redirect to landing page
+    window.location.href = '/';
   };
 
   return (

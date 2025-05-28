@@ -259,27 +259,27 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-background">
       <Sidebar activeSection={activeSection} onSectionChange={(section: string) => setActiveSection(section as DashboardSection)} />
       
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4 flex-shrink-0">
+        <header className="bg-card shadow-sm border-b border-border px-6 py-4 flex-shrink-0">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">
+              <h2 className="text-2xl font-bold text-foreground">
                 {getSectionTitle(activeSection)}
               </h2>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 {getSectionSubtitle(activeSection)}
               </p>
             </div>
             <div className="flex items-center space-x-6">
               <div className="flex items-center space-x-2 text-sm">
                 <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-gray-600">System Online</span>
+                <span className="text-muted-foreground">System Online</span>
               </div>
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-muted-foreground">
                 Last login: {new Date().toLocaleString()}
               </div>
               
@@ -311,7 +311,7 @@ export default function Dashboard() {
         </header>
 
         {/* Content */}
-        <main className="flex-1 overflow-y-auto bg-gray-50">
+        <main className="flex-1 overflow-y-auto bg-background">
           <div className="p-6">
             <div className="max-w-7xl mx-auto">
               {renderContent()}
@@ -513,14 +513,33 @@ function QuickFileOperations() {
         
         <div className="flex space-x-3">
           <button 
-            onClick={() => window.location.href = '#uploaded-files'}
-            className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 hover:shadow-md transition-all duration-200 transform hover:scale-105"
+            onClick={() => {
+              setActiveSection('uploaded-files');
+              window.history.pushState({}, '', '/dashboard/uploaded-files');
+            }}
+            className="flex-1 bg-secondary text-secondary-foreground py-2 px-4 rounded-lg hover:bg-secondary/80 hover:shadow-md transition-all duration-200 transform hover:scale-105"
           >
             📁 View Files
           </button>
           <button 
-            onClick={() => window.location.href = '#uploaded-files'}
-            className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 hover:shadow-md transition-all duration-200 transform hover:scale-105"
+            onClick={() => {
+              // Get the most recent uploaded file and download it
+              const files = queryClient.getQueryData(["/api/files"]) as any[];
+              if (files && files.length > 0) {
+                const latestFile = files[files.length - 1];
+                const link = document.createElement('a');
+                link.href = `/api/files/${latestFile.id}/download`;
+                link.download = latestFile.originalName;
+                link.click();
+              } else {
+                toast({
+                  title: "No files to download",
+                  description: "Please upload a file first",
+                  variant: "destructive",
+                });
+              }
+            }}
+            className="flex-1 bg-secondary text-secondary-foreground py-2 px-4 rounded-lg hover:bg-secondary/80 hover:shadow-md transition-all duration-200 transform hover:scale-105"
           >
             ⬇️ Download
           </button>

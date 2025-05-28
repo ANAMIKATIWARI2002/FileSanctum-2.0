@@ -37,7 +37,7 @@ export default function Sidebar({ activeSection, onSectionChange }: SidebarProps
   };
 
   return (
-    <div className="w-72 bg-white text-gray-900 flex flex-col border-r border-gray-200">
+    <div className="w-72 bg-card text-card-foreground flex flex-col border-r border-border">
       {/* Header */}
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center space-x-3">

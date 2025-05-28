@@ -9,10 +9,11 @@ import SystemAnalytics from "@/components/system-analytics";
 import UserInvite from "@/components/user-invite";
 import NodeViewer from "@/components/node-viewer";
 import NodeManagement from "@/components/node-management";
+import Notifications from "@/components/notifications";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { Sun, Moon } from "lucide-react";
+import { Sun, Moon, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type DashboardSection = 
@@ -293,19 +294,22 @@ export default function Dashboard() {
                 {isDarkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
               </Button>
               
-              <button 
+              {/* Notifications */}
+              <Notifications theme={isDarkMode ? 'dark' : 'light'} />
+              
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => {
-                  // Clear local storage
                   localStorage.removeItem('authToken');
                   localStorage.removeItem('user');
-                  
-                  // Redirect to landing page
                   window.location.href = '/';
                 }}
-                className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors shadow-lg border-2 border-red-600 hover:border-red-700"
+                className="bg-red-600 hover:bg-red-700 text-white border-red-600 hover:border-red-700"
               >
-                🚪 Logout
-              </button>
+                <LogOut className="h-4 w-4 mr-2" />
+                Logout
+              </Button>
             </div>
           </div>
         </header>

@@ -13,8 +13,15 @@ import Notifications from "@/components/notifications";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { Sun, Moon, LogOut } from "lucide-react";
+import { Sun, Moon, LogOut, Server, Plus, RotateCcw, HardDrive, Cpu, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { apiRequest } from "@/lib/queryClient";
 
 type DashboardSection = 
   | "dashboard" 
@@ -24,6 +31,281 @@ type DashboardSection =
   | "node-monitoring" 
   | "system-analytics" 
   | "user-invite";
+
+// Schema for adding new nodes with the specifications requested
+const nodeSchema = z.object({
+  name: z.string().min(1, "Node name is required"),
+  storageCapacity: z.number().min(0.1, "Storage must be at least 0.1 GB").max(5, "Maximum storage is 5 GB"),
+});
+
+type NodeForm = z.infer<typeof nodeSchema>;
+
+// Real-time Node Visualization Component
+function RealTimeNodeVisualization() {
+  const { data: nodes = [], isLoading } = useQuery({
+    queryKey: ["/api/nodes"],
+    refetchInterval: 5000, // Refresh every 5 seconds
+  });
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "healthy":
+        return "bg-green-500";
+      case "degraded":
+        return "bg-yellow-500";
+      case "failed":
+        return "bg-red-500";
+      default:
+        return "bg-slate-500";
+    }
+  };
+
+  const getStoragePercentage = (used: string, capacity: string) => {
+    const usedNum = parseFloat(used);
+    const capacityNum = parseFloat(capacity);
+    return capacityNum > 0 ? Math.round((usedNum / capacityNum) * 100) : 0;
+  };
+
+  if (isLoading) {
+    return (
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Node Visualization</h3>
+        <div className="flex items-center justify-center h-32">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Node Visualization</h3>
+      <div className="space-y-3">
+        {nodes.map((node: any) => {
+          const storagePercentage = getStoragePercentage(node.storageUsed, node.storageCapacity);
+          return (
+            <div key={node.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
+              <div className="flex items-center space-x-3">
+                <div className={`w-3 h-3 rounded-full ${getStatusColor(node.status)}`}></div>
+                <span className="font-medium text-gray-900 dark:text-white">{node.name}</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded">
+                  {node.status.charAt(0).toUpperCase() + node.status.slice(1)}
+                </span>
+              </div>
+              <div className="text-right">
+                <div className="text-sm text-gray-600 dark:text-gray-300">{storagePercentage}% Used</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">{node.storageCapacity} GB</div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// Enhanced Node Health & Management Component
+function EnhancedNodeManagement() {
+  const [isAddNodeOpen, setIsAddNodeOpen] = useState(false);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  
+  const { data: nodes = [] } = useQuery({
+    queryKey: ["/api/nodes"],
+    refetchInterval: 5000,
+  });
+
+  const form = useForm<NodeForm>({
+    resolver: zodResolver(nodeSchema),
+    defaultValues: {
+      name: "",
+      storageCapacity: 1,
+    },
+  });
+
+  // Function to generate automatic IP address
+  const generateNodeIP = () => {
+    const baseIP = "192.168.1.";
+    const lastOctet = Math.floor(Math.random() * 200) + 50; // Range 50-249
+    return baseIP + lastOctet;
+  };
+
+  const addNodeMutation = useMutation({
+    mutationFn: async (data: NodeForm) => {
+      const response = await apiRequest("POST", "/api/nodes", {
+        name: data.name,
+        ipAddress: generateNodeIP(),
+        storageCapacity: data.storageCapacity.toString(),
+        port: 8080,
+        status: "healthy",
+      });
+      return await response.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/nodes"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/system/stats"] });
+      setIsAddNodeOpen(false);
+      form.reset();
+      toast({
+        title: "Node added successfully",
+        description: `${data.name} has been added to the cluster with IP ${data.ipAddress}`,
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Failed to add node",
+        description: "Could not add the new node to the cluster",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const nodeRecoveryMutation = useMutation({
+    mutationFn: async () => {
+      // Recovery logic for degraded nodes
+      const degradedNodes = nodes.filter((node: any) => node.status === "degraded" || node.status === "failed");
+      for (const node of degradedNodes) {
+        await apiRequest("PUT", `/api/nodes/${node.id}/recover`);
+      }
+      return { success: true };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/nodes"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/system/stats"] });
+      toast({
+        title: "Node recovery initiated",
+        description: "Recovery process started for degraded nodes",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Recovery failed",
+        description: "Unable to start node recovery process",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const onSubmit = (data: NodeForm) => {
+    addNodeMutation.mutate(data);
+  };
+
+  const healthyNodes = nodes.filter((node: any) => node.status === "healthy").length;
+  const degradedNodes = nodes.filter((node: any) => node.status === "degraded").length;
+  const failedNodes = nodes.filter((node: any) => node.status === "failed").length;
+
+  return (
+    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Node Health & Management</h3>
+      <div className="space-y-4">
+        <div className="grid grid-cols-3 gap-4 text-center">
+          <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg">
+            <div className="text-2xl font-bold text-green-600 dark:text-green-400">{healthyNodes}</div>
+            <div className="text-sm text-gray-600 dark:text-gray-300">Healthy</div>
+          </div>
+          <div className="bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-lg">
+            <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{degradedNodes}</div>
+            <div className="text-sm text-gray-600 dark:text-gray-300">Warning</div>
+          </div>
+          <div className="bg-red-50 dark:bg-red-900/20 p-3 rounded-lg">
+            <div className="text-2xl font-bold text-red-600 dark:text-red-400">{failedNodes}</div>
+            <div className="text-sm text-gray-600 dark:text-gray-300">Failed</div>
+          </div>
+        </div>
+        
+        <div className="space-y-2">
+          <Dialog open={isAddNodeOpen} onOpenChange={setIsAddNodeOpen}>
+            <DialogTrigger asChild>
+              <button className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">
+                <Plus className="w-4 h-4 inline mr-2" />
+                Add New Node
+              </button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>Add New Node</DialogTitle>
+              </DialogHeader>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <div>
+                  <Label htmlFor="name">Node Name</Label>
+                  <Input
+                    id="name"
+                    placeholder="e.g., MainServer, BackupNode1"
+                    {...form.register("name")}
+                  />
+                  {form.formState.errors.name && (
+                    <p className="text-sm text-red-600 mt-1">
+                      {form.formState.errors.name.message}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <Label htmlFor="storageCapacity">Storage Size (GB)</Label>
+                  <Input
+                    id="storageCapacity"
+                    type="number"
+                    min="0.1"
+                    max="5"
+                    step="0.1"
+                    placeholder="e.g., 2.5"
+                    {...form.register("storageCapacity", { valueAsNumber: true })}
+                  />
+                  {form.formState.errors.storageCapacity && (
+                    <p className="text-sm text-red-600 mt-1">
+                      {form.formState.errors.storageCapacity.message}
+                    </p>
+                  )}
+                  <p className="text-xs text-gray-500 mt-1">Maximum 5 GB per node. IP address will be assigned automatically.</p>
+                </div>
+                <div className="flex justify-end space-x-3 pt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsAddNodeOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button 
+                    type="submit" 
+                    disabled={addNodeMutation.isPending}
+                    className="bg-green-600 hover:bg-green-700"
+                  >
+                    {addNodeMutation.isPending ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                        Adding...
+                      </>
+                    ) : (
+                      "Add Node"
+                    )}
+                  </Button>
+                </div>
+              </form>
+            </DialogContent>
+          </Dialog>
+          
+          <button 
+            onClick={() => nodeRecoveryMutation.mutate()}
+            disabled={nodeRecoveryMutation.isPending}
+            className="w-full bg-orange-600 text-white py-2 px-4 rounded-lg hover:bg-orange-700 transition-colors disabled:opacity-50"
+          >
+            {nodeRecoveryMutation.isPending ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2 inline-block" />
+                Recovering...
+              </>
+            ) : (
+              <>
+                <RotateCcw className="w-4 h-4 inline mr-2" />
+                Node Recovery
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function Dashboard() {
   const { section } = useParams();
@@ -194,65 +476,10 @@ export default function Dashboard() {
               </div>
 
               {/* Section 3: Node Visualization */}
-              <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Node Visualization</h3>
-                <div className="space-y-3">
-                  {Array.from({ length: 6 }, (_, i) => (
-                    <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                      <div className="flex items-center space-x-3">
-                        <div className={`w-3 h-3 rounded-full ${i < 4 ? 'bg-green-500' : i === 4 ? 'bg-yellow-500' : 'bg-red-500'}`}></div>
-                        <span className="font-medium text-gray-900">Node{i + 1}</span>
-                        <span className="text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded">
-                          {i < 4 ? 'Healthy' : i === 4 ? 'Warning' : 'Failed'}
-                        </span>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-sm text-gray-600">{Math.round(Math.random() * 40 + 20)}% Used</div>
-                        <div className="text-xs text-gray-500">{(Math.random() * 50 + 10).toFixed(1)} GB</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <RealTimeNodeVisualization />
 
               {/* Section 4: Node Health & Management */}
-              <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Node Health & Management</h3>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-3 gap-4 text-center">
-                    <div className="bg-green-50 p-3 rounded-lg">
-                      <div className="text-2xl font-bold text-green-600">4</div>
-                      <div className="text-sm text-gray-600">Healthy</div>
-                    </div>
-                    <div className="bg-yellow-50 p-3 rounded-lg">
-                      <div className="text-2xl font-bold text-yellow-600">1</div>
-                      <div className="text-sm text-gray-600">Warning</div>
-                    </div>
-                    <div className="bg-red-50 p-3 rounded-lg">
-                      <div className="text-2xl font-bold text-red-600">1</div>
-                      <div className="text-sm text-gray-600">Failed</div>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <AddNodeButton />
-                    <button 
-                      onClick={() => setActiveSection("node-monitoring")}
-                      className="w-full bg-orange-600 text-white py-2 px-4 rounded-lg hover:bg-orange-700 transition-colors"
-                    >
-                      🔧 Node Recovery
-                    </button>
-                  </div>
-
-                  <div className="bg-gray-50 p-3 rounded-lg">
-                    <div className="text-sm text-gray-600 mb-1">System Status</div>
-                    <div className="flex items-center space-x-2">
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span className="text-sm font-medium text-gray-900">All systems operational</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <EnhancedNodeManagement />
             </div>
           </div>
         );

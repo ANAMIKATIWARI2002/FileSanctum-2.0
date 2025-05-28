@@ -123,8 +123,15 @@ export default function SystemAnalytics() {
             <CardTitle>Storage Usage</CardTitle>
           </CardHeader>
           <CardContent>
-            <div style={{ height: '250px' }}>
+            <div style={{ height: '250px' }} className="relative">
               <canvas ref={storageChartRef} />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-white">2.3 GB</div>
+                  <div className="text-sm text-gray-300">Used of 15.0 GB</div>
+                  <div className="text-xs text-gray-400 mt-1">84.7% Available</div>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -139,16 +146,16 @@ export default function SystemAnalytics() {
           <CardContent>
             <div className="space-y-3">
               <div className="flex justify-between">
-                <span className="text-sm text-slate-600">Read</span>
-                <span className="text-sm font-medium">1.2 GB/s</span>
+                <span className="text-sm text-white dark:text-slate-300">Read</span>
+                <span className="text-sm font-medium text-white">1.2 GB/s</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-slate-600">Write</span>
-                <span className="text-sm font-medium">0.8 GB/s</span>
+                <span className="text-sm text-white dark:text-slate-300">Write</span>
+                <span className="text-sm font-medium text-white">0.8 GB/s</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-slate-600">Network</span>
-                <span className="text-sm font-medium">2.1 GB/s</span>
+                <span className="text-sm text-white dark:text-slate-300">Network</span>
+                <span className="text-sm font-medium text-white">2.1 GB/s</span>
               </div>
             </div>
           </CardContent>
@@ -161,16 +168,16 @@ export default function SystemAnalytics() {
           <CardContent>
             <div className="space-y-3">
               <div className="flex justify-between">
-                <span className="text-sm text-slate-600">Availability</span>
-                <span className="text-sm font-medium text-green-600">99.95%</span>
+                <span className="text-sm text-white dark:text-slate-300">Availability</span>
+                <span className="text-sm font-medium text-green-400">99.95%</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-slate-600">Data Integrity</span>
-                <span className="text-sm font-medium text-green-600">100%</span>
+                <span className="text-sm text-white dark:text-slate-300">Data Integrity</span>
+                <span className="text-sm font-medium text-green-400">100%</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-slate-600">Recovery Time</span>
-                <span className="text-sm font-medium">&lt; 5 min</span>
+                <span className="text-sm text-white dark:text-slate-300">Recovery Time</span>
+                <span className="text-sm font-medium text-white">&lt; 5 min</span>
               </div>
             </div>
           </CardContent>
@@ -183,16 +190,16 @@ export default function SystemAnalytics() {
           <CardContent>
             <div className="space-y-3">
               <div className="flex justify-between">
-                <span className="text-sm text-slate-600">Storage Efficiency</span>
-                <span className="text-sm font-medium">66.7%</span>
+                <span className="text-sm text-white dark:text-slate-300">Storage Efficiency</span>
+                <span className="text-sm font-medium text-white">66.7%</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-slate-600">Compression</span>
-                <span className="text-sm font-medium">2.3:1</span>
+                <span className="text-sm text-white dark:text-slate-300">Compression</span>
+                <span className="text-sm font-medium text-white">2.3:1</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-slate-600">Deduplication</span>
-                <span className="text-sm font-medium">1.8:1</span>
+                <span className="text-sm text-white dark:text-slate-300">Deduplication</span>
+                <span className="text-sm font-medium text-white">1.8:1</span>
               </div>
             </div>
           </CardContent>

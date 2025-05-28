@@ -213,9 +213,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteActivityLog(id: number): Promise<boolean> {
-    const result = await db.delete(activityLogs)
-      .where(eq(activityLogs.id, id));
-    return result.rowCount > 0;
+    try {
+      const result = await db.delete(activityLogs)
+        .where(eq(activityLogs.id, id));
+      return (result.rowCount || 0) > 0;
+    } catch (error) {
+      console.error("Error deleting activity log:", error);
+      return false;
+    }
   }
 
   // Invitation operations

@@ -36,9 +36,6 @@ export default function NodeMonitoring() {
       }
       const result = await response.json();
       console.log("Delete response:", result);
-      if (!result.success) {
-        throw new Error(result.message || "Failed to delete node");
-      }
       return result;
     },
     onSuccess: (data) => {

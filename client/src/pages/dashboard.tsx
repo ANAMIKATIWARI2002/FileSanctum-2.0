@@ -254,14 +254,20 @@ export default function Dashboard() {
                 {getSectionSubtitle(activeSection)}
               </p>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-6">
               <div className="flex items-center space-x-2 text-sm">
                 <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
                 <span className="text-gray-600">System Online</span>
               </div>
               <div className="text-sm text-gray-600">
-                Last updated: {new Date().toLocaleTimeString()}
+                Last login: {new Date().toLocaleString()}
               </div>
+              <button 
+                onClick={() => window.location.href = '/api/logout'}
+                className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors shadow-lg border-2 border-red-600 hover:border-red-700"
+              >
+                🚪 Logout
+              </button>
             </div>
           </div>
         </header>

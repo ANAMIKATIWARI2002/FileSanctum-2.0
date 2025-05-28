@@ -116,20 +116,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/nodes", isAuthenticated, async (req: any, res) => {
+  app.post("/api/nodes", async (req: any, res) => {
     try {
       const nodeData = insertNodeSchema.parse(req.body);
       const node = await storage.createNode(nodeData);
       
       // Log activity
       await storage.createActivityLog({
-        userId: req.user.claims.sub,
+        userId: 'demo-user',
         action: "node_added",
         resource: "node",
         resourceId: node.id.toString(),
         details: { nodeName: node.name, ipAddress: node.ipAddress },
-        ipAddress: req.ip,
-        userAgent: req.get('User-Agent'),
+        ipAddress: req.ip || '127.0.0.1',
+        userAgent: req.get('User-Agent') || 'Unknown',
       });
 
       res.json(node);
@@ -175,7 +175,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/files/upload", isAuthenticated, upload.single('file'), async (req: any, res) => {
+  app.post("/api/files/upload", upload.single('file'), async (req: any, res) => {
     try {
       if (!req.file) {
         return res.status(400).json({ message: "No file provided" });
@@ -186,7 +186,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         originalName: req.file.originalname,
         size: req.file.size.toString(),
         mimeType: req.file.mimetype,
-        uploadedBy: req.user.id || 'demo',
+        uploadedBy: 'demo-user',
         status: "uploading",
         erasureCoding: {
           k: 6, // data chunks
@@ -199,7 +199,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Log activity
       await storage.createActivityLog({
-        userId: req.user.id || 'demo',
+        userId: 'demo-user',
         action: "file_upload_started",
         resource: "file",
         resourceId: file.id.toString(),

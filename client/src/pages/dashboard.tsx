@@ -291,8 +291,8 @@ function AddNodeButton() {
           name: `Node${Date.now()}`,
           ipAddress: `192.168.1.${Math.floor(Math.random() * 100) + 100}`,
           status: 'healthy',
-          storageCapacity: Math.floor(Math.random() * 500) + 100,
-          storageUsed: 0,
+          storageCapacity: `${Math.floor(Math.random() * 500) + 100}`,
+          storageUsed: `0`,
         }),
       });
       

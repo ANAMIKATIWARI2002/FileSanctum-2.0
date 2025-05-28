@@ -479,13 +479,13 @@ function QuickFileOperations() {
         <div className="flex space-x-3">
           <button 
             onClick={() => window.location.href = '#uploaded-files'}
-            className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors"
+            className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 hover:shadow-md transition-all duration-200 transform hover:scale-105"
           >
             📁 View Files
           </button>
           <button 
             onClick={() => window.location.href = '#uploaded-files'}
-            className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors"
+            className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 hover:shadow-md transition-all duration-200 transform hover:scale-105"
           >
             ⬇️ Download
           </button>

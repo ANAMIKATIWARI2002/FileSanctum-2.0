@@ -151,7 +151,7 @@ export default function ActivityLogs() {
               return (
                 <div
                   key={log.id}
-                  className="flex items-start space-x-4 pb-4 border-b border-slate-100 last:border-b-0"
+                  className="flex items-start space-x-4 pb-4 border-b border-gray-200 last:border-b-0 bg-white p-4 rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   <div className="flex-shrink-0">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center ${actionColor}`}>
@@ -160,17 +160,17 @@ export default function ActivityLogs() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center space-x-2 mb-1">
-                      <p className="text-sm font-medium text-slate-900">
+                      <p className="text-sm font-medium text-gray-900">
                         {getActionLabel(log.action)}
                       </p>
-                      <Badge variant="outline" className="text-xs">
+                      <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
                         {log.resource}
                       </Badge>
                     </div>
-                    <p className="text-sm text-slate-600 mb-2">
+                    <p className="text-sm text-gray-700 mb-2">
                       {getActionDescription(log)}
                     </p>
-                    <div className="flex items-center space-x-4 text-xs text-slate-500">
+                    <div className="flex items-center space-x-4 text-xs text-gray-500">
                       <span>{format(new Date(log.createdAt), 'MMM dd, yyyy HH:mm:ss')}</span>
                       {log.ipAddress && <span>{log.ipAddress}</span>}
                     </div>

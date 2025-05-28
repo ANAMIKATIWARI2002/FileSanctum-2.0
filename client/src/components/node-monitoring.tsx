@@ -30,11 +30,7 @@ export default function NodeMonitoring() {
 
   const deleteNodeMutation = useMutation({
     mutationFn: async (nodeId: number) => {
-      const response = await fetch(`/api/nodes/${nodeId}`, {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-      });
-      if (!response.ok) throw new Error("Failed to delete node");
+      const response = await apiRequest("DELETE", `/api/nodes/${nodeId}`);
       return response.json();
     },
     onSuccess: () => {
@@ -296,7 +292,7 @@ export default function NodeMonitoring() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center space-x-2">
-                        {node.status === "degraded" || node.status === "failed" ? (
+                        {(node.status === "degraded" || node.status === "failed") && (
                           <Button
                             size="sm"
                             variant="outline"
@@ -307,8 +303,6 @@ export default function NodeMonitoring() {
                             <RefreshCw className="w-3 h-3 mr-1" />
                             {recoverNodeMutation.isPending ? "Recovering..." : "Recover"}
                           </Button>
-                        ) : (
-                          <span className="text-xs text-slate-400">Healthy</span>
                         )}
                         <Button
                           size="sm"

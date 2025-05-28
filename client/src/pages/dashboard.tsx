@@ -135,12 +135,16 @@ function DynamicStatsCards() {
 function DynamicSystemAnalytics() {
   const { data: nodes = [] } = useQuery({
     queryKey: ["/api/nodes"],
-    refetchInterval: 30000, // Refresh every 30 seconds
+    staleTime: 300000, // Consider data fresh for 5 minutes
+    refetchInterval: false, // Disable automatic refresh
+    refetchOnWindowFocus: false,
   });
 
   const { data: systemStats } = useQuery({
     queryKey: ["/api/system/stats"],
-    refetchInterval: 30000, // Refresh every 30 seconds
+    staleTime: 300000, // Consider data fresh for 5 minutes
+    refetchInterval: false, // Disable automatic refresh
+    refetchOnWindowFocus: false,
   });
 
   // Calculate real-time analytics from your actual system data

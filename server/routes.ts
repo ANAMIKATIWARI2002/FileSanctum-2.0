@@ -327,6 +327,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Bulk delete activity logs
+  app.delete("/api/activity-logs/bulk", isAuthenticated, async (req: any, res) => {
+    try {
+      const { logIds } = req.body;
+      
+      if (!Array.isArray(logIds) || logIds.length === 0) {
+        return res.status(400).json({ message: "Invalid log IDs provided" });
+      }
+
+      let deletedCount = 0;
+      for (const logId of logIds) {
+        const deleted = await storage.deleteActivityLog(parseInt(logId));
+        if (deleted) deletedCount++;
+      }
+
+      res.json({ 
+        success: true, 
+        deletedCount,
+        message: `Successfully deleted ${deletedCount} activity log(s)` 
+      });
+    } catch (error) {
+      console.error("Error deleting activity logs:", error);
+      res.status(500).json({ message: "Failed to delete activity logs" });
+    }
+  });
+
   // Invitation routes
   app.get("/api/invitations", isAuthenticated, async (req: any, res) => {
     try {

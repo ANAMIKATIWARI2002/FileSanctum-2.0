@@ -62,6 +62,7 @@ export interface IStorage {
   // Activity log operations
   createActivityLog(log: InsertActivityLog): Promise<ActivityLog>;
   getActivityLogs(limit?: number): Promise<ActivityLog[]>;
+  deleteActivityLog(id: number): Promise<boolean>;
 
   // Invitation operations
   createInvitation(invitation: InsertInvitation): Promise<Invitation>;
@@ -209,6 +210,12 @@ export class DatabaseStorage implements IStorage {
       .from(activityLogs)
       .orderBy(desc(activityLogs.createdAt))
       .limit(limit);
+  }
+
+  async deleteActivityLog(id: number): Promise<boolean> {
+    const result = await db.delete(activityLogs)
+      .where(eq(activityLogs.id, id));
+    return result.rowCount > 0;
   }
 
   // Invitation operations

@@ -1,8 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { useQuery } from "@tanstack/react-query";
-import { Server, Cpu, HardDrive, Wifi, Clock } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { Server, Cpu, HardDrive, Wifi, Clock, Trash2, RefreshCw } from "lucide-react";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 interface Node {
   id: number;
@@ -19,9 +22,57 @@ interface Node {
 }
 
 export default function NodeMonitoring() {
+  const { toast } = useToast();
   const { data: nodes = [], isLoading } = useQuery<Node[]>({
     queryKey: ["/api/nodes"],
     refetchInterval: 5000, // Refresh every 5 seconds
+  });
+
+  const deleteNodeMutation = useMutation({
+    mutationFn: async (nodeId: number) => {
+      const response = await fetch(`/api/nodes/${nodeId}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      });
+      if (!response.ok) throw new Error("Failed to delete node");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/nodes"] });
+      toast({
+        title: "Success",
+        description: "Node deleted successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to delete node",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const recoverNodeMutation = useMutation({
+    mutationFn: async (nodeId: number) => {
+      return apiRequest(`/api/nodes/${nodeId}/recover`, {
+        method: "PUT",
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/nodes"] });
+      toast({
+        title: "Success",
+        description: "Node recovery initiated successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to recover node",
+        variant: "destructive",
+      });
+    },
   });
 
   const getStatusColor = (status: string) => {
@@ -38,14 +89,14 @@ export default function NodeMonitoring() {
   };
 
   const getStatusBadge = (status: string) => {
-    const variants = {
+    const variants: Record<string, "default" | "outline" | "destructive" | "secondary"> = {
       healthy: "default",
-      degraded: "outline",
+      degraded: "outline", 
       failed: "destructive",
     };
     
     return (
-      <Badge variant={variants[status as keyof typeof variants] || "secondary"}>
+      <Badge variant={variants[status] || "secondary"}>
         <div className={`w-2 h-2 rounded-full mr-1 ${getStatusColor(status)}`} />
         {status.charAt(0).toUpperCase() + status.slice(1)}
       </Badge>
@@ -178,6 +229,9 @@ export default function NodeMonitoring() {
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">
                     Uptime
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">
+                    Actions
                   </th>
                 </tr>
               </thead>

@@ -164,6 +164,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.delete("/api/nodes/:id", isAuthenticated, async (req: any, res) => {
+    try {
+      const nodeId = parseInt(req.params.id);
+      const node = await storage.getNode(nodeId);
+      
+      if (!node) {
+        return res.status(404).json({ message: "Node not found" });
+      }
+
+      const deleted = await storage.deleteNode(nodeId);
+      
+      if (deleted) {
+        // Log activity
+        await storage.createActivityLog({
+          userId: 'demo-user',
+          action: "node_deleted",
+          resource: "node",
+          resourceId: nodeId.toString(),
+          details: { nodeName: node.name, ipAddress: node.ipAddress },
+          ipAddress: req.ip || '127.0.0.1',
+          userAgent: req.get('User-Agent') || 'Unknown',
+        });
+      }
+
+      res.json({ success: deleted, message: deleted ? "Node deleted successfully" : "Failed to delete node" });
+    } catch (error) {
+      console.error("Error deleting node:", error);
+      res.status(500).json({ message: "Failed to delete node" });
+    }
+  });
+
   // File management routes
   app.get("/api/files", isAuthenticated, async (req: any, res) => {
     try {

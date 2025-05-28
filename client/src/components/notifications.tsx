@@ -138,8 +138,9 @@ export default function Notifications({ theme }: NotificationsProps) {
                   variant="ghost"
                   size="sm"
                   onClick={() => setIsOpen(false)}
+                  className="hover:bg-gray-700 p-1"
                 >
-                  <X className="w-4 h-4 text-white" />
+                  <X className="w-5 h-5 text-white font-bold stroke-2" />
                 </Button>
               </div>
             </div>

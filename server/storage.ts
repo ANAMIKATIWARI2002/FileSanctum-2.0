@@ -27,6 +27,8 @@ import {
 import { db } from "./db";
 import { eq, desc, and, sql, gte, lte } from "drizzle-orm";
 import { nanoid } from "nanoid";
+import { storageEngine } from "./storage-engine";
+import * as crypto from 'crypto';
 
 // Interface for storage operations
 export interface IStorage {

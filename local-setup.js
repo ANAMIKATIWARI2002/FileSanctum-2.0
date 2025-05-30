@@ -1,8 +1,8 @@
-const { spawn } = require('child_process');
+const { spawn, execSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 
-// Simple environment setup
+// Create environment file if it doesn't exist
 const envPath = path.join(__dirname, '.env');
 if (!fs.existsSync(envPath)) {
   const envContent = `DATABASE_URL=postgresql://postgres:password@localhost:5432/filesanctum
@@ -19,37 +19,33 @@ PORT=5000`;
 const nodeModulesPath = path.join(__dirname, 'node_modules');
 if (!fs.existsSync(nodeModulesPath)) {
   console.log('Installing dependencies...');
-  const npmInstall = spawn('npm', ['install'], { stdio: 'inherit', shell: true });
-  npmInstall.on('close', (code) => {
-    if (code === 0) startServer();
-    else console.log('Installation failed. Run npm install manually.');
-  });
-} else {
-  startServer();
+  try {
+    execSync('npm install', { stdio: 'inherit', cwd: __dirname });
+    console.log('Dependencies installed successfully.');
+  } catch (error) {
+    console.log('Installation failed. Run npm install manually.');
+    process.exit(1);
+  }
 }
 
-function startServer() {
-  console.log('Setting up database...');
-  const dbSetup = spawn('node', ['setup-database.js'], {
-    stdio: 'inherit',
-    shell: true,
-    cwd: __dirname
-  });
-
-  dbSetup.on('close', (code) => {
-    if (code === 0) {
-      console.log('Starting server...');
-      const server = spawn('node', ['start-windows.js'], { 
-        stdio: 'inherit', 
-        shell: true,
-        cwd: __dirname
-      });
-      
-      server.on('close', (code) => {
-        console.log('Server stopped.');
-      });
-    } else {
-      console.log('Database setup failed.');
-    }
-  });
+// Setup database synchronously
+console.log('Setting up database...');
+try {
+  execSync('node setup-database.js', { stdio: 'inherit', cwd: __dirname });
+  console.log('Database setup completed.');
+} catch (error) {
+  console.log('Database setup failed. Check your PostgreSQL connection and credentials.');
+  process.exit(1);
 }
+
+// Start server only after database is ready
+console.log('Starting server...');
+const server = spawn('node', ['start-windows.js'], { 
+  stdio: 'inherit', 
+  shell: true,
+  cwd: __dirname
+});
+
+server.on('close', (code) => {
+  console.log('Server stopped.');
+});

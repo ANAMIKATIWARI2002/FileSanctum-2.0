@@ -175,7 +175,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (node) {
         // Log activity
         await storage.createActivityLog({
-          userId: 'demo-user',
+          userId: req.user?.claims?.sub || 'admin-demo',
           action: "node_recovery",
           resource: "node",
           resourceId: nodeId.toString(),
@@ -368,7 +368,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Log activity
       await storage.createActivityLog({
-        userId: 'demo-user',
+        userId: req.user?.claims?.sub || 'admin-demo',
         action: "files_moved",
         resource: "files",
         resourceId: fileIds.join(','),
@@ -444,7 +444,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const invitationData = insertInvitationSchema.parse({
         ...req.body,
-        invitedBy: 'demo-user',
+        invitedBy: req.user?.claims?.sub || 'admin-demo',
         token: 'demo-token-' + Date.now(),
       });
       
@@ -452,7 +452,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Log activity
       await storage.createActivityLog({
-        userId: 'demo-user',
+        userId: req.user?.claims?.sub || 'admin-demo',
         action: "user_invited",
         resource: "invitation",
         resourceId: invitation.id.toString(),

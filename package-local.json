@@ -1,23 +1,28 @@
 {
-  "name": "filesanctum-local-demo",
+  "name": "filesanctum-local",
   "version": "1.0.0",
-  "description": "FileSanctum DFSS - Local Demonstration Setup",
+  "description": "FileSanctum DFSS - Complete Local Setup",
   "main": "local-setup.js",
   "scripts": {
-    "start": "node local-setup.js",
-    "demo": "node local-setup.js"
+    "local": "node local-setup.js",
+    "dev-local": "tsx server/index.ts",
+    "build-local": "vite build"
   },
   "dependencies": {
     "express": "^4.18.2",
+    "better-sqlite3": "^8.7.0",
     "multer": "^1.4.5-lts.1",
-    "cors": "^2.8.5"
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "dotenv": "^16.3.1",
+    "cors": "^2.8.5",
+    "tsx": "^4.6.2",
+    "drizzle-orm": "^0.29.0",
+    "ws": "^8.14.2"
   },
-  "keywords": [
-    "distributed-file-storage",
-    "dfss",
-    "file-management",
-    "storage-system"
-  ],
-  "author": "FileSanctum Team",
-  "license": "MIT"
+  "devDependencies": {
+    "vite": "^5.0.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "typescript": "^5.3.0"
+  }
 }

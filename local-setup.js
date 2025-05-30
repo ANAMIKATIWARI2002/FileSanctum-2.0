@@ -1,57 +1,166 @@
 const express = require('express');
-const { Pool } = require('pg');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const multer = require('multer');
 const crypto = require('crypto');
-const http = require('http');
-const WebSocket = require('ws');
 
 // Create Express application
 const app = express();
 app.use(express.json());
 
-// Create HTTP server
-const server = http.createServer(app);
-
-// Create WebSocket server
-const wss = new WebSocket.Server({ server, path: '/ws' });
-
 // Define environment variables
 const PORT = process.env.PORT || 5000;
-const JWT_SECRET = process.env.JWT_SECRET || 'filesanctum_jwt_secret_key';
-const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || 'filesanctum_encryption_key';
 
-// Configure PostgreSQL connection
-let pool;
-try {
-  pool = new Pool({
-    user: 'postgres',         // Default PostgreSQL username
-    password: 'ankit123',     // Change this to your PostgreSQL password
-    host: 'localhost',
-    port: 5432,
-    database: 'filesanctum'   // Change database name if needed
-  });
-  console.log("🔌 Attempting to connect to database...");
-} catch (error) {
-  console.error("❌ Failed to create database pool:", error);
-}
-
-// Add better error handling for database connection
-pool.on('error', (err) => {
-  console.error('💥 Unexpected database error:', err);
-});
-
-// Test database connection
-pool.query('SELECT NOW()', (err, res) => {
-  if (err) {
-    console.error('❌ Database connection error:', err.message);
-  } else {
-    console.log('✅ Database connected successfully');
+// In-memory data storage (no database required)
+let users = [
+  {
+    id: 'admin-demo',
+    email: 'admin@example.com',
+    firstName: 'Admin',
+    lastName: 'Demo',
+    profileImageUrl: null,
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 'user-demo', 
+    email: 'user@example.com',
+    firstName: 'User',
+    lastName: 'Demo',
+    profileImageUrl: null,
+    createdAt: new Date().toISOString()
   }
-});
+];
+
+let files = [
+  {
+    id: 1,
+    name: 'sample-document.pdf',
+    originalName: 'sample-document.pdf',
+    size: '2048576',
+    mimeType: 'application/pdf',
+    status: 'stored',
+    defaultNodeId: 1,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: 2,
+    name: 'project-presentation.pptx',
+    originalName: 'project-presentation.pptx', 
+    size: '5242880',
+    mimeType: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    status: 'stored',
+    defaultNodeId: 2,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  }
+];
+
+let nodes = [
+  {
+    id: 1,
+    name: 'Primary Node',
+    ipAddress: '192.168.1.100',
+    status: 'active',
+    storageCapacity: '2.0 GB',
+    storageUsed: '0.8 GB',
+    cpuUsage: '25%',
+    memoryUsage: '45%',
+    networkThroughput: '150 MB/s',
+    uptime: '99.9%',
+    lastHeartbeat: new Date().toISOString(),
+    isDefault: true,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: 2,
+    name: 'Secondary Node',
+    ipAddress: '192.168.1.101',
+    status: 'active',
+    storageCapacity: '3.0 GB',
+    storageUsed: '1.2 GB',
+    cpuUsage: '30%',
+    memoryUsage: '55%',
+    networkThroughput: '200 MB/s',
+    uptime: '98.5%',
+    lastHeartbeat: new Date().toISOString(),
+    isDefault: false,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: 3,
+    name: 'Backup Node',
+    ipAddress: '192.168.1.102',
+    status: 'maintenance',
+    storageCapacity: '1.5 GB',
+    storageUsed: '0.3 GB',
+    cpuUsage: '15%',
+    memoryUsage: '30%',
+    networkThroughput: '100 MB/s',
+    uptime: '95.2%',
+    lastHeartbeat: new Date(Date.now() - 300000).toISOString(),
+    isDefault: false,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  }
+];
+
+let activityLogs = [
+  {
+    id: 1,
+    userId: 'admin-demo',
+    action: 'file_upload_completed',
+    resource: 'file',
+    resourceId: '1',
+    details: { fileName: 'sample-document.pdf', fileSize: '2048576' },
+    ipAddress: '127.0.0.1',
+    userAgent: 'Demo Browser',
+    createdAt: new Date(Date.now() - 3600000).toISOString()
+  },
+  {
+    id: 2,
+    userId: 'user-demo',
+    action: 'node_created',
+    resource: 'node',
+    resourceId: '3',
+    details: { nodeName: 'Backup Node', ipAddress: '192.168.1.102' },
+    ipAddress: '127.0.0.1',
+    userAgent: 'Demo Browser',
+    createdAt: new Date(Date.now() - 1800000).toISOString()
+  }
+];
+
+let invitations = [
+  {
+    id: 1,
+    email: 'newuser@example.com',
+    role: 'user',
+    message: 'Welcome to FileSanctum',
+    status: 'pending',
+    invitedBy: 'admin-demo',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  }
+];
+
+let systemMetrics = [
+  {
+    id: 1,
+    metricType: 'storage',
+    value: 85.5,
+    unit: 'percent',
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: 2,
+    metricType: 'cpu',
+    value: 45.2,
+    unit: 'percent',
+    createdAt: new Date().toISOString()
+  }
+];
 
 // Setup file storage
 const uploadsDir = path.join(__dirname, 'uploads');
@@ -70,644 +179,448 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// File encryption/decryption functions
-function encryptFile(filePath) {
-  try {
-    const fileContent = fs.readFileSync(filePath);
-    const iv = crypto.randomBytes(16);
-    const key = crypto.scryptSync(ENCRYPTION_KEY, 'salt', 32);
-    const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
-    
-    const encrypted = Buffer.concat([
-      iv,
-      cipher.update(fileContent),
-      cipher.final()
-    ]);
-    
-    fs.writeFileSync(filePath, encrypted);
-    return true;
-  } catch (error) {
-    console.error('Encryption error:', error);
-    return false;
-  }
-}
+// Simple authentication - no JWT needed for demo
+let currentUser = null;
 
-function decryptFile(filePath) {
-  try {
-    const encryptedContent = fs.readFileSync(filePath);
-    const iv = encryptedContent.slice(0, 16);
-    const encryptedData = encryptedContent.slice(16);
-    const key = crypto.scryptSync(ENCRYPTION_KEY, 'salt', 32);
-    const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
-    
-    return Buffer.concat([
-      decipher.update(encryptedData),
-      decipher.final()
-    ]);
-  } catch (error) {
-    console.error('Decryption error:', error);
-    return null;
-  }
-}
-
-// Authentication middleware
+// Middleware to check authentication
 function authenticate(req, res, next) {
-  const token = req.header('x-auth-token') || req.header('Authorization')?.replace('Bearer ', '');
-  
-  if (!token) {
-    return res.status(401).json({ message: 'No token, authorization denied' });
+  if (!currentUser) {
+    return res.status(401).json({ message: 'Not authenticated' });
   }
-  
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = decoded;
-    next();
-  } catch (error) {
-    res.status(401).json({ message: 'Token is not valid' });
-  }
+  req.user = currentUser;
+  next();
 }
 
-// Serve static files (HTML, CSS, JS)
-app.use(express.static(path.join(__dirname, 'public')));
+// Serve the client files directly from client/dist or fallback to a simple HTML
+const clientDistPath = path.join(__dirname, 'client', 'dist');
+const distPath = path.join(__dirname, 'dist');
 
-// Routes
-// Register a new user
-app.post('/api/auth/register', async (req, res) => {
-  try {
-    const { username, email, password, firstName, lastName } = req.body;
-    
-    // Check if user exists
-    const userCheck = await pool.query(
-      'SELECT * FROM users WHERE email = $1',
-      [email]
-    );
-    
-    if (userCheck.rows.length > 0) {
-      return res.status(400).json({ message: 'User already exists' });
-    }
-    
-    // Hash password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-    
-    // Insert user
-    const result = await pool.query(
-      'INSERT INTO users (id, email, first_name, last_name, profile_image_url, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, NOW(), NOW()) RETURNING *',
-      [Date.now().toString(), email, firstName || '', lastName || '', null]
-    );
-    
-    const user = result.rows[0];
-    
-    // Create JWT
-    const token = jwt.sign(
-      { id: user.id, email: user.email },
-      JWT_SECRET,
-      { expiresIn: '24h' }
-    );
-    
-    // Log activity
-    await pool.query(
-      'INSERT INTO activity_logs (user_id, action, resource, resource_id, details, ip_address, user_agent, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())',
-      [user.id, 'REGISTER', 'user', user.id, JSON.stringify({ message: `User ${user.email} registered` }), req.ip, req.get('User-Agent') || '']
-    );
-    
-    res.status(201).json({
-      message: 'User registered successfully',
-      user: {
-        id: user.id,
-        email: user.email,
-        firstName: user.first_name,
-        lastName: user.last_name
-      },
-      token
-    });
-    
-  } catch (error) {
-    console.error('Register error:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
+// Try to serve from either location
+if (fs.existsSync(clientDistPath)) {
+  app.use(express.static(clientDistPath));
+} else if (fs.existsSync(distPath)) {
+  app.use(express.static(distPath));
+} else {
+  // Create a simple landing page if no built files exist
+  app.get('/', (req, res) => {
+    res.send(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>FileSanctum DFSS - Local Demo</title>
+        <style>
+          body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+          .container { text-align: center; }
+          .credentials { background: #f5f5f5; padding: 20px; margin: 20px 0; border-radius: 8px; }
+          .features { text-align: left; margin: 20px 0; }
+          .api-test { background: #e8f5e8; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <h1>🚀 FileSanctum DFSS - Local Demo Server</h1>
+          <p>Your Distributed File Storage System is running successfully!</p>
+          
+          <div class="credentials">
+            <h3>📋 Demo Credentials</h3>
+            <p><strong>Admin:</strong> admin@example.com / admin123</p>
+            <p><strong>User:</strong> user@example.com / user123</p>
+          </div>
+
+          <div class="features">
+            <h3>✨ Available Features</h3>
+            <ul>
+              <li>File Upload & Management</li>
+              <li>Node Management & Monitoring</li>
+              <li>Manual Node Selection for Files</li>
+              <li>Real-time Activity Logging</li>
+              <li>System Analytics Dashboard</li>
+              <li>User Invitation System</li>
+            </ul>
+          </div>
+
+          <div class="api-test">
+            <h3>🔗 API Endpoints Available</h3>
+            <p>Test the API directly:</p>
+            <ul>
+              <li>POST /api/auth/login - Authentication</li>
+              <li>GET /api/nodes - Storage nodes</li>
+              <li>GET /api/files - File management</li>
+              <li>GET /api/activity-logs - Activity tracking</li>
+            </ul>
+          </div>
+
+          <p style="margin-top: 30px;">
+            <strong>Note:</strong> To access the full web interface, build the frontend with <code>npm run build</code>
+          </p>
+        </div>
+      </body>
+      </html>
+    `);
+  });
+}
+
+// API Routes
 
 // Login
-app.post('/api/auth/login', async (req, res) => {
-  try {
-    const { email, password } = req.body;
+app.post('/api/auth/login', (req, res) => {
+  const { email, password } = req.body;
+  
+  if ((email === 'admin@example.com' && password === 'admin123') ||
+      (email === 'user@example.com' && password === 'user123')) {
     
-    // Special case for demo credentials
-    if ((email === 'user@example.com' && password === 'user123') || 
-        (email === 'admin@example.com' && password === 'admin123')) {
-      
-      // Create a demo user
-      const demoUser = {
-        id: email === 'admin@example.com' ? 'admin-demo' : 'user-demo',
-        email: email,
-        first_name: email === 'admin@example.com' ? 'Admin' : 'User',
-        last_name: 'Demo'
-      };
-      
-      // Create JWT for demo user
-      const token = jwt.sign(
-        { id: demoUser.id, email: demoUser.email },
-        JWT_SECRET,
-        { expiresIn: '24h' }
-      );
-      
-      // Log demo user activity
-      try {
-        await pool.query(
-          'INSERT INTO activity_logs (user_id, action, resource, resource_id, details, ip_address, user_agent, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())',
-          [demoUser.id, 'LOGIN', 'user', demoUser.id, JSON.stringify({ message: `Demo user ${demoUser.email} logged in` }), req.ip, req.get('User-Agent') || '']
-        );
-      } catch (err) {
-        console.log('Could not log activity, but continuing login:', err.message);
-      }
-      
-      return res.json({
-        message: 'Login successful',
-        user: demoUser,
-        token
-      });
-    }
+    currentUser = users.find(u => u.email === email);
     
-    // Regular database login
-    try {
-      const result = await pool.query(
-        'SELECT * FROM users WHERE email = $1',
-        [email]
-      );
-      
-      if (result.rows.length === 0) {
-        return res.status(400).json({ message: 'Invalid credentials' });
-      }
-      
-      const user = result.rows[0];
-      
-      // For demo purposes, allow any password for existing users
-      // In production, you would verify with bcrypt.compare(password, user.password)
-      
-      // Create JWT
-      const token = jwt.sign(
-        { id: user.id, email: user.email },
-        JWT_SECRET,
-        { expiresIn: '24h' }
-      );
-      
-      // Log activity
-      await pool.query(
-        'INSERT INTO activity_logs (user_id, action, resource, resource_id, details, ip_address, user_agent, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())',
-        [user.id, 'LOGIN', 'user', user.id, JSON.stringify({ message: `User ${user.email} logged in` }), req.ip, req.get('User-Agent') || '']
-      );
-      
-      res.json({
-        message: 'Login successful',
-        user: {
-          id: user.id,
-          email: user.email,
-          firstName: user.first_name,
-          lastName: user.last_name
-        },
-        token
-      });
-    } catch (dbError) {
-      console.error('Database error during login:', dbError);
-      return res.status(400).json({ message: 'Invalid credentials' });
-    }
+    // Add login activity
+    activityLogs.unshift({
+      id: activityLogs.length + 1,
+      userId: currentUser.id,
+      action: 'user_login',
+      resource: 'user',
+      resourceId: currentUser.id,
+      details: { email: currentUser.email },
+      ipAddress: '127.0.0.1',
+      userAgent: 'Demo Browser',
+      createdAt: new Date().toISOString()
+    });
     
-  } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ message: 'Server error' });
+    res.json({
+      message: 'Login successful',
+      user: currentUser,
+      token: 'demo-token'
+    });
+  } else {
+    res.status(401).json({ message: 'Invalid credentials' });
   }
 });
 
 // Get current user
-app.get('/api/auth/user', authenticate, async (req, res) => {
-  try {
-    const result = await pool.query(
-      'SELECT * FROM users WHERE id = $1',
-      [req.user.id]
-    );
-    
-    if (result.rows.length === 0) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-    
-    const user = result.rows[0];
-    res.json({
-      id: user.id,
-      email: user.email,
-      firstName: user.first_name,
-      lastName: user.last_name,
-      profileImageUrl: user.profile_image_url
-    });
-    
-  } catch (error) {
-    console.error('Get user error:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
+app.get('/api/auth/user', authenticate, (req, res) => {
+  res.json(currentUser);
 });
 
-// Upload file
-app.post('/api/files/upload', authenticate, upload.single('file'), async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ message: 'No file uploaded' });
-    }
-    
-    const { filename, path: filepath, mimetype, size } = req.file;
-    
-    // Encrypt file
-    const encrypted = encryptFile(filepath);
-    
-    // Save file info
-    const result = await pool.query(
-      'INSERT INTO files (name, original_name, size, mime_type, status, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, NOW(), NOW()) RETURNING *',
-      [filename, req.file.originalname, size.toString(), mimetype, 'completed']
-    );
-    
-    const file = result.rows[0];
-    
-    // Log activity
-    await pool.query(
-      'INSERT INTO activity_logs (user_id, action, resource, resource_id, details, ip_address, user_agent, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())',
-      [req.user.id, 'UPLOAD', 'file', file.id.toString(), JSON.stringify({ filename: req.file.originalname, size: size }), req.ip, req.get('User-Agent') || '']
-    );
-    
-    res.status(201).json({
-      message: 'File uploaded successfully',
-      file: {
-        id: file.id,
-        name: file.name,
-        originalName: file.original_name,
-        size: file.size,
-        mimeType: file.mime_type,
-        status: file.status,
-        encrypted: encrypted
-      }
-    });
-    
-  } catch (error) {
-    console.error('Upload error:', error);
-    res.status(500).json({ message: 'Error uploading file' });
-  }
+// Logout
+app.post('/api/auth/logout', (req, res) => {
+  currentUser = null;
+  res.json({ message: 'Logged out successfully' });
 });
 
-// Get files
-app.get('/api/files', authenticate, async (req, res) => {
-  try {
-    const result = await pool.query(
-      'SELECT * FROM files ORDER BY created_at DESC'
-    );
-    
-    res.json(result.rows);
-    
-  } catch (error) {
-    console.error('Get files error:', error);
-    res.status(500).json({ message: 'Error retrieving files' });
-  }
+// Files
+app.get('/api/files', authenticate, (req, res) => {
+  res.json(files);
 });
 
-// Get nodes
-app.get('/api/nodes', authenticate, async (req, res) => {
-  try {
-    const result = await pool.query(
-      'SELECT * FROM nodes ORDER BY name'
-    );
-    
-    res.json(result.rows);
-    
-  } catch (error) {
-    console.error('Get nodes error:', error);
-    res.status(500).json({ message: 'Error retrieving nodes' });
+app.post('/api/files/upload', authenticate, upload.single('file'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ message: 'No file provided' });
   }
+
+  const newFile = {
+    id: files.length + 1,
+    name: req.file.filename,
+    originalName: req.file.originalname,
+    size: req.file.size.toString(),
+    mimeType: req.file.mimetype,
+    status: 'stored',
+    defaultNodeId: nodes.find(n => n.isDefault)?.id || 1,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+
+  files.push(newFile);
+
+  // Add activity log
+  activityLogs.unshift({
+    id: activityLogs.length + 1,
+    userId: currentUser.id,
+    action: 'file_upload_completed',
+    resource: 'file',
+    resourceId: newFile.id.toString(),
+    details: { fileName: newFile.originalName, fileSize: newFile.size },
+    ipAddress: '127.0.0.1',
+    userAgent: 'Demo Browser',
+    createdAt: new Date().toISOString()
+  });
+
+  res.json(newFile);
 });
 
-// Create node
-app.post('/api/nodes', authenticate, async (req, res) => {
-  try {
-    const { name, ipAddress, storageCapacity } = req.body;
-    
-    const result = await pool.query(
-      'INSERT INTO nodes (name, ip_address, status, storage_capacity, storage_used, cpu_usage, memory_usage, network_throughput, uptime, last_heartbeat, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NOW(), NOW()) RETURNING *',
-      [name, ipAddress, 'active', storageCapacity, '0 GB', '25%', '45%', '150 MB/s', '99.9%']
-    );
-    
-    const node = result.rows[0];
-    
-    // Log activity
-    await pool.query(
-      'INSERT INTO activity_logs (user_id, action, resource, resource_id, details, ip_address, user_agent, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())',
-      [req.user.id, 'CREATE', 'node', node.id.toString(), JSON.stringify({ nodeName: name, ipAddress: ipAddress }), req.ip, req.get('User-Agent') || '']
-    );
-    
-    res.status(201).json(node);
-    
-  } catch (error) {
-    console.error('Create node error:', error);
-    res.status(500).json({ message: 'Error creating node' });
-  }
-});
-
-// Get activity logs
-app.get('/api/activity-logs', authenticate, async (req, res) => {
-  try {
-    const result = await pool.query(
-      'SELECT * FROM activity_logs ORDER BY created_at DESC LIMIT 50'
-    );
-    
-    res.json(result.rows);
-    
-  } catch (error) {
-    console.error('Get activity logs error:', error);
-    res.status(500).json({ message: 'Error retrieving activity logs' });
-  }
-});
-
-// Get system metrics
-app.get('/api/system-metrics', authenticate, async (req, res) => {
-  try {
-    const result = await pool.query(
-      'SELECT * FROM system_metrics ORDER BY created_at DESC LIMIT 100'
-    );
-    
-    res.json(result.rows);
-    
-  } catch (error) {
-    console.error('Get system metrics error:', error);
-    res.status(500).json({ message: 'Error retrieving system metrics' });
-  }
-});
-
-// Create invitation
-app.post('/api/invitations', authenticate, async (req, res) => {
-  try {
-    const { email, role, message } = req.body;
-    
-    const result = await pool.query(
-      'INSERT INTO invitations (email, role, message, status, invited_by, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, NOW(), NOW()) RETURNING *',
-      [email, role, message, 'pending', req.user.id]
-    );
-    
-    const invitation = result.rows[0];
-    
-    // Log activity
-    await pool.query(
-      'INSERT INTO activity_logs (user_id, action, resource, resource_id, details, ip_address, user_agent, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())',
-      [req.user.id, 'INVITE', 'user', invitation.id.toString(), JSON.stringify({ email: email, role: role }), req.ip, req.get('User-Agent') || '']
-    );
-    
-    res.status(201).json(invitation);
-    
-  } catch (error) {
-    console.error('Create invitation error:', error);
-    res.status(500).json({ message: 'Error creating invitation' });
-  }
-});
-
-// Get invitations
-app.get('/api/invitations', authenticate, async (req, res) => {
-  try {
-    const result = await pool.query(
-      'SELECT * FROM invitations WHERE invited_by = $1 ORDER BY created_at DESC',
-      [req.user.id]
-    );
-    
-    res.json(result.rows);
-    
-  } catch (error) {
-    console.error('Get invitations error:', error);
-    res.status(500).json({ message: 'Error retrieving invitations' });
-  }
-});
-
-// Contact message
-app.post('/api/contact', async (req, res) => {
-  try {
-    const { name, email, message } = req.body;
-    
-    const result = await pool.query(
-      'INSERT INTO contact_messages (name, email, message, created_at) VALUES ($1, $2, $3, NOW()) RETURNING *',
-      [name, email, message]
-    );
-    
-    res.status(201).json({
-      message: 'Message sent successfully',
-      id: result.rows[0].id
-    });
-    
-  } catch (error) {
-    console.error('Contact message error:', error);
-    res.status(500).json({ message: 'Error sending message' });
-  }
-});
-
-// WebSocket connection handling
-wss.on('connection', (ws) => {
-  console.log('📡 New WebSocket connection established');
+app.delete('/api/files/:id', authenticate, (req, res) => {
+  const fileId = parseInt(req.params.id);
+  const fileIndex = files.findIndex(f => f.id === fileId);
   
-  // Send welcome message
-  ws.send(JSON.stringify({
-    type: 'welcome',
-    data: { message: 'Connected to FileSanctum WebSocket server' }
-  }));
+  if (fileIndex === -1) {
+    return res.status(404).json({ message: 'File not found' });
+  }
+
+  const deletedFile = files[fileIndex];
+  files.splice(fileIndex, 1);
+
+  // Add activity log
+  activityLogs.unshift({
+    id: activityLogs.length + 1,
+    userId: currentUser.id,
+    action: 'file_deleted',
+    resource: 'file',
+    resourceId: fileId.toString(),
+    details: { fileName: deletedFile.originalName },
+    ipAddress: '127.0.0.1',
+    userAgent: 'Demo Browser',
+    createdAt: new Date().toISOString()
+  });
+
+  res.json({ success: true });
+});
+
+app.put('/api/files/move-to-node', authenticate, (req, res) => {
+  const { fileIds, nodeId } = req.body;
   
-  // Handle WebSocket messages
-  ws.on('message', (message) => {
-    try {
-      const data = JSON.parse(message);
-      console.log('📨 WebSocket message received:', data);
-      
-      // Broadcast to all connected clients
-      wss.clients.forEach((client) => {
-        if (client !== ws && client.readyState === WebSocket.OPEN) {
-          client.send(JSON.stringify(data));
-        }
-      });
-    } catch (error) {
-      console.error('WebSocket message error:', error);
+  if (!fileIds || !Array.isArray(fileIds) || fileIds.length === 0) {
+    return res.status(400).json({ message: 'File IDs are required' });
+  }
+  
+  if (!nodeId) {
+    return res.status(400).json({ message: 'Node ID is required' });
+  }
+
+  const updatedFiles = [];
+  fileIds.forEach(fileId => {
+    const file = files.find(f => f.id === fileId);
+    if (file) {
+      file.defaultNodeId = parseInt(nodeId);
+      file.updatedAt = new Date().toISOString();
+      updatedFiles.push(file);
     }
   });
-  
-  ws.on('close', () => {
-    console.log('📡 WebSocket connection closed');
+
+  // Add activity log
+  activityLogs.unshift({
+    id: activityLogs.length + 1,
+    userId: currentUser.id,
+    action: 'files_moved',
+    resource: 'files',
+    resourceId: fileIds.join(','),
+    details: { 
+      fileCount: fileIds.length,
+      targetNodeId: nodeId,
+      movedFiles: updatedFiles.length
+    },
+    ipAddress: '127.0.0.1',
+    userAgent: 'Demo Browser',
+    createdAt: new Date().toISOString()
+  });
+
+  res.json({ 
+    message: 'Files moved successfully',
+    movedCount: updatedFiles.length,
+    files: updatedFiles
   });
 });
 
-// Serve the main HTML page
-app.get('/', (req, res) => {
-  res.send(`
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>FileSanctum - Distributed File Storage System</title>
-      <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-          background: linear-gradient(135deg, #1e293b, #7c3aed, #1e293b);
-          min-height: 100vh;
-          color: white;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-        .container { 
-          text-align: center; 
-          max-width: 600px; 
-          padding: 40px 20px;
-          background: rgba(255, 255, 255, 0.1);
-          border-radius: 20px;
-          backdrop-filter: blur(10px);
-          border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        h1 { 
-          font-size: 3rem; 
-          margin-bottom: 20px; 
-          background: linear-gradient(45deg, #60a5fa, #a855f7);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-        }
-        .subtitle { 
-          font-size: 1.2rem; 
-          margin-bottom: 30px; 
-          opacity: 0.9; 
-        }
-        .features { 
-          display: grid; 
-          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
-          gap: 20px; 
-          margin: 30px 0; 
-        }
-        .feature { 
-          background: rgba(255, 255, 255, 0.1); 
-          padding: 20px; 
-          border-radius: 10px;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .feature h3 { 
-          color: #60a5fa; 
-          margin-bottom: 10px; 
-        }
-        .demo-credentials { 
-          background: rgba(34, 197, 94, 0.2); 
-          padding: 20px; 
-          border-radius: 10px; 
-          margin: 30px 0;
-          border: 1px solid rgba(34, 197, 94, 0.3);
-        }
-        .demo-credentials h3 { 
-          color: #22c55e; 
-          margin-bottom: 15px; 
-        }
-        .credentials { 
-          display: grid; 
-          grid-template-columns: 1fr 1fr; 
-          gap: 15px; 
-          text-align: left; 
-        }
-        .credential-item { 
-          background: rgba(255, 255, 255, 0.1); 
-          padding: 10px; 
-          border-radius: 5px; 
-        }
-        .status { 
-          margin-top: 30px; 
-          padding: 15px; 
-          background: rgba(59, 130, 246, 0.2); 
-          border-radius: 10px;
-          border: 1px solid rgba(59, 130, 246, 0.3);
-        }
-        .status h3 { 
-          color: #3b82f6; 
-          margin-bottom: 10px; 
-        }
-        @media (max-width: 768px) {
-          h1 { font-size: 2rem; }
-          .credentials { grid-template-columns: 1fr; }
-        }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <h1>🛡️ FileSanctum</h1>
-        <p class="subtitle">Distributed File Storage System - Local Development Server</p>
-        
-        <div class="features">
-          <div class="feature">
-            <h3>🔐 Secure Storage</h3>
-            <p>End-to-end encryption with advanced erasure coding for maximum security</p>
-          </div>
-          <div class="feature">
-            <h3>📊 Real-time Monitoring</h3>
-            <p>Live dashboard with system analytics and node management</p>
-          </div>
-          <div class="feature">
-            <h3>🌐 Distributed Network</h3>
-            <p>Scalable distributed storage across multiple nodes</p>
-          </div>
-        </div>
-        
-        <div class="demo-credentials">
-          <h3>🔑 Demo Login Credentials</h3>
-          <div class="credentials">
-            <div class="credential-item">
-              <strong>Admin Account:</strong><br>
-              Email: admin@example.com<br>
-              Password: admin123
-            </div>
-            <div class="credential-item">
-              <strong>User Account:</strong><br>
-              Email: user@example.com<br>
-              Password: user123
-            </div>
-          </div>
-        </div>
-        
-        <div class="status">
-          <h3>🚀 Server Status</h3>
-          <p>✅ FileSanctum server is running on <strong>http://localhost:${PORT}</strong></p>
-          <p>✅ Database connected successfully</p>
-          <p>✅ WebSocket server active on /ws</p>
-          <p>✅ File encryption enabled</p>
-        </div>
-      </div>
-    </body>
-    </html>
-  `);
+// Nodes
+app.get('/api/nodes', authenticate, (req, res) => {
+  res.json(nodes);
 });
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error('💥 Error:', err.stack);
-  res.status(500).json({ message: 'Something went wrong!' });
-});
+app.post('/api/nodes', authenticate, (req, res) => {
+  const { name, storageCapacity } = req.body;
+  
+  const newNode = {
+    id: nodes.length + 1,
+    name: name,
+    ipAddress: `192.168.1.${100 + nodes.length}`,
+    status: 'active',
+    storageCapacity: storageCapacity || '2.0 GB',
+    storageUsed: '0.0 GB',
+    cpuUsage: '20%',
+    memoryUsage: '35%',
+    networkThroughput: '150 MB/s',
+    uptime: '100%',
+    lastHeartbeat: new Date().toISOString(),
+    isDefault: false,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
 
-// Start server
-server.listen(PORT, () => {
-  console.log('\n🚀 ===============================================');
-  console.log('🛡️  FileSanctum - Distributed File Storage System');
-  console.log('🚀 ===============================================');
-  console.log(`🌐 Server running on: http://localhost:${PORT}`);
-  console.log(`📡 WebSocket server: ws://localhost:${PORT}/ws`);
-  console.log('📂 Upload directory: ./uploads');
-  console.log('🔐 File encryption: ENABLED');
-  console.log('\n🔑 Demo Credentials:');
-  console.log('   👤 Admin: admin@example.com / admin123');
-  console.log('   👤 User:  user@example.com / user123');
-  console.log('\n✅ Ready to accept connections!');
-  console.log('===============================================\n');
-});
+  nodes.push(newNode);
 
-// Graceful shutdown
-process.on('SIGINT', () => {
-  console.log('\n🛑 Shutting down FileSanctum server...');
-  server.close(() => {
-    console.log('✅ Server closed successfully');
-    pool.end(() => {
-      console.log('✅ Database connection closed');
-      process.exit(0);
-    });
+  // Add activity log
+  activityLogs.unshift({
+    id: activityLogs.length + 1,
+    userId: currentUser.id,
+    action: 'node_created',
+    resource: 'node',
+    resourceId: newNode.id.toString(),
+    details: { nodeName: newNode.name, ipAddress: newNode.ipAddress },
+    ipAddress: '127.0.0.1',
+    userAgent: 'Demo Browser',
+    createdAt: new Date().toISOString()
   });
+
+  res.json(newNode);
+});
+
+app.put('/api/nodes/:id/set-default', authenticate, (req, res) => {
+  const nodeId = parseInt(req.params.id);
+  
+  // Remove default from all nodes
+  nodes.forEach(node => {
+    node.isDefault = false;
+    node.updatedAt = new Date().toISOString();
+  });
+  
+  // Set new default
+  const targetNode = nodes.find(n => n.id === nodeId);
+  if (targetNode) {
+    targetNode.isDefault = true;
+    targetNode.updatedAt = new Date().toISOString();
+    
+    // Add activity log
+    activityLogs.unshift({
+      id: activityLogs.length + 1,
+      userId: currentUser.id,
+      action: 'node_set_default',
+      resource: 'node',
+      resourceId: nodeId.toString(),
+      details: { nodeName: targetNode.name },
+      ipAddress: '127.0.0.1',
+      userAgent: 'Demo Browser',
+      createdAt: new Date().toISOString()
+    });
+    
+    res.json(targetNode);
+  } else {
+    res.status(404).json({ message: 'Node not found' });
+  }
+});
+
+app.delete('/api/nodes/:id', authenticate, (req, res) => {
+  const nodeId = parseInt(req.params.id);
+  const nodeIndex = nodes.findIndex(n => n.id === nodeId);
+  
+  if (nodeIndex === -1) {
+    return res.status(404).json({ message: 'Node not found' });
+  }
+
+  const deletedNode = nodes[nodeIndex];
+  nodes.splice(nodeIndex, 1);
+
+  // Add activity log
+  activityLogs.unshift({
+    id: activityLogs.length + 1,
+    userId: currentUser.id,
+    action: 'node_deleted',
+    resource: 'node',
+    resourceId: nodeId.toString(),
+    details: { nodeName: deletedNode.name },
+    ipAddress: '127.0.0.1',
+    userAgent: 'Demo Browser',
+    createdAt: new Date().toISOString()
+  });
+
+  res.json({ success: true });
+});
+
+// Activity Logs
+app.get('/api/activity-logs', authenticate, (req, res) => {
+  res.json(activityLogs.slice(0, 50)); // Return latest 50 logs
+});
+
+app.delete('/api/activity-logs/:id', authenticate, (req, res) => {
+  const logId = parseInt(req.params.id);
+  const logIndex = activityLogs.findIndex(log => log.id === logId);
+  
+  if (logIndex === -1) {
+    return res.status(404).json({ message: 'Activity log not found' });
+  }
+
+  activityLogs.splice(logIndex, 1);
+  res.json({ success: true });
+});
+
+// System Stats
+app.get('/api/system/stats', authenticate, (req, res) => {
+  const activeNodes = nodes.filter(n => n.status === 'active').length;
+  const totalStorageGB = nodes.reduce((total, node) => {
+    const capacity = parseFloat(node.storageCapacity.replace(' GB', ''));
+    return total + capacity;
+  }, 0);
+  const usedStorageGB = nodes.reduce((total, node) => {
+    const used = parseFloat(node.storageUsed.replace(' GB', ''));
+    return total + used;
+  }, 0);
+  
+  res.json({
+    activeNodes,
+    totalStorage: `${totalStorageGB.toFixed(1)} GB`,
+    totalFiles: files.length,
+    storageUsagePercent: totalStorageGB > 0 ? Math.round((usedStorageGB / totalStorageGB) * 100) : 0
+  });
+});
+
+// System Metrics
+app.get('/api/metrics', authenticate, (req, res) => {
+  res.json(systemMetrics);
+});
+
+// Invitations
+app.get('/api/invitations', authenticate, (req, res) => {
+  res.json(invitations.filter(inv => inv.invitedBy === currentUser.id));
+});
+
+app.post('/api/invitations', authenticate, (req, res) => {
+  const { email, role, message } = req.body;
+  
+  const newInvitation = {
+    id: invitations.length + 1,
+    email,
+    role: role || 'user',
+    message: message || '',
+    status: 'pending',
+    invitedBy: currentUser.id,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+
+  invitations.push(newInvitation);
+
+  // Add activity log
+  activityLogs.unshift({
+    id: activityLogs.length + 1,
+    userId: currentUser.id,
+    action: 'user_invited',
+    resource: 'invitation',
+    resourceId: newInvitation.id.toString(),
+    details: { email, role },
+    ipAddress: '127.0.0.1',
+    userAgent: 'Demo Browser',
+    createdAt: new Date().toISOString()
+  });
+
+  res.json(newInvitation);
+});
+
+// Serve the frontend for all other routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
+
+// Start the server
+app.listen(PORT, () => {
+  console.log('🚀 FileSanctum DFSS Demo Server Started!');
+  console.log(`📡 Server running on http://localhost:${PORT}`);
+  console.log('');
+  console.log('📋 Demo Credentials:');
+  console.log('   Admin: admin@example.com / admin123');
+  console.log('   User:  user@example.com / user123');
+  console.log('');
+  console.log('✨ All features available:');
+  console.log('   • File Upload & Management');
+  console.log('   • Node Management & Monitoring');
+  console.log('   • Manual Node Selection for Files');
+  console.log('   • Real-time Activity Logging');
+  console.log('   • System Analytics Dashboard');
+  console.log('   • User Invitation System');
+  console.log('');
+  console.log('🎯 Ready for teacher demonstration!');
 });

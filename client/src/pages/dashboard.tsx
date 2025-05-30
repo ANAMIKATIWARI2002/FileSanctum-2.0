@@ -240,10 +240,31 @@ function RealTimeNodeVisualization() {
     ipAddress: string;
   }
 
+  interface File {
+    id: number;
+    name: string;
+    originalName: string;
+    size: string;
+    mimeType: string;
+    status: string;
+    defaultNodeId: number;
+  }
+
+  const [selectedNodeId, setSelectedNodeId] = useState<number | null>(null);
+  const [showNodeFiles, setShowNodeFiles] = useState(false);
+  const { toast } = useToast();
+
   const { data: nodes = [], isLoading } = useQuery<Node[]>({
     queryKey: ["/api/nodes"],
-    staleTime: 300000, // Consider data fresh for 5 minutes
-    refetchInterval: false, // Disable automatic refresh
+    staleTime: 300000,
+    refetchInterval: false,
+    refetchOnWindowFocus: false,
+  });
+
+  const { data: allFiles = [] } = useQuery<File[]>({
+    queryKey: ["/api/files"],
+    staleTime: 300000,
+    refetchInterval: false,
     refetchOnWindowFocus: false,
   });
 
@@ -277,25 +298,159 @@ function RealTimeNodeVisualization() {
     );
   }
 
+  const getNodeFiles = (nodeId: number) => {
+    return allFiles.filter(file => file.defaultNodeId === nodeId);
+  };
+
+  const handleFileDownload = async (file: File) => {
+    try {
+      const response = await fetch(`/api/files/${file.id}/download`);
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = file.originalName;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        toast({
+          title: "Success",
+          description: "File downloaded successfully",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to download file",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleFileDelete = async (fileId: number) => {
+    try {
+      const response = await fetch(`/api/files/${fileId}`, {
+        method: "DELETE",
+      });
+      if (response.ok) {
+        toast({
+          title: "Success", 
+          description: "File deleted successfully",
+        });
+        // Refresh files data
+        window.location.reload();
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete file",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Node Visualization</h3>
-      <div className="space-y-3">
+      
+      <div className="max-h-96 overflow-y-auto space-y-3">
         {nodes.map((node) => {
           const storagePercentage = getStoragePercentage(node.storageUsed, node.storageCapacity);
+          const nodeFiles = getNodeFiles(node.id);
+          const isExpanded = selectedNodeId === node.id && showNodeFiles;
+          
           return (
-            <div key={node.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
-              <div className="flex items-center space-x-3">
-                <div className={`w-3 h-3 rounded-full ${getStatusColor(node.status)}`}></div>
-                <span className="font-medium text-gray-900 dark:text-white">{node.name}</span>
-                <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded">
-                  {node.status.charAt(0).toUpperCase() + node.status.slice(1)}
-                </span>
+            <div key={node.id} className="border border-gray-200 dark:border-gray-600 rounded-lg">
+              <div 
+                className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors cursor-pointer"
+                onClick={() => {
+                  if (selectedNodeId === node.id) {
+                    setShowNodeFiles(!showNodeFiles);
+                  } else {
+                    setSelectedNodeId(node.id);
+                    setShowNodeFiles(true);
+                  }
+                }}
+              >
+                <div className="flex items-center space-x-3">
+                  <div className={`w-3 h-3 rounded-full ${getStatusColor(node.status)}`}></div>
+                  <span className="font-medium text-gray-900 dark:text-white">{node.name}</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded">
+                    {node.status.charAt(0).toUpperCase() + node.status.slice(1)}
+                  </span>
+                  <span className="text-xs text-blue-600 dark:text-blue-400">
+                    {nodeFiles.length} files
+                  </span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="text-right">
+                    <div className="text-sm text-gray-600 dark:text-gray-300">{storagePercentage}% Used</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">{node.storageCapacity} GB</div>
+                  </div>
+                  <svg 
+                    className={`w-4 h-4 text-gray-500 transition-transform ${isExpanded ? 'rotate-180' : ''}`} 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
               </div>
-              <div className="text-right">
-                <div className="text-sm text-gray-600 dark:text-gray-300">{storagePercentage}% Used</div>
-                <div className="text-xs text-gray-500 dark:text-gray-400">{node.storageCapacity} GB</div>
-              </div>
+              
+              {isExpanded && (
+                <div className="p-3 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-600">
+                  <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-2">
+                    Files stored in {node.name}
+                  </h4>
+                  {nodeFiles.length === 0 ? (
+                    <p className="text-sm text-gray-500 dark:text-gray-400">No files stored in this node</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {nodeFiles.map((file) => (
+                        <div key={file.id} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded">
+                          <div className="flex-1">
+                            <div className="text-sm font-medium text-gray-900 dark:text-white">
+                              {file.originalName}
+                            </div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400">
+                              {(parseInt(file.size) / (1024 * 1024)).toFixed(2)} MB • {file.status}
+                            </div>
+                          </div>
+                          <div className="flex space-x-1">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleFileDownload(file);
+                              }}
+                              className="p-1 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                              title="Download"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                              </svg>
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleFileDelete(file.id);
+                              }}
+                              className="p-1 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                              title="Delete"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           );
         })}

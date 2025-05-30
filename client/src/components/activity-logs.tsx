@@ -39,11 +39,12 @@ export default function ActivityLogs() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: logs = [], isLoading } = useQuery<ActivityLog[]>({
+  const { data: logs = [], isLoading, error } = useQuery<ActivityLog[]>({
     queryKey: ["/api/activity-logs"],
-    staleTime: 300000, // Consider data fresh for 5 minutes
-    refetchInterval: false, // Disable automatic refresh
+    staleTime: 60000, // Consider data fresh for 1 minute
+    refetchInterval: false,
     refetchOnWindowFocus: false,
+    retry: 2,
   });
 
   const deleteLogsMutation = useMutation({

@@ -202,14 +202,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createFile(file: InsertFile): Promise<File> {
-    // Get default node if not specified
-    let defaultNodeId = file.defaultNodeId;
-    if (!defaultNodeId) {
-      const defaultNode = await this.getDefaultNode();
-      if (defaultNode) {
-        defaultNodeId = defaultNode.id;
-      }
-    }
+    const allNodes = await this.getAllNodes();
+    
+    // Find Primary Node and Secondary Node
+    const primaryNode = allNodes.find(node => node.name === "Primary Node");
+    const secondaryNode = allNodes.find(node => node.name === "Secondary Node");
+    
+    // Always use Primary Node as default storage
+    const defaultNodeId = primaryNode ? primaryNode.id : file.defaultNodeId;
 
     const fileData = {
       ...file,
@@ -218,16 +218,20 @@ export class DatabaseStorage implements IStorage {
 
     const [newFile] = await db.insert(files).values(fileData).returning();
 
-    // Create file chunks for both primary and secondary nodes
-    const allNodes = await this.getAllNodes();
-    const primaryNode = allNodes.find(node => node.isDefault);
-    const secondaryNode = allNodes.find(node => !node.isDefault && node.status === 'healthy');
-    
+    // Always create file chunks for both Primary and Secondary nodes
     if (primaryNode) {
       await this.createFileChunksForNode(newFile.id, primaryNode.id);
     }
     if (secondaryNode) {
       await this.createFileChunksForNode(newFile.id, secondaryNode.id);
+    }
+
+    // Also create a file entry for Secondary node to show file is stored there
+    if (secondaryNode && primaryNode && secondaryNode.id !== primaryNode.id) {
+      await db.insert(files).values({
+        ...fileData,
+        defaultNodeId: secondaryNode.id,
+      }).onConflictDoNothing();
     }
 
     return newFile;

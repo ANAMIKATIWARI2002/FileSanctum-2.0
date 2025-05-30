@@ -449,11 +449,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/invitations", isAuthenticated, async (req: any, res) => {
     try {
-      const invitationData = insertInvitationSchema.parse({
+      const invitationData = {
         ...req.body,
         invitedBy: req.user?.claims?.sub || 'admin-demo',
         token: 'demo-token-' + Date.now(),
-      });
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+      };
       
       const invitation = await storage.createInvitation(invitationData);
       

@@ -28,17 +28,17 @@ if (!fs.existsSync(nodeModulesPath)) {
   }
 }
 
-// Setup database synchronously
+// Setup database synchronously - this is the fix
 console.log('Setting up database...');
 try {
-  execSync('node setup-database.js', { stdio: 'inherit', cwd: __dirname });
+  execSync('node setup-database.mjs', { stdio: 'inherit', cwd: __dirname });
   console.log('Database setup completed.');
 } catch (error) {
   console.log('Database setup failed. Check your PostgreSQL connection and credentials.');
   process.exit(1);
 }
 
-// Start server only after database is ready
+// Start server only after database is confirmed ready
 console.log('Starting server...');
 const server = spawn('node', ['start-windows.js'], { 
   stdio: 'inherit', 

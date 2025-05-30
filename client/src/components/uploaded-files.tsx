@@ -45,7 +45,19 @@ export default function UploadedFiles() {
 
   const deleteMutation = useMutation({
     mutationFn: async (fileId: number) => {
-      await apiRequest("DELETE", `/api/files/${fileId}`);
+      const response = await fetch(`/api/files/${fileId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to delete file");
+      }
+      
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/files"] });
@@ -54,10 +66,10 @@ export default function UploadedFiles() {
         description: "File has been permanently deleted",
       });
     },
-    onError: () => {
+    onError: (error: Error) => {
       toast({
         title: "Delete failed",
-        description: "Failed to delete file",
+        description: error.message,
         variant: "destructive",
       });
     },

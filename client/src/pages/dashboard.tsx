@@ -333,14 +333,26 @@ function RealTimeNodeVisualization() {
     try {
       const response = await fetch(`/api/files/${fileId}`, {
         method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
+      
       if (response.ok) {
         toast({
           title: "Success", 
           description: "File deleted successfully",
         });
-        // Refresh files data
-        window.location.reload();
+        // Refresh queries instead of reloading page
+        queryClient.invalidateQueries({ queryKey: ["/api/files"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/nodes"] });
+      } else {
+        const error = await response.json();
+        toast({
+          title: "Error",
+          description: error.message || "Failed to delete file",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       toast({

@@ -324,14 +324,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "File not found" });
       }
 
-      // Skip authorization check for demo
-
       const deleted = await storage.deleteFile(fileId);
       
       if (deleted) {
         // Log activity
         await storage.createActivityLog({
-          userId: 'demo-user',
+          userId: req.user?.claims?.sub || 'admin-demo',
           action: "file_deleted",
           resource: "file",
           resourceId: fileId.toString(),

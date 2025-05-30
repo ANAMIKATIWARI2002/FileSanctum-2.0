@@ -29,14 +29,27 @@ if (!fs.existsSync(nodeModulesPath)) {
 }
 
 function startServer() {
-  console.log('Starting server...');
-  const server = spawn('node', ['start-windows.js'], { 
-    stdio: 'inherit', 
+  console.log('Setting up database...');
+  const dbSetup = spawn('node', ['setup-database.js'], {
+    stdio: 'inherit',
     shell: true,
     cwd: __dirname
   });
-  
-  server.on('close', (code) => {
-    console.log('Server stopped.');
+
+  dbSetup.on('close', (code) => {
+    if (code === 0) {
+      console.log('Starting server...');
+      const server = spawn('node', ['start-windows.js'], { 
+        stdio: 'inherit', 
+        shell: true,
+        cwd: __dirname
+      });
+      
+      server.on('close', (code) => {
+        console.log('Server stopped.');
+      });
+    } else {
+      console.log('Database setup failed.');
+    }
   });
 }

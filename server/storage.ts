@@ -203,58 +203,151 @@ export class DatabaseStorage implements IStorage {
     return file;
   }
 
-  async createFile(file: InsertFile): Promise<File> {
+  async createFile(file: InsertFile & { fileBuffer?: Buffer }): Promise<File> {
     const allNodes = await this.getAllNodes();
     
-    // Find Primary Node and Secondary Node
+    // Find Primary Node and Secondary Node only
     const primaryNode = allNodes.find(node => node.name === "Primary Node");
     const secondaryNode = allNodes.find(node => node.name === "Secondary Node");
     
-    // Always use Primary Node as default storage
-    const defaultNodeId = primaryNode ? primaryNode.id : file.defaultNodeId;
+    if (!primaryNode || !secondaryNode) {
+      throw new Error("Primary or Secondary node not found");
+    }
+
+    // Generate encryption key for the file
+    const encryptionKey = crypto.randomBytes(32).toString('hex');
+    const checksum = crypto.createHash('sha256').update(file.fileBuffer || Buffer.from('')).digest('hex');
 
     const fileData = {
       ...file,
-      defaultNodeId,
+      defaultNodeId: primaryNode.id,
+      encryptionKey,
+      checksum,
+      erasureCoding: {
+        k: 4, // 4 data chunks
+        m: 2, // 2 parity chunks
+        algorithm: "Reed-Solomon"
+      }
     };
+
+    delete fileData.fileBuffer; // Remove buffer before database insert
 
     const [newFile] = await db.insert(files).values(fileData).returning();
 
-    // Always create file chunks for both Primary and Secondary nodes
-    if (primaryNode) {
-      await this.createFileChunksForNode(newFile.id, primaryNode.id);
-    }
-    if (secondaryNode) {
-      await this.createFileChunksForNode(newFile.id, secondaryNode.id);
-    }
-
-    // Also create a file entry for Secondary node to show file is stored there
-    if (secondaryNode && primaryNode && secondaryNode.id !== primaryNode.id) {
-      await db.insert(files).values({
-        ...fileData,
-        defaultNodeId: secondaryNode.id,
-      }).onConflictDoNothing();
+    // Process and store file chunks if fileBuffer is provided
+    if (file.fileBuffer) {
+      await this.processAndStoreFileChunks(newFile.id, file.fileBuffer, encryptionKey, primaryNode.id, secondaryNode.id);
     }
 
     return newFile;
   }
 
-  private async createFileChunksForNode(fileId: number, nodeId: number): Promise<void> {
-    // Create 4 chunks by default for file distribution
-    const chunkPromises = [];
-    for (let i = 0; i < 4; i++) {
-      chunkPromises.push(
-        this.createFileChunk({
+  // New method for processing and storing file chunks with real encryption and chunking
+  private async processAndStoreFileChunks(
+    fileId: number, 
+    fileBuffer: Buffer, 
+    encryptionKey: string, 
+    primaryNodeId: number, 
+    secondaryNodeId: number
+  ): Promise<void> {
+    try {
+      // Split file into chunks
+      const dataChunks = storageEngine.chunkFile(fileBuffer);
+      
+      // Create parity chunks for redundancy
+      const parityChunks = storageEngine.createParityChunks(dataChunks);
+      
+      // Store data chunks in both nodes with encryption
+      for (let i = 0; i < dataChunks.length; i++) {
+        const { encryptedData } = storageEngine.encryptData(dataChunks[i], encryptionKey);
+        
+        // Store in primary node
+        await storageEngine.storeChunk(primaryNodeId, fileId, i, encryptedData, 'data');
+        
+        // Store in secondary node for redundancy
+        await storageEngine.storeChunk(secondaryNodeId, fileId, i, encryptedData, 'data');
+        
+        // Create database record for chunk tracking
+        await this.createFileChunk({
           fileId,
-          nodeId,
+          nodeId: primaryNodeId,
           chunkIndex: i,
           chunkType: "data",
-          size: "256", // Size in MB
-          checksum: `chunk_${i}_${Date.now()}`, // Simple checksum for demo
-        })
-      );
+          size: encryptedData.length.toString(),
+          checksum: crypto.createHash('sha256').update(encryptedData).digest('hex'),
+        });
+        
+        await this.createFileChunk({
+          fileId,
+          nodeId: secondaryNodeId,
+          chunkIndex: i,
+          chunkType: "data",
+          size: encryptedData.length.toString(),
+          checksum: crypto.createHash('sha256').update(encryptedData).digest('hex'),
+        });
+      }
+      
+      // Store parity chunks for error recovery
+      for (let i = 0; i < parityChunks.length; i++) {
+        const { encryptedData } = storageEngine.encryptData(parityChunks[i], encryptionKey);
+        
+        await storageEngine.storeChunk(primaryNodeId, fileId, i, encryptedData, 'parity');
+        await storageEngine.storeChunk(secondaryNodeId, fileId, i, encryptedData, 'parity');
+        
+        await this.createFileChunk({
+          fileId,
+          nodeId: primaryNodeId,
+          chunkIndex: i,
+          chunkType: "parity",
+          size: encryptedData.length.toString(),
+          checksum: crypto.createHash('sha256').update(encryptedData).digest('hex'),
+        });
+        
+        await this.createFileChunk({
+          fileId,
+          nodeId: secondaryNodeId,
+          chunkIndex: i,
+          chunkType: "parity",
+          size: encryptedData.length.toString(),
+          checksum: crypto.createHash('sha256').update(encryptedData).digest('hex'),
+        });
+      }
+      
+    } catch (error) {
+      console.error('Error processing file chunks:', error);
+      throw error;
     }
-    await Promise.all(chunkPromises);
+  }
+
+  // Enhanced method to reconstruct and download file
+  async reconstructFile(fileId: number): Promise<Buffer | null> {
+    try {
+      const file = await this.getFile(fileId);
+      if (!file || !file.encryptionKey) {
+        return null;
+      }
+
+      const dataChunks = await this.getFileChunks(fileId);
+      const dataChunkCount = dataChunks.filter(chunk => chunk.chunkType === 'data').length / 2; // Divided by 2 because stored in both nodes
+      
+      const reconstructedBuffer = await storageEngine.reconstructFile(fileId, dataChunkCount);
+      
+      if (reconstructedBuffer && file.encryptionKey) {
+        // Decrypt the reconstructed file
+        const iv = Buffer.alloc(16); // For demo, using zero IV - in production use stored IV
+        return storageEngine.decryptData(reconstructedBuffer, file.encryptionKey, iv);
+      }
+      
+      return reconstructedBuffer;
+    } catch (error) {
+      console.error('Error reconstructing file:', error);
+      return null;
+    }
+  }
+
+  private async createFileChunksForNode(fileId: number, nodeId: number): Promise<void> {
+    // This method is kept for backward compatibility but actual chunking is done in processAndStoreFileChunks
+    console.log(`Legacy chunk creation for file ${fileId} on node ${nodeId}`);
   }
 
   async updateFile(id: number, updates: Partial<InsertFile>): Promise<File | undefined> {
@@ -276,8 +369,26 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteFile(id: number): Promise<boolean> {
-    const result = await db.delete(files).where(eq(files.id, id));
-    return (result.rowCount || 0) > 0;
+    try {
+      // Get file chunks to delete physical files
+      const chunks = await this.getFileChunks(id);
+      
+      // Delete physical chunks from storage
+      for (const chunk of chunks) {
+        await storageEngine.deleteChunk(chunk.nodeId, id, chunk.chunkIndex, chunk.chunkType as 'data' | 'parity');
+      }
+      
+      // Delete chunk records from database
+      await db.delete(fileChunks).where(eq(fileChunks.fileId, id));
+      
+      // Delete file record from database
+      const result = await db.delete(files).where(eq(files.id, id));
+      
+      return (result.rowCount || 0) > 0;
+    } catch (error) {
+      console.error("Error deleting file:", error);
+      return false;
+    }
   }
 
   // File chunk operations

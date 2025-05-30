@@ -277,13 +277,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         mimeType: req.file.mimetype,
         uploadedBy: req.user?.claims?.sub || 'admin-demo',
         status: "uploading",
-        erasureCoding: {
-          k: 6, // data chunks
-          m: 3, // parity chunks
-          algorithm: "Reed-Solomon"
-        },
-        encryptionKey: "AES-256-GCM", // In production, this would be properly generated
-        checksum: "placeholder-checksum", // In production, calculate actual checksum
+        fileBuffer: req.file.buffer // Pass the actual file buffer for processing
       });
 
       // Log activity

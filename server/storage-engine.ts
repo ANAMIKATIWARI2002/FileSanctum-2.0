@@ -89,12 +89,21 @@ export class LocalStorageEngine {
     chunkData: Buffer, 
     chunkType: 'data' | 'parity'
   ): Promise<string> {
-    const nodeName = nodeId === 5 ? 'primary-node' : 'secondary-node';
-    const chunkFileName = `${fileId}_${chunkType}_${chunkIndex}.chunk`;
-    const chunkPath = path.join(this.baseStoragePath, nodeName, chunkFileName);
-    
-    await fs.writeFile(chunkPath, chunkData);
-    return chunkPath;
+    try {
+      const nodeName = nodeId === 5 ? 'primary-node' : 'secondary-node';
+      const chunkFileName = `${fileId}_${chunkType}_${chunkIndex}.chunk`;
+      const chunkPath = path.join(this.baseStoragePath, nodeName, chunkFileName);
+      
+      // Ensure the directory exists
+      await fs.ensureDir(path.dirname(chunkPath));
+      
+      // Write the chunk data to file
+      await fs.outputFile(chunkPath, chunkData);
+      return chunkPath;
+    } catch (error) {
+      console.error('Error storing chunk:', error);
+      throw error;
+    }
   }
 
   // Retrieve chunk from storage

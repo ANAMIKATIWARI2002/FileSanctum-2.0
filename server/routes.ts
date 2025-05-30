@@ -301,7 +301,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       setTimeout(async () => {
         await storage.updateFileStatus(file.id, "stored");
         await storage.createActivityLog({
-          userId: 'demo-user',
+          userId: req.user?.claims?.sub || 'admin-demo',
           action: "file_upload_completed",
           resource: "file",
           resourceId: file.id.toString(),

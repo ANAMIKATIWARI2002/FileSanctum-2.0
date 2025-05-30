@@ -314,16 +314,19 @@ export default function NodeMonitoring() {
                             {recoverNodeMutation.isPending ? "Recovering..." : "Recover"}
                           </Button>
                         )}
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => deleteNodeMutation.mutate(node.id)}
-                          disabled={deleteNodeMutation.isPending}
-                          className="text-red-600 border-red-600 hover:bg-red-50"
-                        >
-                          <Trash2 className="w-3 h-3 mr-1" />
-                          {deleteNodeMutation.isPending ? "Deleting..." : "Delete"}
-                        </Button>
+                        {/* Only show delete button for non-default nodes */}
+                        {node.name !== 'Primary Node' && node.name !== 'Secondary Node' && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => deleteNodeMutation.mutate(node.id)}
+                            disabled={deleteNodeMutation.isPending}
+                            className="text-red-600 border-red-600 hover:bg-red-50"
+                          >
+                            <Trash2 className="w-3 h-3 mr-1" />
+                            {deleteNodeMutation.isPending ? "Deleting..." : "Delete"}
+                          </Button>
+                        )}
                       </div>
                     </td>
                   </tr>

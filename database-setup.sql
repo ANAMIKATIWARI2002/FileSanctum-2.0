@@ -1,147 +1,158 @@
--- FileSanctum Database Setup
--- Run this file in PostgreSQL to create all necessary tables
+-- FileSanctum Database Setup Script
+-- Run this after creating the 'filesanctum' database
 
 -- Create users table
 CREATE TABLE IF NOT EXISTS users (
-  id VARCHAR PRIMARY KEY,
-  email VARCHAR UNIQUE,
-  first_name VARCHAR,
-  last_name VARCHAR,
-  profile_image_url VARCHAR,
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
+  id TEXT PRIMARY KEY,
+  email TEXT UNIQUE,
+  first_name TEXT,
+  last_name TEXT,
+  profile_image_url TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Create sessions table (for authentication)
 CREATE TABLE IF NOT EXISTS sessions (
-  sid VARCHAR PRIMARY KEY,
-  sess JSONB NOT NULL,
-  expire TIMESTAMP NOT NULL
+  sid VARCHAR NOT NULL PRIMARY KEY,
+  sess JSON NOT NULL,
+  expire TIMESTAMP(6) NOT NULL
 );
-
-CREATE INDEX IF NOT EXISTS idx_session_expire ON sessions(expire);
 
 -- Create nodes table
 CREATE TABLE IF NOT EXISTS nodes (
   id SERIAL PRIMARY KEY,
-  name VARCHAR NOT NULL,
-  ip_address VARCHAR NOT NULL,
-  status VARCHAR NOT NULL DEFAULT 'active',
-  storage_capacity VARCHAR NOT NULL,
-  storage_used VARCHAR DEFAULT '0 GB',
-  cpu_usage VARCHAR DEFAULT '0%',
-  memory_usage VARCHAR DEFAULT '0%',
-  network_throughput VARCHAR DEFAULT '0 MB/s',
-  uptime VARCHAR DEFAULT '0%',
-  last_heartbeat TIMESTAMP DEFAULT NOW(),
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
+  name TEXT NOT NULL,
+  ip_address TEXT NOT NULL,
+  status TEXT DEFAULT 'active',
+  storage_capacity TEXT,
+  storage_used TEXT DEFAULT '0 GB',
+  cpu_usage TEXT DEFAULT '0%',
+  memory_usage TEXT DEFAULT '0%',
+  network_throughput TEXT DEFAULT '0 MB/s',
+  uptime TEXT DEFAULT '100%',
+  last_heartbeat TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  is_default BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Create files table
 CREATE TABLE IF NOT EXISTS files (
   id SERIAL PRIMARY KEY,
-  name VARCHAR NOT NULL,
-  original_name VARCHAR NOT NULL,
-  size VARCHAR NOT NULL,
-  mime_type VARCHAR NOT NULL,
-  status VARCHAR NOT NULL DEFAULT 'completed',
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
+  name TEXT NOT NULL,
+  original_name TEXT NOT NULL,
+  size TEXT NOT NULL,
+  mime_type TEXT,
+  status TEXT DEFAULT 'stored',
+  default_node_id INTEGER REFERENCES nodes(id),
+  encryption_key TEXT,
+  checksum TEXT,
+  erasure_coding JSONB,
+  uploaded_by TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Create file_chunks table
 CREATE TABLE IF NOT EXISTS file_chunks (
   id SERIAL PRIMARY KEY,
-  file_id INTEGER REFERENCES files(id) ON DELETE CASCADE,
+  file_id INTEGER NOT NULL REFERENCES files(id) ON DELETE CASCADE,
+  node_id INTEGER NOT NULL REFERENCES nodes(id),
   chunk_index INTEGER NOT NULL,
-  node_id INTEGER REFERENCES nodes(id),
-  checksum VARCHAR NOT NULL,
-  size VARCHAR NOT NULL,
-  created_at TIMESTAMP DEFAULT NOW()
+  chunk_hash TEXT,
+  size TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Create activity_logs table
 CREATE TABLE IF NOT EXISTS activity_logs (
   id SERIAL PRIMARY KEY,
-  user_id VARCHAR NOT NULL,
-  action VARCHAR NOT NULL,
-  resource VARCHAR NOT NULL,
-  resource_id VARCHAR NOT NULL,
+  user_id TEXT NOT NULL,
+  action TEXT NOT NULL,
+  resource TEXT NOT NULL,
+  resource_id TEXT NOT NULL,
   details JSONB,
-  ip_address VARCHAR,
-  user_agent VARCHAR,
-  created_at TIMESTAMP DEFAULT NOW()
+  ip_address TEXT,
+  user_agent TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Create invitations table
 CREATE TABLE IF NOT EXISTS invitations (
   id SERIAL PRIMARY KEY,
-  email VARCHAR NOT NULL,
-  role VARCHAR NOT NULL,
+  email TEXT NOT NULL,
+  role TEXT DEFAULT 'user',
   message TEXT,
-  status VARCHAR NOT NULL DEFAULT 'pending',
-  invited_by VARCHAR NOT NULL,
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
+  status TEXT DEFAULT 'pending',
+  invited_by TEXT NOT NULL,
+  token TEXT NOT NULL,
+  expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Create system_metrics table
 CREATE TABLE IF NOT EXISTS system_metrics (
   id SERIAL PRIMARY KEY,
-  metric_type VARCHAR NOT NULL,
-  value DECIMAL NOT NULL,
-  unit VARCHAR,
-  timestamp TIMESTAMP DEFAULT NOW(),
-  created_at TIMESTAMP DEFAULT NOW()
+  metric_type TEXT NOT NULL,
+  value REAL NOT NULL,
+  unit TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Create contact_messages table
 CREATE TABLE IF NOT EXISTS contact_messages (
   id SERIAL PRIMARY KEY,
-  name VARCHAR NOT NULL,
-  email VARCHAR NOT NULL,
+  name TEXT NOT NULL,
+  email TEXT NOT NULL,
   message TEXT NOT NULL,
-  created_at TIMESTAMP DEFAULT NOW()
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Insert default nodes
-INSERT INTO nodes (name, ip_address, status, storage_capacity, storage_used, cpu_usage, memory_usage, network_throughput, uptime, last_heartbeat)
+-- Insert demo users
+INSERT INTO users (id, email, first_name, last_name) 
 VALUES 
-  ('node1', '192.168.1.101', 'active', '1 TB', '750 GB', '45%', '62%', '250 MB/s', '99.8%', NOW()),
-  ('node2', '192.168.1.102', 'active', '1 TB', '680 GB', '38%', '55%', '180 MB/s', '99.9%', NOW()),
-  ('node3', '192.168.1.103', 'active', '1 TB', '820 GB', '52%', '68%', '320 MB/s', '99.7%', NOW()),
-  ('node4', '192.168.1.104', 'active', '2 TB', '1.2 TB', '35%', '48%', '290 MB/s', '99.9%', NOW()),
-  ('node5', '192.168.1.105', 'active', '2 TB', '1.5 TB', '48%', '72%', '210 MB/s', '99.6%', NOW()),
-  ('node6', '192.168.1.106', 'maintenance', '1 TB', '650 GB', '28%', '42%', '150 MB/s', '98.5%', NOW()),
-  ('node7', '192.168.1.107', 'active', '2 TB', '1.1 TB', '42%', '58%', '275 MB/s', '99.8%', NOW()),
-  ('node8', '192.168.1.108', 'active', '1 TB', '590 GB', '36%', '51%', '195 MB/s', '99.9%', NOW()),
-  ('node9', '192.168.1.109', 'active', '2 TB', '1.7 TB', '55%', '78%', '340 MB/s', '99.4%', NOW()),
-  ('node10', '192.168.1.110', 'active', '1 TB', '720 GB', '41%', '64%', '225 MB/s', '99.7%', NOW())
+  ('admin-demo', 'admin@example.com', 'Admin', 'Demo'),
+  ('user-demo', 'user@example.com', 'User', 'Demo')
+ON CONFLICT (id) DO NOTHING;
+
+-- Insert demo nodes
+INSERT INTO nodes (name, ip_address, status, storage_capacity, storage_used, cpu_usage, memory_usage, network_throughput, uptime, is_default) 
+VALUES 
+  ('Primary Node', '192.168.1.100', 'active', '2.0 GB', '0.8 GB', '25%', '45%', '150 MB/s', '99.9%', true),
+  ('Secondary Node', '192.168.1.101', 'active', '3.0 GB', '1.2 GB', '30%', '55%', '200 MB/s', '98.5%', false),
+  ('Backup Node', '192.168.1.102', 'maintenance', '1.5 GB', '0.3 GB', '15%', '30%', '100 MB/s', '95.2%', false)
 ON CONFLICT DO NOTHING;
 
--- Insert sample system metrics
-INSERT INTO system_metrics (metric_type, value, unit, timestamp)
+-- Insert demo files
+INSERT INTO files (name, original_name, size, mime_type, status, default_node_id, uploaded_by) 
 VALUES 
-  ('cpu_usage', 45.2, '%', NOW() - INTERVAL '1 hour'),
-  ('memory_usage', 68.5, '%', NOW() - INTERVAL '1 hour'),
-  ('storage_usage', 75.8, '%', NOW() - INTERVAL '1 hour'),
-  ('network_throughput', 245.3, 'MB/s', NOW() - INTERVAL '1 hour'),
-  ('cpu_usage', 42.1, '%', NOW() - INTERVAL '30 minutes'),
-  ('memory_usage', 65.2, '%', NOW() - INTERVAL '30 minutes'),
-  ('storage_usage', 76.1, '%', NOW() - INTERVAL '30 minutes'),
-  ('network_throughput', 268.7, 'MB/s', NOW() - INTERVAL '30 minutes'),
-  ('cpu_usage', 48.7, '%', NOW()),
-  ('memory_usage', 71.3, '%', NOW()),
-  ('storage_usage', 76.4, '%', NOW()),
-  ('network_throughput', 289.5, 'MB/s', NOW())
+  ('sample-document.pdf', 'sample-document.pdf', '2048576', 'application/pdf', 'stored', 1, 'admin-demo'),
+  ('project-presentation.pptx', 'project-presentation.pptx', '5242880', 'application/vnd.openxmlformats-officedocument.presentationml.presentation', 'stored', 2, 'user-demo')
 ON CONFLICT DO NOTHING;
 
--- Insert demo users (optional - these will also be handled by the login system)
-INSERT INTO users (id, email, first_name, last_name, profile_image_url)
+-- Insert demo activity logs
+INSERT INTO activity_logs (user_id, action, resource, resource_id, details, ip_address, user_agent) 
 VALUES 
-  ('admin-demo', 'admin@example.com', 'Admin', 'User', NULL),
-  ('user-demo', 'user@example.com', 'Demo', 'User', NULL)
-ON CONFLICT (email) DO NOTHING;
+  ('admin-demo', 'file_upload_completed', 'file', '1', '{"fileName":"sample-document.pdf","fileSize":"2048576"}', '127.0.0.1', 'Demo Browser'),
+  ('user-demo', 'node_created', 'node', '3', '{"nodeName":"Backup Node","ipAddress":"192.168.1.102"}', '127.0.0.1', 'Demo Browser')
+ON CONFLICT DO NOTHING;
 
-COMMIT;
+-- Insert demo system metrics
+INSERT INTO system_metrics (metric_type, value, unit) 
+VALUES 
+  ('storage', 85.5, 'percent'),
+  ('cpu', 45.2, 'percent'),
+  ('memory', 67.8, 'percent')
+ON CONFLICT DO NOTHING;
+
+-- Create indexes for better performance
+CREATE INDEX IF NOT EXISTS idx_sessions_expire ON sessions (expire);
+CREATE INDEX IF NOT EXISTS idx_activity_logs_created_at ON activity_logs (created_at);
+CREATE INDEX IF NOT EXISTS idx_files_uploaded_by ON files (uploaded_by);
+CREATE INDEX IF NOT EXISTS idx_file_chunks_file_id ON file_chunks (file_id);
+CREATE INDEX IF NOT EXISTS idx_nodes_status ON nodes (status);
+
+-- Display setup completion message
+SELECT 'FileSanctum database setup completed successfully!' AS message;

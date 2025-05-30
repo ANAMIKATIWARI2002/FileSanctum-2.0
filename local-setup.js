@@ -28,24 +28,72 @@ if (!fs.existsSync(nodeModulesPath)) {
   }
 }
 
-// Setup database synchronously - this is the fix
+// Setup database using drizzle schema
 console.log('Setting up database...');
 try {
-  execSync('node setup-database.mjs', { stdio: 'inherit', cwd: __dirname });
-  console.log('Database setup completed.');
+  execSync('npm run db:push', { stdio: 'inherit', cwd: __dirname });
+  
+  // Add demo data
+  const { Pool } = require('pg');
+  require('dotenv').config();
+  
+  const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: false });
+  
+  async function addDemoData() {
+    try {
+      await pool.query(`
+        INSERT INTO users (id, email, first_name, last_name) 
+        VALUES ('admin-demo', 'admin@example.com', 'Admin', 'Demo'), ('user-demo', 'user@example.com', 'User', 'Demo') 
+        ON CONFLICT (id) DO NOTHING;
+      `);
+      
+      await pool.query(`
+        INSERT INTO nodes (name, ip_address, port, status, storage_capacity, storage_used, cpu_usage, memory_usage, network_throughput, uptime, is_default) 
+        VALUES ('Primary Node', '192.168.1.100', 8080, 'healthy', 2048, 819, 25, 45, 150, 99.9, true),
+               ('Secondary Node', '192.168.1.101', 8080, 'healthy', 3072, 1229, 30, 55, 200, 98.5, false),
+               ('Backup Node', '192.168.1.102', 8080, 'degraded', 1536, 307, 15, 30, 100, 95.2, false) 
+        ON CONFLICT (name) DO NOTHING;
+      `);
+      
+      await pool.query(`
+        INSERT INTO files (name, original_name, size, mime_type, status, default_node_id, uploaded_by) 
+        VALUES ('sample-document.pdf', 'sample-document.pdf', 2048576, 'application/pdf', 'stored', 1, 'admin-demo'),
+               ('project-presentation.pptx', 'project-presentation.pptx', 5242880, 'application/vnd.openxmlformats-officedocument.presentationml.presentation', 'stored', 2, 'user-demo') 
+        ON CONFLICT DO NOTHING;
+      `);
+      
+      await pool.query(`
+        INSERT INTO activity_logs (user_id, action, resource, resource_id, details, ip_address, user_agent) 
+        VALUES ('admin-demo', 'file_upload_completed', 'file', '1', '{"fileName":"sample-document.pdf","fileSize":"2048576"}', '127.0.0.1', 'Demo Browser'),
+               ('user-demo', 'node_created', 'node', '3', '{"nodeName":"Backup Node","ipAddress":"192.168.1.102"}', '127.0.0.1', 'Demo Browser') 
+        ON CONFLICT DO NOTHING;
+      `);
+      
+      await pool.end();
+    } catch (error) {
+      await pool.end();
+    }
+  }
+  
+  addDemoData().then(() => {
+    console.log('Database setup completed.');
+    startServer();
+  });
+  
 } catch (error) {
   console.log('Database setup failed. Check your PostgreSQL connection and credentials.');
   process.exit(1);
 }
 
-// Start server only after database is confirmed ready
-console.log('Starting server...');
-const server = spawn('node', ['start-windows.js'], { 
-  stdio: 'inherit', 
-  shell: true,
-  cwd: __dirname
-});
-
-server.on('close', (code) => {
-  console.log('Server stopped.');
-});
+function startServer() {
+  console.log('Starting server...');
+  const server = spawn('node', ['start-windows.js'], { 
+    stdio: 'inherit', 
+    shell: true,
+    cwd: __dirname
+  });
+  
+  server.on('close', (code) => {
+    console.log('Server stopped.');
+  });
+}

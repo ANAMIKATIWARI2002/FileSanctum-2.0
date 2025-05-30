@@ -30,14 +30,13 @@ if (!fs.existsSync(nodeModulesPath)) {
 
 function startServer() {
   console.log('Starting server...');
-  const server = spawn('npm', ['run', 'dev'], { 
+  const server = spawn('node', ['start-windows.js'], { 
     stdio: 'inherit', 
     shell: true,
-    env: { ...process.env, NODE_ENV: 'development' }
+    cwd: __dirname
   });
   
-  setTimeout(() => {
-    console.log('Server running successfully.');
-    console.log('URL: http://localhost:5000');
-  }, 3000);
+  server.on('close', (code) => {
+    console.log('Server stopped.');
+  });
 }

@@ -253,6 +253,7 @@ function RealTimeNodeVisualization() {
   const [selectedNodeId, setSelectedNodeId] = useState<number | null>(null);
   const [showNodeFiles, setShowNodeFiles] = useState(false);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const { data: nodes = [], isLoading } = useQuery<Node[]>({
     queryKey: ["/api/nodes"],

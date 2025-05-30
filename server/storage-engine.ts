@@ -18,31 +18,28 @@ export class LocalStorageEngine {
     await fs.ensureDir(path.join(this.baseStoragePath, 'secondary-node'));
   }
 
-  // Encrypt data using AES-256-GCM
+  // Encrypt data using AES-256-CBC
   encryptData(data: Buffer, key?: string): { encryptedData: Buffer, encryptionKey: string, iv: Buffer } {
     const encryptionKey = key || crypto.randomBytes(32).toString('hex');
     const iv = crypto.randomBytes(16);
-    const cipher = crypto.createCipher('aes-256-gcm', encryptionKey);
+    const keyBuffer = Buffer.from(encryptionKey, 'hex').slice(0, 32);
+    const cipher = crypto.createCipheriv('aes-256-cbc', keyBuffer, iv);
     
     const encrypted = Buffer.concat([cipher.update(data), cipher.final()]);
-    const authTag = cipher.getAuthTag();
     
     return {
-      encryptedData: Buffer.concat([encrypted, authTag]),
+      encryptedData: encrypted,
       encryptionKey,
       iv
     };
   }
 
-  // Decrypt data using AES-256-GCM
+  // Decrypt data using AES-256-CBC
   decryptData(encryptedData: Buffer, encryptionKey: string, iv: Buffer): Buffer {
-    const authTag = encryptedData.slice(-16);
-    const encrypted = encryptedData.slice(0, -16);
+    const keyBuffer = Buffer.from(encryptionKey, 'hex').slice(0, 32);
+    const decipher = crypto.createDecipheriv('aes-256-cbc', keyBuffer, iv);
     
-    const decipher = crypto.createDecipher('aes-256-gcm', encryptionKey);
-    decipher.setAuthTag(authTag);
-    
-    return Buffer.concat([decipher.update(encrypted), decipher.final()]);
+    return Buffer.concat([decipher.update(encryptedData), decipher.final()]);
   }
 
   // Split file into chunks for distributed storage

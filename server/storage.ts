@@ -147,9 +147,20 @@ export class DatabaseStorage implements IStorage {
 
   async deleteNode(id: number): Promise<boolean> {
     try {
-      const result = await db.delete(nodes).where(eq(nodes.id, id));
-      console.log(`Delete node ${id} result:`, result);
-      // Force return true since the operation completed without error
+      // First, move any files from this node to the default node
+      const defaultNode = await this.getDefaultNode();
+      if (defaultNode && defaultNode.id !== id) {
+        await db
+          .update(files)
+          .set({ defaultNodeId: defaultNode.id })
+          .where(eq(files.defaultNodeId, id));
+      }
+      
+      // Delete any file chunks for this node
+      await db.delete(fileChunks).where(eq(fileChunks.nodeId, id));
+      
+      // Now delete the node
+      await db.delete(nodes).where(eq(nodes.id, id));
       return true;
     } catch (error) {
       console.error(`Error deleting node ${id}:`, error);
@@ -207,9 +218,16 @@ export class DatabaseStorage implements IStorage {
 
     const [newFile] = await db.insert(files).values(fileData).returning();
 
-    // Create file chunks automatically for the default node
-    if (defaultNodeId) {
-      await this.createFileChunksForNode(newFile.id, defaultNodeId);
+    // Create file chunks for both primary and secondary nodes
+    const allNodes = await this.getAllNodes();
+    const primaryNode = allNodes.find(node => node.isDefault);
+    const secondaryNode = allNodes.find(node => !node.isDefault && node.status === 'healthy');
+    
+    if (primaryNode) {
+      await this.createFileChunksForNode(newFile.id, primaryNode.id);
+    }
+    if (secondaryNode) {
+      await this.createFileChunksForNode(newFile.id, secondaryNode.id);
     }
 
     return newFile;

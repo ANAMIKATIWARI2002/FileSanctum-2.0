@@ -116,14 +116,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/nodes", async (req: any, res) => {
+  app.post("/api/nodes", isAuthenticated, async (req: any, res) => {
     try {
       const nodeData = insertNodeSchema.parse(req.body);
       const node = await storage.createNode(nodeData);
       
       // Log activity
       await storage.createActivityLog({
-        userId: 'demo-user',
+        userId: req.user?.claims?.sub || 'admin-demo',
         action: "node_added",
         resource: "node",
         resourceId: node.id.toString(),
@@ -268,7 +268,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         originalName: req.file.originalname,
         size: req.file.size.toString(),
         mimeType: req.file.mimetype,
-        uploadedBy: 'demo-user',
+        uploadedBy: req.user?.claims?.sub || 'admin-demo',
         status: "uploading",
         erasureCoding: {
           k: 6, // data chunks

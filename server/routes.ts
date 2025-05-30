@@ -251,13 +251,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "File not found" });
       }
 
-      // In a real implementation, you would fetch the file from storage
-      // For now, we'll create a simple text file as demonstration
-      const content = `This is a demo file: ${file.originalName}\nFile ID: ${file.id}\nSize: ${file.size} bytes`;
+      // Reconstruct file from distributed chunks
+      const reconstructedBuffer = await storage.reconstructFile(fileId);
+      
+      if (!reconstructedBuffer) {
+        return res.status(500).json({ message: "Failed to reconstruct file" });
+      }
       
       res.setHeader('Content-Disposition', `attachment; filename="${file.originalName}"`);
       res.setHeader('Content-Type', file.mimeType || 'application/octet-stream');
-      res.send(content);
+      res.send(reconstructedBuffer);
     } catch (error) {
       console.error("Error downloading file:", error);
       res.status(500).json({ message: "Failed to download file" });

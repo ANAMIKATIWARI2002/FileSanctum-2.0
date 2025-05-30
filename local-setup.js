@@ -50,8 +50,7 @@ try {
       await pool.query(`
         INSERT INTO nodes (name, ip_address, port, status, storage_capacity, storage_used, cpu_usage, memory_usage, network_throughput, uptime, is_default) 
         VALUES ('Primary Node', '192.168.1.100', 8080, 'healthy', 2048, 819, 25, 45, 150, 99.9, true),
-               ('Secondary Node', '192.168.1.101', 8080, 'healthy', 3072, 1229, 30, 55, 200, 98.5, false),
-               ('Backup Node', '192.168.1.102', 8080, 'degraded', 1536, 307, 15, 30, 100, 95.2, false) 
+               ('Secondary Node', '192.168.1.101', 8080, 'healthy', 3072, 1229, 30, 55, 200, 98.5, false) 
         ON CONFLICT (name) DO NOTHING;
       `);
       
@@ -65,7 +64,7 @@ try {
       await pool.query(`
         INSERT INTO activity_logs (user_id, action, resource, resource_id, details, ip_address, user_agent) 
         VALUES ('admin-demo', 'file_upload_completed', 'file', '1', '{"fileName":"sample-document.pdf","fileSize":"2048576"}', '127.0.0.1', 'Demo Browser'),
-               ('user-demo', 'node_created', 'node', '3', '{"nodeName":"Backup Node","ipAddress":"192.168.1.102"}', '127.0.0.1', 'Demo Browser') 
+               ('admin-demo', 'system_initialized', 'system', '1', '{"message":"Primary and Secondary nodes initialized"}', '127.0.0.1', 'Demo Browser') 
         ON CONFLICT DO NOTHING;
       `);
       

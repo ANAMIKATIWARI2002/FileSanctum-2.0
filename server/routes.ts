@@ -201,12 +201,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Node not found" });
       }
 
+      // Prevent deletion of default nodes (primary and secondary)
+      if (node.isDefault || node.name === 'Primary Node' || node.name === 'Secondary Node') {
+        return res.status(400).json({ 
+          message: "Cannot delete default nodes (Primary Node and Secondary Node are protected)" 
+        });
+      }
+
       const deleted = await storage.deleteNode(nodeId);
       
       if (deleted) {
         // Log activity
         await storage.createActivityLog({
-          userId: 'demo-user',
+          userId: req.user?.claims?.sub || 'admin-demo',
           action: "node_deleted",
           resource: "node",
           resourceId: nodeId.toString(),
@@ -257,7 +264,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/files/upload", upload.single('file'), async (req: any, res) => {
+  app.post("/api/files/upload", isAuthenticated, upload.single('file'), async (req: any, res) => {
     try {
       if (!req.file) {
         return res.status(400).json({ message: "No file provided" });
@@ -281,7 +288,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Log activity
       await storage.createActivityLog({
-        userId: 'demo-user',
+        userId: req.user?.claims?.sub || 'admin-demo',
         action: "file_upload_started",
         resource: "file",
         resourceId: file.id.toString(),

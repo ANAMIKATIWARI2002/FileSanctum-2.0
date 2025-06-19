@@ -69,7 +69,7 @@ function continueSetup() {
       console.log('Starting FileSanctum server...\n');
       
       // Step 5: Start server
-      const server = spawn('node', ['start-windows.js'], { 
+      const server = spawn('node', ['start-windows.cjs'], { 
         stdio: 'inherit', 
         shell: true,
         cwd: __dirname
@@ -88,7 +88,7 @@ function continueSetup() {
       console.error('Failed to add demo data:', error.message);
       console.log('You can still start the server, but you may need to add data manually.');
       
-      const server = spawn('node', ['start-windows.js'], { 
+      const server = spawn('node', ['start-windows.cjs'], { 
         stdio: 'inherit', 
         shell: true,
         cwd: __dirname
